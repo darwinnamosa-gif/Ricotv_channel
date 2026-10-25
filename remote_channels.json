@@ -1,6 +1,13 @@
 {
-  "version": 1,
-  "overrides": {},
+  "added": [],
+  "overrides": {
+    "10517": {
+      "urls": [
+        "https://a16.kora-plus.li/live/b1.m3u8?token=fBT4f7OZ2ARVrb3ECOOnEC9dwTY&exp=1792945699",
+        "https://a15.kora-plus.li/live/main.m3u8?token=RB6x6ad7D_e8WtHdxiLtwUjUFWw&exp=1792946109"
+      ]
+    }
+  },
   "removed": [],
-  "added": []
+  "version": 2
 }
