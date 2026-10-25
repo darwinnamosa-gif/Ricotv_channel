@@ -1,13 +1,45 @@
 {
-  "added": [],
+  "version": 3,
   "overrides": {
     "10517": {
       "urls": [
-        "https://a16.kora-plus.li/live/b1.m3u8?token=fBT4f7OZ2ARVrb3ECOOnEC9dwTY&exp=1792945699",
-        "https://a15.kora-plus.li/live/main.m3u8?token=RB6x6ad7D_e8WtHdxiLtwUjUFWw&exp=1792946109"
+        "https://a12.kora-plus.li/live/b1.m3u8?token=f5JzrEZttK5F-OzycyG-LRxvf_Y&exp=1792950090",
+        "https://a15.kora-plus.li/live/main.m3u8?token=wb3KsUN-mtyixvZjaIvrtVcp02k&exp=1792950146"
+      ]
+    },
+    "10516": {
+      "urls": [
+        "https://a15.kora-plus.li/live/b2.m3u8?token=hFvKnBFf-X89GFi0dBiNEdMDrlY&exp=1792950663"
+      ]
+    },
+    "10513": {
+      "urls": [
+        "https://a16.kora-plus.li/live/b4.m3u8?token=Cj_RqCOrjpMU5vqYqXRPJShKcZg&exp=1792950489"
+      ]
+    },
+    "10511": {
+      "urls": [
+        "https://a15.kora-plus.li/live/b6.m3u8?token=P-kqM6mk8fyWZCR2-5VCbu61nvk&exp=1792950272"
+      ]
+    },
+    "56853": {
+      "urls": [
+        "https://a11.kora-plus.li/live/action.m3u8?token=5ESFe6fQgnEFDZIgM3-WyJ_VDy8&exp=1792950831",
+        "https://a12.kora-plus.li/live/daznde2.m3u8?token=XoYjz4PIYmvBN6tHH3TCzi1xysY&exp=1792950892"
+      ]
+    },
+    "248856": {
+      "urls": [
+        "https://a13.kora-plus.li/live/ad1.m3u8?token=VpkBd5ZnuZHoH8RjtZP9nJa_UfM&exp=1792950999",
+        "https://a14.kora-plus.li/live/calcio.m3u8?token=Ei0RGial9HppLYDi6lHP6chx9a0&exp=1792951146"
+      ]
+    },
+    "28568": {
+      "urls": [
+        "https://cdn.live.easybroadcast.io/abr_corp/73_arryadia_k2tgcj0/corp/73_arryadia_k2tgcj0_480p/chunks_dvr.m3u8?token=Me2qxLbbxUCTwplRepFOskujZkuYPWMJ55KETa0emPA&expires=1792951365&token_path=%2Fabr_corp%2F73_arryadia_k2tgcj0"
       ]
     }
   },
   "removed": [],
-  "version": 2
+  "added": []
 }
