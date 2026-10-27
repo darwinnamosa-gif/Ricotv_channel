@@ -13,11 +13,12 @@
     }
   },
   "removed": [],
-  "version": 14,
+  "version": 15,
   "appUpdate": {
-    "versionCode": 47,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code47.apk",
-    "message": "A new version of RicoTV is available with an in-app links refresh button.",
-    "force": false
+    "versionCode": 48,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code48.apk",
+    "message": "A new version of RicoTV is available with a fixed updater.",
+    "force": false,
+    "apkSize": 14012909
   }
 }
