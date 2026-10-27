@@ -2,10 +2,10 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 9,
+  "version": 10,
   "appUpdate": {
-    "versionCode": 44,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code44.apk",
+    "versionCode": 45,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code45.apk",
     "message": "A new version of RicoTV is available. Tap Download to install it.",
     "force": false
   }
