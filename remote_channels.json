@@ -1,8 +1,23 @@
 {
   "added": [],
-  "overrides": {},
+  "overrides": {
+    "10517": {
+      "urls": [
+        "https://a11.kora-plus.li/live/b1.m3u8?token=JMyd0u1tW_zj5Hgwc2Ci2rRWVqM&exp=1793127134",
+        "https://a11.kora-plus.li/live/b1.m3u8?token=8UKQRs0oebgHKIfaC7oQIxmncI&exp=1793128888",
+        "https://a14.kora-plus.li/live/canal11.m3u8?token=6NcUeNDrbo1oK0RVuToFMYoSVTQ&exp=1793128972"
+      ]
+    },
+    "248856": {
+      "urls": [
+        "https://a16.kora-plus.li/live/alwan3.m3u8?token=8Ewhxq7-gDvPZb_3ZekvKrThGDs&exp=1793129015",
+        "https://a13.kora-plus.li/live/ad1.m3u8?token=Nk8SmyCwqIOsx81PtqMrP3rGOvo&exp=1793129072",
+        "https://a14.kora-plus.li/live/dazn1t.m3u8?token=I_8mH6r6RF5D5rfj0AjcWEKVAFs&exp=1793129097"
+      ]
+    }
+  },
   "removed": [],
-  "version": 10,
+  "version": 11,
   "appUpdate": {
     "versionCode": 45,
     "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code45.apk",
