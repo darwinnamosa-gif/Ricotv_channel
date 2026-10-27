@@ -10,10 +10,16 @@
       "urls": [
         "https://a11.kora-plus.li/live/alwan3.m3u8?token=0lBbblAbw43CxBhkxNd9JDqu-Uc&exp=1793132842"
       ]
+    },
+    "10516": {
+      "urls": [
+        "https://a13.kora-plus.li/live/b2.m3u8?token=BXi75ddG6xU1HlU6V1_wFSMyK70&exp=1793133760",
+        "https://a16.kora-plus.li/live/main.m3u8?token=SkZ784L3HLpxneCOKTuLi9xMALc&exp=1793133813"
+      ]
     }
   },
   "removed": [],
-  "version": 15,
+  "version": 16,
   "appUpdate": {
     "versionCode": 48,
     "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code48.apk",
