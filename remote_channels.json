@@ -5,14 +5,19 @@
       "urls": [
         "https://a11.kora-plus.li/live/alwan3.m3u8?token=0lBbblAbw43CxBhkxNd9JDqu-Uc&exp=1793132842"
       ]
+    },
+    "248852": {
+      "urls": [
+        "https://a11.kora-plus.li/live/alwan3.m3u8?token=0lBbblAbw43CxBhkxNd9JDqu-Uc&exp=1793132842"
+      ]
     }
   },
   "removed": [],
-  "version": 13,
+  "version": 14,
   "appUpdate": {
-    "versionCode": 46,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code46.apk",
-    "message": "A new version of RicoTV is available. Tap Download to install it.",
+    "versionCode": 47,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code47.apk",
+    "message": "A new version of RicoTV is available with an in-app links refresh button.",
     "force": false
   }
 }
