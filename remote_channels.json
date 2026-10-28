@@ -2,12 +2,54 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 21,
+  "version": 22,
   "appUpdate": {
     "versionCode": 52,
     "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code52.apk",
     "message": "A new version of RicoTV is available with an remote panel lines support (code 52).",
     "force": false,
     "apkSize": 14012909
-  }
+  },
+  "lines": [
+    {
+      "u": "kE2pYwT5",
+      "p": "hyGDkB7"
+    },
+    {
+      "u": "gmHhC5gg",
+      "p": "pg3Wbfy"
+    },
+    {
+      "u": "kAT5ZSwg",
+      "p": "gCFXCrZ"
+    },
+    {
+      "u": "fNPS8grq",
+      "p": "mc9ZyzD"
+    },
+    {
+      "u": "qN6dzubd",
+      "p": "bGAHCKj"
+    },
+    {
+      "u": "ha1m8YuB",
+      "p": "eqanuQw"
+    },
+    {
+      "u": "wD4PyN4h",
+      "p": "q5FC2en"
+    },
+    {
+      "u": "fKHfjnMT",
+      "p": "njGgeF3"
+    },
+    {
+      "u": "bHDJfwS7",
+      "p": "d5Fh5mq"
+    },
+    {
+      "u": "rAbEjecB",
+      "p": "fPGya9B"
+    }
+  ]
 }
