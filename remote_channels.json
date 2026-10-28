@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 29,
+  "version": 30,
   "appUpdate": {
-    "versionCode": 57,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code57.apk",
-    "apkSize": 14029515,
-    "force": true,
-    "message": "Arryadia 4K removed + quality reset on update + ladder-first"
+    "versionCode": 58,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code58.apk",
+    "apkSize": 13750987,
+    "force": false,
+    "message": "Rvotv rebrand: new name, logo and icon"
   },
   "lines": [
     {
