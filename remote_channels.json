@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 31,
+  "version": 32,
   "appUpdate": {
-    "versionCode": 58,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code58.apk",
+    "versionCode": 59,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code59.apk",
     "apkSize": 13750987,
     "force": true,
-    "message": "Rvotv rebrand: new name, logo and icon"
+    "message": "League Cup fix: Liverpool-Chelsea now shows"
   },
   "lines": [
     {
