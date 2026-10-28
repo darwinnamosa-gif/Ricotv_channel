@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 22,
+  "version": 23,
   "appUpdate": {
-    "versionCode": 52,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code52.apk",
-    "message": "A new version of RicoTV is available with an remote panel lines support (code 52).",
+    "versionCode": 53,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code53.apk",
+    "apkSize": 14017079,
     "force": false,
-    "apkSize": 14012909
+    "message": "Saudi Pro League matches now open on THAMANYA 1"
   },
   "lines": [
     {
