@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 26,
+  "version": 27,
   "appUpdate": {
-    "versionCode": 55,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code55.apk",
+    "versionCode": 56,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code56.apk",
     "apkSize": 14029515,
     "force": false,
-    "message": "THAMANYA 1/2 split for simultaneous Saudi matches + Arryadia 4 links"
+    "message": "Arryadia public removed + player up-ladder"
   },
   "lines": [
     {
