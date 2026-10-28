@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 37,
+  "version": 38,
   "appUpdate": {
-    "versionCode": 63,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code63.apk",
+    "versionCode": 64,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code64.apk",
     "apkSize": 13755083,
     "force": true,
-    "message": "STARZPLAY rows show platform label, chooser on every tap"
+    "message": "Pre-switch: server lines update before expiry, no restart needed"
   },
   "lines": [
     {
@@ -51,5 +51,6 @@
       "u": "wjrTgxCZ",
       "p": "p8A6m7t"
     }
-  ]
+  ],
+  "linesExp": 1793266200000
 }
