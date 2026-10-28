@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 24,
+  "version": 25,
   "appUpdate": {
-    "versionCode": 53,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code53.apk",
+    "versionCode": 54,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code54.apk",
     "apkSize": 14017079,
     "force": false,
-    "message": "Saudi Pro League matches now open on THAMANYA 1"
+    "message": "beIN auto-fallback in player + top-bar icons removed"
   },
   "lines": [
     {
