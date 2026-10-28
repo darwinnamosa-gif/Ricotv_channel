@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 33,
+  "version": 34,
   "appUpdate": {
-    "versionCode": 60,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code60.apk",
+    "versionCode": 61,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code61.apk",
     "apkSize": 13750987,
     "force": true,
-    "message": "Player fix: no more audio-only frozen frame on quality switch"
+    "message": "STARZPLAY matches now offer a 3-channel chooser"
   },
   "lines": [
     {
