@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 28,
+  "version": 29,
   "appUpdate": {
-    "versionCode": 56,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code56.apk",
+    "versionCode": 57,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code57.apk",
     "apkSize": 14029515,
     "force": true,
-    "message": "Arryadia public removed + player up-ladder"
+    "message": "Arryadia 4K removed + quality reset on update + ladder-first"
   },
   "lines": [
     {
