@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 32,
+  "version": 33,
   "appUpdate": {
-    "versionCode": 59,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code59.apk",
+    "versionCode": 60,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code60.apk",
     "apkSize": 13750987,
     "force": true,
-    "message": "League Cup fix: Liverpool-Chelsea now shows"
+    "message": "Player fix: no more audio-only frozen frame on quality switch"
   },
   "lines": [
     {
