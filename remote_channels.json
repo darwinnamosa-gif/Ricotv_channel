@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 35,
+  "version": 36,
   "appUpdate": {
-    "versionCode": 62,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code62.apk",
-    "apkSize": 13750987,
+    "versionCode": 63,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code63.apk",
+    "apkSize": 13755083,
     "force": true,
-    "message": "Premium 1 and 2 names now match reality"
+    "message": "STARZPLAY rows show platform label, chooser on every tap"
   },
   "lines": [
     {
