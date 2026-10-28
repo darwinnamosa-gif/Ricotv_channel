@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 38,
+  "version": 39,
   "appUpdate": {
-    "versionCode": 64,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code64.apk",
+    "versionCode": 65,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code65.apk",
     "apkSize": 13755083,
     "force": true,
-    "message": "Pre-switch: server lines update before expiry, no restart needed"
+    "message": "Home hero shows Rvotv (rebrand fix)"
   },
   "lines": [
     {
