@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 25,
+  "version": 26,
   "appUpdate": {
-    "versionCode": 54,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code54.apk",
-    "apkSize": 14017079,
+    "versionCode": 55,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code55.apk",
+    "apkSize": 14029515,
     "force": false,
-    "message": "beIN auto-fallback in player + top-bar icons removed"
+    "message": "THAMANYA 1/2 split for simultaneous Saudi matches + Arryadia 4 links"
   },
   "lines": [
     {
