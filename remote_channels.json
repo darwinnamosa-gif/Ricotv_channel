@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 39,
+  "version": 40,
   "appUpdate": {
-    "versionCode": 65,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code65.apk",
+    "versionCode": 66,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code66.apk",
     "apkSize": 13755083,
     "force": true,
-    "message": "Home hero shows Rvotv (rebrand fix)"
+    "message": "BROWSE CHANNELS now opens all categories"
   },
   "lines": [
     {
