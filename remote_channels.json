@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 34,
+  "version": 35,
   "appUpdate": {
-    "versionCode": 61,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code61.apk",
+    "versionCode": 62,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code62.apk",
     "apkSize": 13750987,
     "force": true,
-    "message": "STARZPLAY matches now offer a 3-channel chooser"
+    "message": "Premium 1 and 2 names now match reality"
   },
   "lines": [
     {
