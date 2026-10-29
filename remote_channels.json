@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 43,
+  "version": 44,
   "appUpdate": {
-    "versionCode": 68,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code68.apk",
-    "apkSize": 13767517,
+    "versionCode": 69,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code69.apk",
+    "apkSize": 13779805,
     "force": true,
-    "message": "AD SPORT 1/2 (all versions) added to STARZPLAY category"
+    "message": "AD SPORT real logo tiles"
   },
   "lines": [
     {
