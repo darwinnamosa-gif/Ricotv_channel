@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 46,
+  "version": 47,
   "appUpdate": {
-    "versionCode": 69,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code69.apk",
-    "apkSize": 13779805,
+    "versionCode": 75,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code75.apk",
+    "apkSize": 14173097,
     "force": true,
-    "message": "AD SPORT real logo tiles"
+    "message": "Faster taps, lighter ads"
   },
   "lines": [
     {
