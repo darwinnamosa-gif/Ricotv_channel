@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 50,
+  "version": 51,
   "appUpdate": {
-    "versionCode": 75,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code75.apk",
-    "apkSize": 14173097,
+    "versionCode": 77,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code77.apk",
+    "apkSize": 17005191,
     "force": true,
-    "message": "Faster taps, lighter ads"
+    "message": "Improved ads (AdMob + Start.io)"
   },
   "lines": [
     {
