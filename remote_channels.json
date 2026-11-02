@@ -2,7 +2,7 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 57,
+  "version": 58,
   "appUpdate": {
     "versionCode": 77,
     "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code77.apk",
@@ -50,6 +50,46 @@
     {
       "u": "j6qP1K1H",
       "p": "tA7HjUm"
+    },
+    {
+      "u": "tJnSZdHZ",
+      "p": "qQg2nSx"
+    },
+    {
+      "u": "a4wKw1EZ",
+      "p": "cWTeEg9"
+    },
+    {
+      "u": "mcbXEuHP",
+      "p": "dbpsCsS"
+    },
+    {
+      "u": "cnKUB324",
+      "p": "h1aJN7g"
+    },
+    {
+      "u": "dWRHKdbT",
+      "p": "csmenqx"
+    },
+    {
+      "u": "hs5gBBxf",
+      "p": "dJrZhKw"
+    },
+    {
+      "u": "zgd3fs86",
+      "p": "jHMP18Z"
+    },
+    {
+      "u": "xa1cwgRb",
+      "p": "ngEhWuP"
+    },
+    {
+      "u": "vCdtC5Uj",
+      "p": "sAjpDDz"
+    },
+    {
+      "u": "vcTPh9Kx",
+      "p": "bJDfcAK"
     }
   ],
   "linesExp": 1793700180000
