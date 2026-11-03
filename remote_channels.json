@@ -2,7 +2,7 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 58,
+  "version": 59,
   "appUpdate": {
     "versionCode": 77,
     "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code77.apk",
@@ -12,85 +12,45 @@
   },
   "lines": [
     {
-      "u": "bB8q0YsR",
-      "p": "m16DZsD"
+      "u": "dsYGB28T",
+      "p": "anKPykf"
     },
     {
-      "u": "n1x06Bu5",
-      "p": "hneDxJT"
+      "u": "nXk0pWqT",
+      "p": "e53fBPx"
     },
     {
-      "u": "by7rs6pB",
-      "p": "f7Zz1qR"
+      "u": "byHkcFy9",
+      "p": "jnCCDcc"
     },
     {
-      "u": "ckNnHS5j",
-      "p": "ckdHS2s"
+      "u": "cKNMR4J3",
+      "p": "cBEcqXq"
     },
     {
-      "u": "zFrBhTqd",
-      "p": "akKE253"
+      "u": "hwxnk7hb",
+      "p": "jSymrCE"
     },
     {
-      "u": "fJfZxXx3",
-      "p": "c4XucRu"
+      "u": "nf8FKf7W",
+      "p": "b4NGwZs"
     },
     {
-      "u": "kfHYzE61",
-      "p": "nA6wyxd"
+      "u": "fHENZxRH",
+      "p": "mwbJtn9"
     },
     {
-      "u": "rsFPrFem",
-      "p": "d5BSYBG"
+      "u": "u0AeuFEB",
+      "p": "uHx4uya"
     },
     {
-      "u": "rrAc7zQw",
-      "p": "e1E9sTQ"
+      "u": "rpMb3zMM",
+      "p": "pmTtJuK"
     },
     {
-      "u": "j6qP1K1H",
-      "p": "tA7HjUm"
-    },
-    {
-      "u": "tJnSZdHZ",
-      "p": "qQg2nSx"
-    },
-    {
-      "u": "a4wKw1EZ",
-      "p": "cWTeEg9"
-    },
-    {
-      "u": "mcbXEuHP",
-      "p": "dbpsCsS"
-    },
-    {
-      "u": "cnKUB324",
-      "p": "h1aJN7g"
-    },
-    {
-      "u": "dWRHKdbT",
-      "p": "csmenqx"
-    },
-    {
-      "u": "hs5gBBxf",
-      "p": "dJrZhKw"
-    },
-    {
-      "u": "zgd3fs86",
-      "p": "jHMP18Z"
-    },
-    {
-      "u": "xa1cwgRb",
-      "p": "ngEhWuP"
-    },
-    {
-      "u": "vCdtC5Uj",
-      "p": "sAjpDDz"
-    },
-    {
-      "u": "vcTPh9Kx",
-      "p": "bJDfcAK"
+      "u": "bERNKEQ8",
+      "p": "gUumEkD"
     }
   ],
-  "linesExp": 1793700180000
+  "linesExp": 1793743320000
 }
