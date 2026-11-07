@@ -108,6 +108,11 @@
   .col:nth-child(1) .col-head{transform:rotate(-.7deg)}
   .col:nth-child(2) .col-head{transform:rotate(.6deg)}
   .col:nth-child(3) .col-head{transform:rotate(-.5deg)}
+  .col:nth-child(4) .col-head{transform:rotate(.6deg)}
+  .col:nth-child(5) .col-head{transform:rotate(-.7deg)}
+  .menu-grid .col:nth-child(n+4){border-top:3px solid rgba(17,17,17,.85)}
+  .menu-grid .col:nth-child(4){border-left:none}
+  .col-wide{grid-column:2 / 4}
   .col-head h2{
     margin:0;font-weight:900;line-height:1.2;
     font-size:clamp(1.6rem,3.4vw,2.15rem);color:var(--yellow);
@@ -204,6 +209,7 @@
     .hero-photo{width:100%;height:auto;aspect-ratio:16/10;transform:rotate(1.6deg)}
     .hero-title{font-size:clamp(4.2rem,19vw,7rem)}
     .menu-grid{grid-template-columns:1fr;padding:4px 20px 0}
+    .col-wide{grid-column:auto}
     .col{padding:24px 4px 6px}
     .col + .col{border-left:none;border-top:3px solid rgba(17,17,17,.85)}
     .foot-flex{flex-direction:column;align-items:center;gap:26px;flex-wrap:wrap}
@@ -272,10 +278,11 @@
       <div class="dish"><div class="d-name">طون كاشير لانشون فرماج أحمر</div><p class="d-desc" dir="ltr">Thon • Kachir • Lanchon • Fromage Rouge</p><p class="d-price" dir="ltr">18 <small>DH</small></p></div>
       <div class="dish"><div class="d-name">طون لانشون</div><p class="d-desc" dir="ltr">Thon • Lanchon</p><p class="d-price" dir="ltr">11 <small>DH</small></p></div>
       <div class="dish"><div class="d-name">طون لانشون فرماج أحمر</div><p class="d-desc" dir="ltr">Thon • Lanchon • Fromage Rouge</p><p class="d-price" dir="ltr">16 <small>DH</small></p></div>
-      <div class="dish"><div class="d-name">طون حاد فيمي <span class="tag-spicy">حاد</span></div><p class="d-desc" dir="ltr">Thon Épicé • Fumé</p><p class="d-price" dir="ltr">14 <small>DH</small></p></div>
-      <div class="dish"><div class="d-name">طون حاد فيمي كاشير <span class="tag-spicy">حاد</span></div><p class="d-desc" dir="ltr">Thon Épicé • Fumé • Kachir</p><p class="d-price" dir="ltr">15 <small>DH</small></p></div>
-      <div class="dish"><div class="d-name">طون حاد فيمي فرماج أحمر <span class="tag-spicy">حاد</span></div><p class="d-desc" dir="ltr">Thon Épicé • Fumé • Fromage Rouge</p><p class="d-price" dir="ltr">18 <small>DH</small></p></div>
+      <div class="dish"><div class="d-name">طون داند فيمي</div><p class="d-desc" dir="ltr">Thon • Dinde Fumée</p><p class="d-price" dir="ltr">14 <small>DH</small></p></div>
+      <div class="dish"><div class="d-name">طون داند فيمي كاشير</div><p class="d-desc" dir="ltr">Thon • Dinde Fumée • Kachir</p><p class="d-price" dir="ltr">15 <small>DH</small></p></div>
+      <div class="dish"><div class="d-name">طون داند فيمي فرماج احمر</div><p class="d-desc" dir="ltr">Thon • Dinde Fumée • Fromage Rouge</p><p class="d-price" dir="ltr">18 <small>DH</small></p></div>
       <div class="dish"><div class="d-name">طون فرماج أحمر</div><p class="d-desc" dir="ltr">Thon • Fromage Rouge</p><p class="d-price" dir="ltr">14 <small>DH</small></p></div>
+      <div class="dish"><div class="d-name">طون دوبل</div><p class="d-desc" dir="ltr">Thon Double</p><p class="d-price" dir="ltr">13 <small>DH</small></p></div>
     </section>
 
     <!-- ===== SALADES (center) ===== -->
@@ -315,8 +322,33 @@
       </div>
       <div class="dish">
         <div class="d-name"><span class="drink-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h13v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5V9z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M7 5c0-1 .8-1 .8-2M11 5c0-1 .8-1 .8-2"/></svg></span>قهوة</div>
-        <p class="d-desc" dir="ltr">Café chaud</p><p class="d-price" dir="ltr">5 <small>DH</small></p>
+        <p class="d-desc" dir="ltr">Café chaud</p><p class="d-price" dir="ltr">6 <small>DH</small></p>
       </div>
+    </section>
+
+    <!-- ===== SAUCES ===== -->
+    <section class="col" id="sauces" dir="rtl" aria-label="الصلصات">
+      <div class="col-head">
+        <h2>الصلصات <span class="fr" dir="ltr">Sauces</span></h2>
+      </div>
+      <p class="col-intro">زيد الصلصة اللي تعجبك على السندويش ولا السلطة ديالك.</p>
+
+      <div class="dish"><div class="d-name">مايونيز</div><p class="d-desc" dir="ltr">Mayonaise</p><p class="d-price" dir="ltr">0 <small>DH</small></p></div>
+      <div class="dish"><div class="d-name">كيتشاب</div><p class="d-desc" dir="ltr">Ketchup</p><p class="d-price" dir="ltr">0 <small>DH</small></p></div>
+      <div class="dish"><div class="d-name">رانش</div><p class="d-desc" dir="ltr">Ranch</p><p class="d-price" dir="ltr">1 <small>DH</small></p></div>
+      <div class="dish"><div class="d-name">صلصة 3&gt;</div><p class="d-desc" dir="ltr">Sauce &lt;3</p><p class="d-price" dir="ltr">1 <small>DH</small></p></div>
+    </section>
+
+    <!-- ===== WAJABAT SPECIAL ===== -->
+    <section class="col col-wide" id="special" dir="rtl" aria-label="وجبات 3 سبيسيال">
+      <div class="col-head">
+        <h2>وجبات 3&gt; سبيسيال <span class="fr" dir="ltr">Spécial</span></h2>
+      </div>
+      <p class="col-intro">وجبات كبيرة ومركّبة — الأفضل ديال الدار، بالطون وكلشي فيها.</p>
+
+      <div class="dish"><div class="d-name">سندويش رويال</div><p class="d-desc" dir="ltr">Sandwich Royale</p><p class="d-price" dir="ltr">25 <small>DH</small></p></div>
+      <div class="dish"><div class="d-name">سلطة رويال</div><p class="d-desc ar">الأرز أو المعكرونة · الخس · الزيتون · الطماطم · البصل · الخيار · الذرة · التونة · البيض · فرماج أحمر · كاشير · داند فيمي · الصوص</p><p class="d-price" dir="ltr">30 <small>DH</small></p></div>
+      <div class="dish"><div class="d-name">سلطة الافوكادو</div><p class="d-desc ar">الأفوكادو · الخس · الزيتون · الطماطم · الخيار · البصل · الذرة · التونة · البيض · الصلصة</p><p class="d-price" dir="ltr">35 <small>DH</small></p></div>
     </section>
 
   </main>
