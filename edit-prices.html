@@ -353,7 +353,7 @@
       <b>Kifach kay-khdm :</b>
       <ol>
         <li>3mer l-prix dyal kol plat f l-box dyalo (ghir arqam, b7al <b>15</b> wla <b>12.5</b>). Li khliti khawi, ghadi y-bqa bla prix f l-menu.</li>
-        <li>Wrrek <b>Save</b> l-te7t — ghadi y-nzel lik <b>2 fichiers</b> : <b>prices.json</b> o <b>menu-thon3s.html</b> (l-menu m-jdoud b l-prix, b design <b>Model 6 — jaune / ka7el</b> : titre géant THON 3S, menu f 3 colonnes, prix f badges ka7el, o footer b QR o awqat l3amal).</li>
+        <li>Wrrek <b>Save</b> l-te7t — ghadi y-nzel lik <b>2 fichiers</b> : <b>prices.json</b> o <b>menu-thon3s.html</b> (l-menu m-jdoud b l-prix, b design <b>Model 6 — orange fat7 / ka7el</b> : titre géant THON 3S, menu f 3 colonnes, prix f badges ka7el, o footer b QR o awqat l3amal).</li>
         <li>Sift l-fichiers l <b>Muse</b> f chat, o howa y-7athom lik f GitHub Pages — nafs l-link o nafs l-QR kay-bqaw.</li>
         <li>T-qder <b>t-zid plat jdid</b> mn l-bloc « Zid plat jdid », <b>t-bdel smiya</b> dyal ay plat b bouton ✎, <b>t-zid / t-bdel smiya b Français</b> b bouton <b>FR</b>, wla <b>t-ms7o</b> b bouton 🗑 — kolchi kay-tzad f Save. Smiya b Français <b>optionnelle</b> : ila khlitiha khawya, l-plat kay-ban ghir b l-3arabi.</li>
         <li>T-qder ta <b>t-zid catégorie jdida</b> (b7al Pizza, Tacos...) mn l-bloc « Zid catégorie jdida » — ghadi t-ban section jdida b smiytha, t-qder t-zid fiha plats, <b>t-bdel smiytha</b> b ✎ wla <b>t-mse7ha</b> b 🗑, o hiya ta hiya kat-khroj f Save.</li>
@@ -976,7 +976,7 @@ function buildData(){
   };
 }
 
-/* ---------- Generated menu HTML — Model 6 Bold Yellow (jaune / ka7el), same design as the published menu ---------- */
+/* ---------- Generated menu HTML — Model 6 Bold Orange clair (orange fat7 / ka7el), same design as the published menu ---------- */
 var MENU_URL = 'https://darwinnamosa-gif.github.io/Ricotv_channel/menu-thon3s.html';
 var heroPhotoData = '';
 var qrPhotoData = '';
@@ -1015,11 +1015,11 @@ function menuRows(cat){
 }
 function buildMenuHTML(){
   var css = [
-    ':root{--yellow:#ffc900;--yellow-soft:#ffd83d;--black:#111111;--ink:#111111;--ink-soft:rgba(17,17,17,.72);--red:#e0231a;--shadow-hard:10px 10px 0 var(--black)}',
+    ':root{--yellow:#ffa94d;--yellow-soft:#ffb26b;--orange-1:#ffa94d;--orange-2:#ffb26b;--black:#111111;--ink:#111111;--ink-soft:rgba(17,17,17,.72);--red:#e0231a;--shadow-hard:10px 10px 0 var(--black)}',
     '*{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--black);color-scheme:light}',
     'body{margin:0;color:var(--ink);background:var(--black);font-family:Cairo,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}',
     'img{max-width:100%;display:block}a{color:inherit}',
-    '.poster{max-width:1180px;margin:0 auto;position:relative;background:radial-gradient(rgba(17,17,17,.15) 1.6px, transparent 1.7px) 0 0/22px 22px, var(--yellow);overflow:hidden}',
+    '.poster{max-width:1180px;margin:0 auto;position:relative;background:radial-gradient(rgba(17,17,17,.15) 1.6px, transparent 1.7px) 0 0/22px 22px, linear-gradient(135deg,#ffa94d 0%,#ffb26b 100%);overflow:hidden}',
     '.hazard{height:20px;background:repeating-linear-gradient(-45deg, var(--black) 0 18px, var(--yellow) 18px 36px);border-top:4px solid var(--black);border-bottom:4px solid var(--black)}',
     '.hazard.thin{height:13px}',
     '.hero{position:relative;padding:34px 30px 38px;overflow:hidden}',
@@ -1161,7 +1161,7 @@ el('saveBtn').addEventListener('click', function(){
   } else {
     box.className = 'result ok';
     box.innerHTML = '<b>✓ Tzado l-fichiers!</b> 3mer ti <b>'+n+' / '+totalItems()+' prix</b>. '
-      + 'N-zlo lik <b>prices.json</b> o <b>menu-thon3s.html</b> (b design <b>Model 6 — jaune / ka7el</b>) — sift-hom l Muse f chat bach y-7athom f GitHub Pages.';
+      + 'N-zlo lik <b>prices.json</b> o <b>menu-thon3s.html</b> (b design <b>Model 6 — orange fat7 / ka7el</b>) — sift-hom l Muse f chat bach y-7athom f GitHub Pages.';
   }
   box.innerHTML += '<div class="dl-row">'
     + '<a class="btn" href="'+links.json+'" download="prices.json">⬇ prices.json</a>'
