@@ -145,6 +145,54 @@
     background:var(--orange-soft);border-radius:9px;padding:9px 9px;white-space:nowrap;
   }
 
+  /* ---------- Add a dish ---------- */
+  .addbox{
+    margin-top:20px;background:#fff;border:1.5px dashed var(--orange);
+    border-radius:16px;padding:16px;
+  }
+  .addbox h2{margin:0 0 4px;font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--brown-800)}
+  .addbox p{margin:0 0 12px;font-size:13.5px;color:var(--ink-soft);line-height:1.55}
+  .addgrid{display:flex;flex-wrap:wrap;gap:9px}
+  .addgrid select,.addgrid input{
+    font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);
+    background:var(--cream);border:2px solid var(--cream-3);border-radius:12px;
+    padding:11px 12px;outline:none;min-width:0;
+  }
+  .addgrid select:focus,.addgrid input:focus{border-color:var(--orange);background:#fff}
+  .addgrid .f-cat{flex:1 1 150px}
+  .addgrid .f-name{flex:2 1 180px;font-family:'Cairo',sans-serif;font-weight:700}
+  .addgrid .f-price{flex:0 1 110px;text-align:center;font-weight:800;-moz-appearance:textfield;appearance:textfield}
+  .addgrid .f-price::-webkit-outer-spin-button,.addgrid .f-price::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .btn-add{background:var(--orange);color:#fff}
+  .btn-add:hover{background:var(--orange-dark)}
+  .addmsg{display:none;margin-top:10px;font-size:13.5px;font-weight:700;line-height:1.5}
+  .addmsg.ok{display:block;color:var(--green)}
+  .addmsg.err{display:block;color:var(--red)}
+
+  /* ---------- Row actions (rename / delete) ---------- */
+  .row-actions{display:flex;gap:6px;flex-shrink:0}
+  .mini-btn{
+    appearance:none;border:1.5px solid var(--line);background:var(--cream);cursor:pointer;
+    width:36px;height:36px;border-radius:10px;font-size:15px;line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;padding:0;font-family:inherit;
+  }
+  .mini-btn:hover{border-color:var(--orange)}
+  .mini-btn.del:hover{border-color:var(--red);background:var(--red-bg)}
+  .mini-btn.confirm{background:var(--red);border-color:var(--red);color:#fff;width:auto;padding:0 10px;font-weight:800;font-size:12.5px;font-family:'Cairo',sans-serif}
+  .tag-new{
+    display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.05em;
+    background:var(--orange-soft);color:var(--orange-dark);border:1px solid #f6cf9c;
+    border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:2px;font-family:'Inter',sans-serif;
+  }
+  .rename-box{display:flex;gap:7px;align-items:center}
+  .rename-box input{
+    flex:1;min-width:0;font-family:'Cairo',sans-serif;font-weight:800;font-size:16.5px;color:var(--ink);
+    background:var(--cream);border:2px solid var(--orange);border-radius:10px;padding:8px 10px;outline:none;text-align:right;
+  }
+  .rename-box .mini-btn{width:34px;height:34px;flex-shrink:0}
+  .rename-box .ok{background:var(--orange);border-color:var(--orange);color:#fff}
+  .empty-note{font-size:13.5px;color:var(--ink-soft);background:#fff;border:1.5px dashed var(--line);border-radius:14px;padding:12px 14px;text-align:center;line-height:1.6}
+
   /* ---------- Result panel ---------- */
   .result{
     display:none;margin-top:22px;border-radius:16px;padding:16px;
@@ -215,19 +263,37 @@
         <li>3mer l-prix dyal kol plat f l-box dyalo (ghir arqam, b7al <b>15</b> wla <b>12.5</b>). Li khliti khawi, ghadi y-bqa bla prix f l-menu.</li>
         <li>Wrrek <b>Save</b> l-te7t — ghadi y-nzel lik <b>2 fichiers</b> : <b>prices.json</b> o <b>menu-thon3s.html</b> (l-menu m-jdoud b l-prix).</li>
         <li>Sift l-fichiers l <b>Muse</b> f chat, o howa y-7athom lik f GitHub Pages — nafs l-link o nafs l-QR kay-bqaw.</li>
+        <li>T-qder <b>t-zid plat jdid</b> mn l-bloc « Zid plat jdid », <b>t-bdel smiya</b> dyal ay plat b bouton ✎, wla <b>t-ms7o</b> b bouton 🗑 — kolchi kay-tzad f Save.</li>
       </ol>
     </div>
   </header>
 
   <main class="sheet">
     <div class="toolbar">
-      <div class="counter"><strong id="filledCount">0</strong> / 20 prix m-3mer</div>
+      <div class="counter"><strong id="filledCount">0</strong> / <span id="totalCount">20</span> prix m-3mer</div>
       <div class="toolbar-actions">
         <label class="btn btn-file" for="importFile">⬆ Importer prices.json</label>
         <input type="file" id="importFile" accept=".json,application/json" hidden>
         <button class="btn btn-ghost" id="clearBtn" type="button">🗑 Kolchi khawi</button>
       </div>
     </div>
+
+    <section class="addbox" aria-label="Zid plat jdid">
+      <h2>＋ Zid plat jdid</h2>
+      <p>Khtar l-catégorie, kteb smiya dyal l-plat (b l-3arabi b7al l-o5rin), o prix dyalo ila bghiti — ghadi y-tzad f l-liste dyalo o y-khroj f l-menu mli t-dir Save.</p>
+      <div class="addgrid">
+        <select id="newCat" class="f-cat" aria-label="Catégorie dyal plat jdid">
+          <option value="sandwiches">Sandwich — سندويش</option>
+          <option value="salades">Salade — سلطة</option>
+          <option value="boissons">Boisson — مشروب</option>
+          <option value="plats">Plat — طبق</option>
+        </select>
+        <input type="text" id="newName" class="f-name" dir="rtl" lang="ar" placeholder="سمية الطبق الجديد" aria-label="Smiya dyal plat jdid">
+        <input type="number" id="newPrice" class="f-price" inputmode="decimal" min="0" step="0.5" placeholder="prix" aria-label="Prix dyal plat jdid b dirham">
+        <button class="btn btn-add" id="addBtn" type="button">＋ Zid</button>
+      </div>
+      <div class="addmsg" id="addMsg" role="status"></div>
+    </section>
 
     <div id="groups"></div>
 
@@ -284,15 +350,38 @@ var MENU = [
 var CATS = {
   sandwiches:{ ar:'السندويشات', fr:'Sandwichs', orange:false },
   salades:{ ar:'السلطات', fr:'Salades', orange:true },
-  boissons:{ ar:'المشروبات', fr:'Boissons', orange:false }
+  boissons:{ ar:'المشروبات', fr:'Boissons', orange:false },
+  plats:{ ar:'الأطباق', fr:'Plats', orange:true }
 };
-var TOTAL = 20;
+var CAT_ORDER = ['sandwiches','salades','boissons','plats'];
+var CUSTOM = [];      /* plats zaydin b l-éditeur */
+var RENAMES = {};     /* smiyat m-bdla dyal l-plats l-qdam */
+var priceCache = {};  /* prix m-7fod 9bel ma t-3awd t-bna l-liste */
+var uidSeq = 0;
 
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function displayName(it){ return RENAMES[it.id] || it.name; }
+function groupsData(){
+  var groups = MENU.map(function(g){
+    return { cat:g.cat, items:g.items.map(function(it){ return {id:it.id, name:it.name, sub:it.sub||'', custom:false}; }) };
+  });
+  groups.push({ cat:'plats', items:[] });
+  CUSTOM.forEach(function(it){
+    var g = null;
+    groups.forEach(function(x){ if(x.cat===it.cat) g = x; });
+    if(!g){ g = {cat:it.cat, items:[]}; groups.push(g); }
+    g.items.push({ id:it.id, name:it.name, sub:it.sub||'', custom:true });
+  });
+  return groups;
+}
 function allItems(){
   var out=[];
-  MENU.forEach(function(g){ g.items.forEach(function(it){ out.push({group:g.cat, id:it.id, name:it.name, sub:it.sub||''}); }); });
+  groupsData().forEach(function(g){ g.items.forEach(function(it){ out.push({group:g.cat, id:it.id, name:displayName(it), sub:it.sub||'', custom:!!it.custom}); }); });
   return out;
 }
+function totalItems(){ return allItems().length; }
 function el(id){ return document.getElementById(id); }
 function inputFor(id){ return document.querySelector('input[data-id="'+id+'"]'); }
 function rawPrice(id){
@@ -310,31 +399,123 @@ function fmtPrice(n){
 }
 
 /* ---------- Build editor rows ---------- */
-(function build(){
+var renamingId = null;
+
+function rowHtml(it){
+  var name = displayName(it);
+  var nameHtml;
+  if(renamingId === it.id){
+    nameHtml = '<div class="rename-box">'
+      + '<input type="text" data-rename="'+it.id+'" dir="rtl" lang="ar" value="'+esc(name)+'" aria-label="Smiya jdida">'
+      + '<button class="mini-btn ok" type="button" data-save-rename="'+it.id+'" title="Sauvegarder" aria-label="Sauvegarder smiya">✓</button>'
+      + '<button class="mini-btn" type="button" data-cancel-rename title="Annuler" aria-label="Annuler">✕</button>'
+      + '</div>';
+  } else {
+    nameHtml = '<div class="name-ar" dir="rtl" lang="ar">'
+      + (it.custom ? '<span class="tag-new">JDID</span>' : '')
+      + esc(name) + '</div>'
+      + (it.sub ? '<div class="name-sub" dir="rtl" lang="ar">'+esc(it.sub)+'</div>' : '');
+  }
+  return '<div class="row" id="row-'+it.id+'">'
+    + '<div class="name">'+nameHtml+'</div>'
+    + '<div class="price-box">'
+    + '<input type="number" inputmode="decimal" min="0" step="0.5" placeholder="—" data-id="'+it.id+'" aria-label="Prix : '+esc(name)+'" value="'+esc(priceCache[it.id]||'')+'">'
+    + '<span class="unit" lang="ar">درهم</span>'
+    + '</div>'
+    + '<div class="row-actions">'
+    + '<button class="mini-btn" type="button" data-rename-btn="'+it.id+'" title="Bdel smiya" aria-label="Bdel smiya dyal '+esc(name)+'">✎</button>'
+    + '<button class="mini-btn del" type="button" data-del="'+it.id+'" title="Mse7 plat" aria-label="Mse7 '+esc(name)+'">🗑</button>'
+    + '</div></div>';
+}
+
+function render(){
   var html='';
-  MENU.forEach(function(g){
-    var c = CATS[g.cat];
-    html += '<section class="group" aria-label="'+c.fr+'">'
-      + '<div class="group-head"><span class="pill'+(c.orange?' orange':'')+'" dir="rtl" lang="ar">'+c.ar+'</span>'
+  groupsData().forEach(function(g){
+    var c = CATS[g.cat] || {ar:g.cat, fr:g.cat, orange:false};
+    html += '<section class="group" aria-label="'+esc(c.fr)+'">'
+      + '<div class="group-head"><span class="pill'+(c.orange?' orange':'')+'" dir="rtl" lang="ar">'+esc(c.ar)+'</span>'
       + '<span class="group-count">'+g.items.length+' plats</span><span class="rule"></span></div>'
       + '<div class="rows">';
-    g.items.forEach(function(it){
-      html += '<div class="row" id="row-'+it.id+'">'
-        + '<div class="name"><div class="name-ar" dir="rtl" lang="ar">'+it.name+'</div>'
-        + (it.sub ? '<div class="name-sub" dir="rtl" lang="ar">'+it.sub+'</div>' : '')
-        + '</div>'
-        + '<div class="price-box">'
-        + '<input type="number" inputmode="decimal" min="0" step="0.5" placeholder="—" data-id="'+it.id+'" aria-label="Prix : '+it.name+'">'
-        + '<span class="unit" lang="ar">درهم</span>'
-        + '</div></div>';
-    });
+    if(g.items.length===0){
+      html += '<div class="empty-note">Ma kayn 7ta plat daba f had l-catégorie — zid wa7ed mn l-bloc « Zid plat jdid » l-foq.</div>';
+    }
+    g.items.forEach(function(it){ html += rowHtml(it); });
     html += '</div></section>';
   });
   el('groups').innerHTML = html;
+  wireRows();
+  refresh();
+}
+
+function wireRows(){
   document.querySelectorAll('input[data-id]').forEach(function(inp){
-    inp.addEventListener('input', refresh);
+    inp.addEventListener('input', function(){
+      priceCache[inp.getAttribute('data-id')] = inp.value;
+      refresh();
+    });
   });
-})();
+  document.querySelectorAll('[data-rename-btn]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      renamingId = btn.getAttribute('data-rename-btn');
+      render();
+      var inp = document.querySelector('input[data-rename="'+renamingId+'"]');
+      if(inp){ inp.focus(); inp.select(); }
+    });
+  });
+  document.querySelectorAll('[data-save-rename]').forEach(function(btn){
+    btn.addEventListener('click', function(){ saveRename(btn.getAttribute('data-save-rename')); });
+  });
+  document.querySelectorAll('input[data-rename]').forEach(function(inp){
+    inp.addEventListener('keydown', function(ev){
+      if(ev.key==='Enter'){ ev.preventDefault(); saveRename(inp.getAttribute('data-rename')); }
+      if(ev.key==='Escape'){ renamingId = null; render(); }
+    });
+  });
+  document.querySelectorAll('[data-cancel-rename]').forEach(function(btn){
+    btn.addEventListener('click', function(){ renamingId = null; render(); });
+  });
+  document.querySelectorAll('[data-del]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-del');
+      if(btn.getAttribute('data-armed')==='1'){ deleteItem(id); return; }
+      btn.setAttribute('data-armed','1');
+      btn.classList.add('confirm');
+      btn.textContent = 'متأكد؟';
+      setTimeout(function(){
+        if(document.body.contains(btn)){ btn.removeAttribute('data-armed'); btn.classList.remove('confirm'); btn.textContent = '🗑'; }
+      }, 3000);
+    });
+  });
+}
+
+function saveRename(id){
+  var inp = document.querySelector('input[data-rename="'+id+'"]');
+  if(!inp) return;
+  var v = inp.value.trim();
+  if(v){
+    var cust = null;
+    CUSTOM.forEach(function(it){ if(it.id===id) cust = it; });
+    if(cust){ cust.name = v; }
+    else {
+      var base = null;
+      MENU.forEach(function(g){ g.items.forEach(function(it){ if(it.id===id) base = it; }); });
+      if(base && v === base.name){ delete RENAMES[id]; } else { RENAMES[id] = v; }
+    }
+  }
+  renamingId = null;
+  render();
+}
+function deleteItem(id){
+  var wasCustom = false;
+  CUSTOM = CUSTOM.filter(function(it){ if(it.id===id) wasCustom = true; return it.id!==id; });
+  if(!wasCustom){
+    MENU.forEach(function(g){ g.items = g.items.filter(function(it){ return it.id!==id; }); });
+  }
+  delete RENAMES[id];
+  delete priceCache[id];
+  if(renamingId===id) renamingId = null;
+  render();
+}
 
 function filledCount(){
   var n=0;
@@ -348,7 +529,8 @@ function refresh(){
   });
   var n = filledCount();
   el('filledCount').textContent = n;
-  el('miniCount').textContent = n + ' / ' + TOTAL;
+  el('totalCount').textContent = totalItems();
+  el('miniCount').textContent = n + ' / ' + totalItems();
   el('jsonPreview').textContent = JSON.stringify(buildData(), null, 2);
 }
 
@@ -371,14 +553,14 @@ function buildData(){
 
 /* ---------- Generated menu HTML (same design as the published menu) ---------- */
 function menuRows(cat){
-  var g = MENU.filter(function(x){ return x.cat===cat; })[0];
-  return g.items.map(function(it){
+  var items = allItems().filter(function(it){ return it.group===cat; });
+  return items.map(function(it){
     var p = priceNumber(it.id);
     var priceHtml = (p===null)
       ? '<span class="dots"></span>'
       : '<span class="price">'+fmtPrice(p)+' <small>درهم</small></span>';
-    return '<div class="mrow"><div class="mname"><div class="mn" dir="rtl" lang="ar">'+it.name+'</div>'
-      + (it.sub ? '<div class="ms" dir="rtl" lang="ar">'+it.sub+'</div>' : '')
+    return '<div class="mrow"><div class="mname"><div class="mn" dir="rtl" lang="ar">'+esc(it.name)+'</div>'
+      + (it.sub ? '<div class="ms" dir="rtl" lang="ar">'+esc(it.sub)+'</div>' : '')
       + '</div>'+priceHtml+'</div>';
   }).join('\n');
 }
@@ -409,7 +591,8 @@ function buildMenuHTML(){
     'footer{text-align:center;color:#b99c72;font-size:13px;margin-top:22px;line-height:1.7}'
   ].join('\n');
   var sections = '';
-  ['sandwiches','salades','boissons'].forEach(function(cat){
+  CAT_ORDER.forEach(function(cat){
+    if(allItems().filter(function(it){ return it.group===cat; }).length===0) return;
     var c = CATS[cat];
     sections += '<section class="group"><div class="ghead"><span class="pill'+(c.orange?' o':'')+'" dir="rtl" lang="ar">'+c.ar+'</span><span class="grule"></span></div>'
       + menuRows(cat) + '</section>\n';
@@ -459,7 +642,7 @@ el('saveBtn').addEventListener('click', function(){
       + 'Ila bghiti, 3mer l-prix o 3awd Save.';
   } else {
     box.className = 'result ok';
-    box.innerHTML = '<b>✓ Tzado l-fichiers!</b> 3mer ti <b>'+n+' / '+TOTAL+' prix</b>. '
+    box.innerHTML = '<b>✓ Tzado l-fichiers!</b> 3mer ti <b>'+n+' / '+totalItems()+' prix</b>. '
       + 'N-zlo lik <b>prices.json</b> o <b>menu-thon3s.html</b> — sift-hom l Muse f chat bach y-7athom f GitHub Pages.';
   }
   box.innerHTML += '<div class="dl-row">'
@@ -495,9 +678,36 @@ el('copyJsonBtn').addEventListener('click', function(ev){ ev.preventDefault(); c
 
 el('clearBtn').addEventListener('click', function(){
   document.querySelectorAll('input[data-id]').forEach(function(inp){ inp.value=''; });
+  priceCache = {};
   el('resultBox').className = 'result'; el('resultBox').innerHTML='';
   refresh();
 });
+
+/* ---------- Zid plat jdid ---------- */
+el('addBtn').addEventListener('click', function(){
+  var cat = el('newCat').value;
+  var name = el('newName').value.trim();
+  var priceVal = el('newPrice').value.trim().replace(',', '.');
+  var msg = el('addMsg');
+  if(!name){
+    msg.className = 'addmsg err';
+    msg.textContent = '⚠ Kteb smiya dyal l-plat awal.';
+    el('newName').focus();
+    return;
+  }
+  var id = 'custom-' + Date.now().toString(36) + '-' + (++uidSeq);
+  CUSTOM.push({ id:id, cat:cat, name:name, sub:'' });
+  if(priceVal !== '' && !isNaN(parseFloat(priceVal))) priceCache[id] = priceVal;
+  el('newName').value = '';
+  el('newPrice').value = '';
+  msg.className = 'addmsg ok';
+  msg.textContent = '✓ Tzad « ' + name + ' » f ' + (CATS[cat] ? CATS[cat].fr : cat) + ' — ghadi y-khroj f l-menu mli t-dir Save.';
+  render();
+  var row = el('row-'+id);
+  if(row) row.scrollIntoView({behavior:'smooth', block:'center'});
+});
+el('newName').addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); el('addBtn').click(); } });
+el('newPrice').addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); el('addBtn').click(); } });
 
 /* ---------- Import an existing prices.json ---------- */
 el('importFile').addEventListener('change', function(ev){
@@ -509,18 +719,37 @@ el('importFile').addEventListener('change', function(ev){
     try{
       var data = JSON.parse(reader.result);
       var map = data.prices || {};
-      if((!map || !Object.keys(map).length) && Array.isArray(data.items)){
-        data.items.forEach(function(it){ if(it && it.id) map[it.id] = it.price; });
+      if(Array.isArray(data.items)){
+        data.items.forEach(function(it){ if(it && it.id && (map[it.id]===undefined || map[it.id]===null) && it.price!==undefined) map[it.id] = it.price; });
       }
+      var added = 0;
+      if(Array.isArray(data.items)){
+        data.items.forEach(function(it){
+          if(!it || !it.id || !it.name) return;
+          var base = null;
+          MENU.forEach(function(g){ g.items.forEach(function(b){ if(b.id===it.id) base = b; }); });
+          var known = !!base || CUSTOM.some(function(c){ return c.id===it.id; });
+          if(base){
+            if(it.name !== base.name) RENAMES[it.id] = it.name;
+          } else if(!known){
+            var cat = CATS[it.category] ? it.category : 'plats';
+            CUSTOM.push({ id:it.id, cat:cat, name:it.name, sub:it.sub||'' });
+            added++;
+          }
+        });
+      }
+      render();
       var count = 0;
       allItems().forEach(function(it){
         var v = map[it.id];
         var inp = inputFor(it.id);
-        if(inp && v !== null && v !== undefined && v !== ''){ inp.value = v; count++; }
+        if(inp && v !== null && v !== undefined && v !== ''){ inp.value = v; priceCache[it.id] = String(v); count++; }
       });
       refresh();
       box.className = 'result ok';
-      box.innerHTML = '<b>✓ T-importa prices.json</b> — l9ina <b>'+count+' prix</b> m-3mer. Bdel li bghiti o 3awd Save.';
+      box.innerHTML = '<b>✓ T-importa prices.json</b> — l9ina <b>'+count+' prix</b> m-3mer'
+        + (added ? ' o <b>'+added+' plat zayd</b> t-rstoraw mn l-fichier' : '')
+        + '. Bdel li bghiti o 3awd Save.';
     }catch(e){
       box.className = 'result warn';
       box.innerHTML = '<b>Ma t-qrach l-fichier.</b> T2aked blli howa prices.json s7i7 li n-zel mn hna.';
@@ -531,7 +760,7 @@ el('importFile').addEventListener('change', function(ev){
   reader.readAsText(file);
 });
 
-refresh();
+render();
 </script>
 </body>
 </html>
