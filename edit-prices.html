@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light" />
+<link rel="icon" href="data:," />
+<title>Éditeur Prix - THON 3S</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Cairo:wght@500;700;800;900&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brown-950:#1c1008;
+    --brown-900:#2a180d;
+    --brown-800:#3a2312;
+    --brown-700:#54341a;
+    --cream:#fdf6e7;
+    --cream-2:#f7ead0;
+    --cream-3:#efe0bd;
+    --ink:#2b1a0e;
+    --ink-soft:#6b543e;
+    --orange:#f5820b;
+    --orange-dark:#d96a00;
+    --orange-soft:#fdeeda;
+    --line:#e7d6b4;
+    --green:#1e7a3c;
+    --green-bg:#e6f5ea;
+    --red:#b3261e;
+    --red-bg:#fdecea;
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html{color-scheme:light}
+  body{
+    margin:0;
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:
+      radial-gradient(900px 420px at 110% -80px, rgba(245,130,11,.28), transparent 60%),
+      radial-gradient(700px 380px at -10% 30%, rgba(245,130,11,.14), transparent 60%),
+      var(--brown-950);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:0 16px 120px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:34px 8px 22px;text-align:center;color:var(--cream)}
+  .hero .brand{
+    font-family:'Cairo',sans-serif;font-weight:900;letter-spacing:.04em;
+    font-size:15px;color:var(--orange);text-transform:uppercase;
+  }
+  .hero h1{
+    font-family:'Playfair Display',serif;font-weight:900;
+    font-size:clamp(38px,8vw,58px);line-height:1.02;margin:8px 0 4px;color:#fff7e8;
+  }
+  .hero h1 em{font-style:normal;color:var(--orange)}
+  .hero .sub{font-size:15px;color:#e9d9bd;margin:6px 0 0}
+  .badge{
+    display:inline-block;margin-top:16px;background:var(--orange);color:#fff;
+    font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+    padding:9px 18px;border-radius:999px 999px 999px 6px;
+    box-shadow:0 10px 24px rgba(245,130,11,.35);
+  }
+  .howto{
+    margin:18px auto 0;max-width:640px;background:rgba(253,246,231,.08);
+    border:1px solid rgba(253,246,231,.22);border-radius:14px;
+    padding:14px 16px;text-align:left;font-size:14px;line-height:1.65;color:#f3e7cd;
+  }
+  .howto b{color:#fff}
+  .howto ol{margin:6px 0 0;padding-left:20px}
+  .howto li{margin:2px 0}
+
+  /* ---------- Sheet ---------- */
+  .sheet{
+    background:var(--cream);
+    border-radius:28px 28px 22px 22px;
+    margin-top:26px;padding:26px 20px 22px;
+    box-shadow:0 24px 60px rgba(0,0,0,.45);
+    position:relative;overflow:hidden;
+  }
+  .sheet::before{
+    content:"";position:absolute;inset:0 0 auto 0;height:10px;
+    background:repeating-linear-gradient(90deg,var(--orange) 0 26px, var(--brown-900) 26px 52px);
+    opacity:.9;
+  }
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    margin:6px 0 4px;
+  }
+  .counter{
+    font-weight:800;font-size:14px;color:var(--brown-800);
+    background:var(--orange-soft);border:1px solid #f6cf9c;border-radius:999px;padding:8px 14px;
+  }
+  .counter strong{color:var(--orange-dark);font-size:16px}
+  .toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{
+    appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:700;font-size:13.5px;
+    border-radius:999px;padding:10px 16px;display:inline-flex;align-items:center;gap:7px;
+    transition:transform .12s ease, background .12s ease;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--brown-800)}
+  .btn-ghost:hover{border-color:var(--orange);color:var(--orange-dark)}
+  .btn-file{background:var(--brown-900);color:var(--cream)}
+  .btn-file:hover{background:var(--brown-800)}
+
+  .group{margin-top:26px}
+  .group-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .pill{
+    font-family:'Cairo',sans-serif;font-weight:900;font-size:19px;color:#fff;
+    background:var(--brown-800);padding:7px 20px;border-radius:999px 999px 999px 8px;
+    box-shadow:0 6px 16px rgba(42,24,13,.25);
+  }
+  .pill.orange{background:var(--orange)}
+  .group-count{font-size:13px;font-weight:700;color:var(--ink-soft)}
+  .group-head .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--cream-3) 0 7px,transparent 7px 13px)}
+
+  .rows{display:flex;flex-direction:column;gap:9px}
+  .row{
+    display:flex;align-items:center;gap:12px;
+    background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:11px 13px;
+  }
+  .row.filled{border-color:var(--orange);background:#fffaf1}
+  .row .name{min-width:0;flex:1}
+  .row .name-ar{
+    font-family:'Cairo',sans-serif;font-weight:800;font-size:17.5px;color:var(--ink);
+    text-align:right;line-height:1.35;word-break:break-word;
+  }
+  .row .name-sub{
+    font-family:'Cairo',sans-serif;font-size:12.5px;color:var(--ink-soft);text-align:right;line-height:1.5;margin-top:1px;
+  }
+  .price-box{display:flex;align-items:center;gap:7px;flex-shrink:0}
+  .price-box input{
+    width:92px;padding:12px 10px;text-align:center;
+    font-family:inherit;font-size:18px;font-weight:800;color:var(--ink);
+    background:var(--cream);border:2px solid var(--cream-3);border-radius:12px;outline:none;
+    -moz-appearance:textfield;appearance:textfield;
+  }
+  .price-box input::-webkit-outer-spin-button,.price-box input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .price-box input:focus{border-color:var(--orange);background:#fff;box-shadow:0 0 0 4px rgba(245,130,11,.16)}
+  .price-box input::placeholder{color:#c9b48a;font-weight:600;font-size:15px}
+  .unit{
+    font-family:'Cairo',sans-serif;font-weight:800;font-size:14px;color:var(--orange-dark);
+    background:var(--orange-soft);border-radius:9px;padding:9px 9px;white-space:nowrap;
+  }
+
+  /* ---------- Result panel ---------- */
+  .result{
+    display:none;margin-top:22px;border-radius:16px;padding:16px;
+    font-size:14px;line-height:1.6;
+  }
+  .result.ok{display:block;background:var(--green-bg);border:1.5px solid #a9d8b6;color:#14401f}
+  .result.warn{display:block;background:#fff4e0;border:1.5px solid #f2cd8f;color:#5c3a05}
+  .result b{font-weight:800}
+  .result .dl-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .result .dl-row .btn{background:var(--brown-900);color:var(--cream);text-decoration:none}
+  .result .dl-row .btn.light{background:#fff;color:var(--brown-900);border:1.5px solid var(--line)}
+
+  details.json-box{margin-top:20px;background:var(--brown-900);border-radius:16px;overflow:hidden}
+  details.json-box summary{
+    cursor:pointer;color:var(--cream);font-weight:700;font-size:14px;padding:14px 16px;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+  }
+  details.json-box summary::-webkit-details-marker{display:none}
+  details.json-box pre{
+    margin:0;padding:0 16px 16px;color:#ffd9a3;font-size:12px;line-height:1.6;overflow-x:auto;white-space:pre;
+  }
+  .copy-btn{background:var(--orange);color:#fff;border:0;border-radius:999px;padding:7px 13px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;flex-shrink:0}
+
+  /* ---------- Sticky save bar ---------- */
+  .savebar{
+    position:fixed;left:0;right:0;bottom:0;z-index:20;
+    background:rgba(28,16,8,.94);backdrop-filter:blur(8px);
+    border-top:1px solid rgba(253,246,231,.16);
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+  .savebar-in{max-width:860px;margin:0 auto;display:flex;gap:10px;align-items:center}
+  .savebar .mini{color:#e9d9bd;font-size:13px;font-weight:600;line-height:1.4;flex-shrink:0}
+  .savebar .mini strong{color:#fff;font-size:15px}
+  .btn-save{
+    flex:1;background:var(--orange);color:#fff;border:0;cursor:pointer;font-family:inherit;
+    font-weight:800;font-size:16.5px;border-radius:14px;padding:15px 14px;
+    box-shadow:0 10px 26px rgba(245,130,11,.4);
+    display:flex;align-items:center;justify-content:center;gap:9px;
+  }
+  .btn-save:active{transform:scale(.98)}
+  .btn-save:hover{background:var(--orange-dark)}
+
+  footer{margin-top:26px;text-align:center;color:#b99c72;font-size:12.5px;line-height:1.7;padding:0 10px}
+  footer .ar{font-family:'Cairo',sans-serif}
+
+  @media (max-width:520px){
+    .sheet{padding:22px 13px 18px;border-radius:22px}
+    .row{padding:10px 10px;gap:9px}
+    .row .name-ar{font-size:16px}
+    .price-box input{width:78px;font-size:17px;padding:11px 6px}
+    .unit{padding:8px 7px;font-size:13px}
+    .savebar .mini{display:none}
+    .howto{font-size:13.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="brand">THON &lt;3S — Sandwichs &amp; Salades</div>
+    <h1>Éditeur <em>des Prix</em></h1>
+    <p class="sub">3mer ghir l-arqam b dirham — bla ma t-7el 7ta HTML.</p>
+    <span class="badge">✎ Modification des prix</span>
+    <div class="howto">
+      <b>Kifach kay-khdm :</b>
+      <ol>
+        <li>3mer l-prix dyal kol plat f l-box dyalo (ghir arqam, b7al <b>15</b> wla <b>12.5</b>). Li khliti khawi, ghadi y-bqa bla prix f l-menu.</li>
+        <li>Wrrek <b>Save</b> l-te7t — ghadi y-nzel lik <b>2 fichiers</b> : <b>prices.json</b> o <b>menu-thon3s.html</b> (l-menu m-jdoud b l-prix).</li>
+        <li>Sift l-fichiers l <b>Muse</b> f chat, o howa y-7athom lik f GitHub Pages — nafs l-link o nafs l-QR kay-bqaw.</li>
+      </ol>
+    </div>
+  </header>
+
+  <main class="sheet">
+    <div class="toolbar">
+      <div class="counter"><strong id="filledCount">0</strong> / 20 prix m-3mer</div>
+      <div class="toolbar-actions">
+        <label class="btn btn-file" for="importFile">⬆ Importer prices.json</label>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+        <button class="btn btn-ghost" id="clearBtn" type="button">🗑 Kolchi khawi</button>
+      </div>
+    </div>
+
+    <div id="groups"></div>
+
+    <div class="result" id="resultBox" role="status"></div>
+
+    <details class="json-box" id="jsonDetails">
+      <summary><span>prices.json — aperçu direct</span><button class="copy-btn" id="copyJsonBtn" type="button">Copier</button></summary>
+      <pre id="jsonPreview"></pre>
+    </details>
+  </main>
+
+  <footer>
+    THON &lt;3S · Sandwichs &amp; Salades <span class="ar">— الأثمنة كاتتبدل غير هنا، بلا ما تمس الـ HTML</span><br>
+    L-prix li khawi ma kay-tbe3ch f l-menu.
+  </footer>
+</div>
+
+<div class="savebar">
+  <div class="savebar-in">
+    <div class="mini"><strong id="miniCount">0 / 20</strong><br>prix m-3mer</div>
+    <button class="btn-save" id="saveBtn" type="button">💾 Save — نزّل prices.json + Menu HTML</button>
+  </div>
+</div>
+
+<script>
+var MENU = [
+  { cat:'sandwiches', items:[
+    { id:'thon-adi',            name:'طون عادي' },
+    { id:'thon-fromage',        name:'طون فرماج' },
+    { id:'thon-kiri',           name:'طون كيري' },
+    { id:'thon-kachir',         name:'طون كاشير' },
+    { id:'thon-kachir-lanchon', name:'طون كاشير لانشون' },
+    { id:'thon-kachir-fromage-ahmar',        name:'طون كاشير فرماج احمر' },
+    { id:'thon-kachir-lanchon-fromage-ahmar',name:'طون كاشير لانشون فرماج احمر' },
+    { id:'thon-lanchon',        name:'طون لانشون' },
+    { id:'thon-lanchon-fromage-ahmar', name:'طون لانشون فرماج احمر' },
+    { id:'thon-had-fume',             name:'طون حاد فيمي' },
+    { id:'thon-had-fume-kachir',      name:'طون حاد فيمي كاشير' },
+    { id:'thon-had-fume-fromage-ahmar', name:'طون حاد فيمي فرماج احمر' },
+    { id:'thon-fromage-ahmar',        name:'طون فرماج احمر' }
+  ]},
+  { cat:'salades', items:[
+    { id:'salade-pates',  name:'سلطة المعكرونة', sub:'الذرة · البيض · التونة · الصلصة' },
+    { id:'salade-riz',    name:'سلطة الأرز',     sub:'الأرز · الذرة · التونة · البيض · الصلصة' },
+    { id:'salade-nicoise',name:'السلطة النيسوازية', sub:'الخس · الطماطم · التونة · البيض · الزيتون · الصلصة' }
+  ]},
+  { cat:'boissons', items:[
+    { id:'verre-soda',   name:'كاس مشروب غازي' },
+    { id:'bouteille-soda-petite', name:'قرعة مشروب غازي صغيرة' },
+    { id:'bouteille-eau-petite',  name:'قرعة ماء صغيرة' },
+    { id:'cafe',         name:'قهوة' }
+  ]}
+];
+var CATS = {
+  sandwiches:{ ar:'السندويشات', fr:'Sandwichs', orange:false },
+  salades:{ ar:'السلطات', fr:'Salades', orange:true },
+  boissons:{ ar:'المشروبات', fr:'Boissons', orange:false }
+};
+var TOTAL = 20;
+
+function allItems(){
+  var out=[];
+  MENU.forEach(function(g){ g.items.forEach(function(it){ out.push({group:g.cat, id:it.id, name:it.name, sub:it.sub||''}); }); });
+  return out;
+}
+function el(id){ return document.getElementById(id); }
+function inputFor(id){ return document.querySelector('input[data-id="'+id+'"]'); }
+function rawPrice(id){
+  var inp = inputFor(id); if(!inp) return '';
+  return inp.value.trim().replace(',', '.');
+}
+function priceNumber(id){
+  var v = rawPrice(id); if(v==='') return null;
+  var n = parseFloat(v); return isNaN(n) ? null : n;
+}
+function fmtPrice(n){
+  if(n===null) return '';
+  var s = (Math.round(n*100)/100).toString();
+  return s;
+}
+
+/* ---------- Build editor rows ---------- */
+(function build(){
+  var html='';
+  MENU.forEach(function(g){
+    var c = CATS[g.cat];
+    html += '<section class="group" aria-label="'+c.fr+'">'
+      + '<div class="group-head"><span class="pill'+(c.orange?' orange':'')+'" dir="rtl" lang="ar">'+c.ar+'</span>'
+      + '<span class="group-count">'+g.items.length+' plats</span><span class="rule"></span></div>'
+      + '<div class="rows">';
+    g.items.forEach(function(it){
+      html += '<div class="row" id="row-'+it.id+'">'
+        + '<div class="name"><div class="name-ar" dir="rtl" lang="ar">'+it.name+'</div>'
+        + (it.sub ? '<div class="name-sub" dir="rtl" lang="ar">'+it.sub+'</div>' : '')
+        + '</div>'
+        + '<div class="price-box">'
+        + '<input type="number" inputmode="decimal" min="0" step="0.5" placeholder="—" data-id="'+it.id+'" aria-label="Prix : '+it.name+'">'
+        + '<span class="unit" lang="ar">درهم</span>'
+        + '</div></div>';
+    });
+    html += '</div></section>';
+  });
+  el('groups').innerHTML = html;
+  document.querySelectorAll('input[data-id]').forEach(function(inp){
+    inp.addEventListener('input', refresh);
+  });
+})();
+
+function filledCount(){
+  var n=0;
+  allItems().forEach(function(it){ if(priceNumber(it.id)!==null) n++; });
+  return n;
+}
+function refresh(){
+  allItems().forEach(function(it){
+    var row = el('row-'+it.id);
+    if(row) row.classList.toggle('filled', priceNumber(it.id)!==null);
+  });
+  var n = filledCount();
+  el('filledCount').textContent = n;
+  el('miniCount').textContent = n + ' / ' + TOTAL;
+  el('jsonPreview').textContent = JSON.stringify(buildData(), null, 2);
+}
+
+/* ---------- Data ---------- */
+function buildData(){
+  var items = allItems().map(function(it){
+    return { id:it.id, category:it.group, name:it.name, price: priceNumber(it.id) };
+  });
+  var prices = {};
+  items.forEach(function(it){ prices[it.id] = it.price; });
+  return {
+    restaurant: 'THON <3S — Sandwichs & Salades <3 S',
+    currency: 'MAD',
+    unit: 'درهم',
+    updated: new Date().toISOString(),
+    prices: prices,
+    items: items
+  };
+}
+
+/* ---------- Generated menu HTML (same design as the published menu) ---------- */
+function menuRows(cat){
+  var g = MENU.filter(function(x){ return x.cat===cat; })[0];
+  return g.items.map(function(it){
+    var p = priceNumber(it.id);
+    var priceHtml = (p===null)
+      ? '<span class="dots"></span>'
+      : '<span class="price">'+fmtPrice(p)+' <small>درهم</small></span>';
+    return '<div class="mrow"><div class="mname"><div class="mn" dir="rtl" lang="ar">'+it.name+'</div>'
+      + (it.sub ? '<div class="ms" dir="rtl" lang="ar">'+it.sub+'</div>' : '')
+      + '</div>'+priceHtml+'</div>';
+  }).join('\n');
+}
+function buildMenuHTML(){
+  var css = [
+    '*{box-sizing:border-box}html{color-scheme:light}',
+    'body{margin:0;font-family:Cairo,system-ui,sans-serif;background:#1c1008;color:#2b1a0e}',
+    '.page{max-width:760px;margin:0 auto;padding:28px 16px 44px}',
+    '.hero{text-align:center;color:#fdf6e7;padding:10px 6px 20px}',
+    '.brand{font-weight:900;letter-spacing:.05em;font-size:14px;color:#f5820b;text-transform:uppercase}',
+    '.hero h1{font-family:Georgia,serif;font-weight:900;font-size:clamp(38px,9vw,56px);margin:8px 0 2px;color:#fff7e8;line-height:1.05}',
+    '.hero h1 span{color:#f5820b}',
+    '.hero p{margin:4px 0 0;color:#e9d9bd;font-size:15px}',
+    '.badge{display:inline-block;margin-top:14px;background:#f5820b;color:#fff;font-weight:800;font-size:13px;letter-spacing:.06em;padding:9px 18px;border-radius:999px 999px 999px 6px}',
+    '.sheet{background:#fdf6e7;border-radius:26px;padding:26px 20px 20px;box-shadow:0 24px 60px rgba(0,0,0,.45)}',
+    '.group{margin-top:22px}.group:first-child{margin-top:2px}',
+    '.ghead{display:flex;align-items:center;gap:12px;margin-bottom:10px}',
+    '.pill{font-weight:900;font-size:19px;color:#fff;background:#3a2312;padding:7px 20px;border-radius:999px 999px 999px 8px}',
+    '.pill.o{background:#f5820b}',
+    '.grule{flex:1;border-top:3px dotted #e7d6b4}',
+    '.mrow{display:flex;align-items:flex-end;gap:12px;padding:9px 2px;border-bottom:1px dashed #eadfc2}',
+    '.mrow:last-child{border-bottom:0}',
+    '.mname{flex:1;min-width:0}.mn{font-weight:800;font-size:18px;text-align:right;line-height:1.4}',
+    '.ms{font-size:12.5px;color:#6b543e;text-align:right;line-height:1.5}',
+    '.price{font-weight:900;font-size:18px;color:#d96a00;white-space:nowrap;background:#fdeeda;border-radius:9px;padding:4px 10px}',
+    '.price small{font-size:12.5px}',
+    '.dots{flex:0 0 44px;border-bottom:3px dotted #d9c491;margin-bottom:6px}',
+    'footer{text-align:center;color:#b99c72;font-size:13px;margin-top:22px;line-height:1.7}'
+  ].join('\n');
+  var sections = '';
+  ['sandwiches','salades','boissons'].forEach(function(cat){
+    var c = CATS[cat];
+    sections += '<section class="group"><div class="ghead"><span class="pill'+(c.orange?' o':'')+'" dir="rtl" lang="ar">'+c.ar+'</span><span class="grule"></span></div>'
+      + menuRows(cat) + '</section>\n';
+  });
+  return '<!doctype html>\n<html lang="ar">\n<head>\n<meta charset="utf-8">\n'
+    + '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+    + '<meta name="color-scheme" content="light">\n<title>THON &lt;3S — Menu</title>\n'
+    + '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&display=swap" rel="stylesheet">\n'
+    + '<style>\n'+css+'\n</style>\n</head>\n<body>\n<div class="page">\n'
+    + '<header class="hero"><div class="brand">THON &lt;3S</div>'
+    + '<h1>Menu <span>Restaurant</span></h1>'
+    + '<p>Sandwichs &amp; Salades au thon</p>'
+    + '<span class="badge">SPECIAL MENU</span></header>\n'
+    + '<main class="sheet">\n'+sections+'</main>\n'
+    + '<footer>THON &lt;3S · Sandwichs &amp; Salades &lt;3 S<br><span lang="ar">مرحبا بكم</span></footer>\n'
+    + '</div>\n</body>\n</html>';
+}
+
+/* ---------- Downloads ---------- */
+function download(filename, content, type){
+  var blob = new Blob([content], {type:type});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  return url;
+}
+function persistentLinks(){
+  var jsonBlob = new Blob([JSON.stringify(buildData(), null, 2)], {type:'application/json'});
+  var htmlBlob = new Blob([buildMenuHTML()], {type:'text/html'});
+  return { json: URL.createObjectURL(jsonBlob), html: URL.createObjectURL(htmlBlob) };
+}
+
+el('saveBtn').addEventListener('click', function(){
+  var n = filledCount();
+  var box = el('resultBox');
+  var data = buildData();
+  var jsonText = JSON.stringify(data, null, 2);
+  var htmlText = buildMenuHTML();
+  download('prices.json', jsonText, 'application/json');
+  setTimeout(function(){ download('menu-thon3s.html', htmlText, 'text/html'); }, 500);
+  var links = persistentLinks();
+  if(n===0){
+    box.className = 'result warn';
+    box.innerHTML = '<b>تنبيه:</b> ma 3mer ti 7ta prix — l-fichiers n-zlo walakin l-menu ghadi y-bqa bla prix. '
+      + 'Ila bghiti, 3mer l-prix o 3awd Save.';
+  } else {
+    box.className = 'result ok';
+    box.innerHTML = '<b>✓ Tzado l-fichiers!</b> 3mer ti <b>'+n+' / '+TOTAL+' prix</b>. '
+      + 'N-zlo lik <b>prices.json</b> o <b>menu-thon3s.html</b> — sift-hom l Muse f chat bach y-7athom f GitHub Pages.';
+  }
+  box.innerHTML += '<div class="dl-row">'
+    + '<a class="btn" href="'+links.json+'" download="prices.json">⬇ prices.json</a>'
+    + '<a class="btn" href="'+links.html+'" download="menu-thon3s.html">⬇ menu-thon3s.html</a>'
+    + '<button class="btn light" type="button" id="copyJsonBtn2">📋 Copier prices.json</button>'
+    + '</div>'
+    + '<div style="margin-top:8px;font-size:13px">Ila l-browser 7bes download dyal l-fichier t-tani, wrrek 3la l-boutons l-foq bach t-nzlo b ydek.</div>';
+  var c2 = el('copyJsonBtn2');
+  if(c2) c2.addEventListener('click', copyJson);
+  box.scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+function copyJson(){
+  var text = JSON.stringify(buildData(), null, 2);
+  function done(btn){
+    if(!btn) return; var old = btn.textContent; btn.textContent = '✓ T-copiat';
+    setTimeout(function(){ btn.textContent = old; }, 1600);
+  }
+  var btn = document.activeElement;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ done(btn); }, function(){ fallback(); });
+  } else { fallback(); }
+  function fallback(){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); done(btn); }catch(e){}
+    ta.remove();
+  }
+}
+el('copyJsonBtn').addEventListener('click', function(ev){ ev.preventDefault(); copyJson(); });
+
+el('clearBtn').addEventListener('click', function(){
+  document.querySelectorAll('input[data-id]').forEach(function(inp){ inp.value=''; });
+  el('resultBox').className = 'result'; el('resultBox').innerHTML='';
+  refresh();
+});
+
+/* ---------- Import an existing prices.json ---------- */
+el('importFile').addEventListener('change', function(ev){
+  var file = ev.target.files && ev.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    var box = el('resultBox');
+    try{
+      var data = JSON.parse(reader.result);
+      var map = data.prices || {};
+      if((!map || !Object.keys(map).length) && Array.isArray(data.items)){
+        data.items.forEach(function(it){ if(it && it.id) map[it.id] = it.price; });
+      }
+      var count = 0;
+      allItems().forEach(function(it){
+        var v = map[it.id];
+        var inp = inputFor(it.id);
+        if(inp && v !== null && v !== undefined && v !== ''){ inp.value = v; count++; }
+      });
+      refresh();
+      box.className = 'result ok';
+      box.innerHTML = '<b>✓ T-importa prices.json</b> — l9ina <b>'+count+' prix</b> m-3mer. Bdel li bghiti o 3awd Save.';
+    }catch(e){
+      box.className = 'result warn';
+      box.innerHTML = '<b>Ma t-qrach l-fichier.</b> T2aked blli howa prices.json s7i7 li n-zel mn hna.';
+    }
+    box.scrollIntoView({behavior:'smooth', block:'center'});
+    ev.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
+refresh();
+</script>
+</body>
+</html>
