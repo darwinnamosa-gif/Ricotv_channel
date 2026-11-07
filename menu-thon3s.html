@@ -157,12 +157,14 @@
   .item .name{font-weight:800;font-size:1.08rem;line-height:1.45}
   .item .dots{flex:1;border-bottom:3px dotted rgba(122,92,62,.55);min-width:16px;transform:translateY(-5px)}
   .price{
-    flex:0 0 auto;display:flex;align-items:center;gap:5px;color:var(--ink-soft);
-    font-weight:700;font-size:.85rem;white-space:nowrap;
+    flex:0 0 auto;display:flex;align-items:center;gap:5px;color:var(--ink);
+    font-weight:800;font-size:.9rem;white-space:nowrap;
   }
   .price .slot{
-    display:inline-block;width:52px;height:25px;
-    border:2px dashed var(--orange-deep);border-radius:8px;background:rgba(255,255,255,.45);
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:44px;height:28px;padding:0 6px;
+    border:2px solid var(--orange-deep);border-radius:8px;background:#fff8e8;
+    font-weight:900;font-size:1.08rem;line-height:1;color:var(--ink);
   }
   .tag-spicy{
     flex:0 0 auto;font-size:.72rem;font-weight:900;color:#fff;background:var(--red);
@@ -200,7 +202,7 @@
     .badge-special{top:auto;bottom:-38px;inset-inline-end:14px;padding:16px 18px 19px;max-width:158px}
     .hero{padding-bottom:26px}
     .wave{margin-top:44px}
-    .price .slot{width:42px}
+    .price .slot{min-width:38px}
     .item .name{font-size:1.02rem}
   }
   @media print{
@@ -255,19 +257,19 @@
         <p class="sec-intro">سندويشات الطون بأنواعها — بالفرماج، الكاشير، اللانشون… وختار اللي يعجبك.</p>
 
         <div class="menu-list" role="list">
-          <div class="item" role="listitem"><span class="name">طون عادي</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون فرماج</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون كيري</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون كاشير</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون كاشير لانشون</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون كاشير فرماج أحمر</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون كاشير لانشون فرماج أحمر</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون لانشون</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون لانشون فرماج أحمر</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون حاد فيمي</span><span class="tag-spicy">حاد</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون حاد فيمي كاشير</span><span class="tag-spicy">حاد</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون حاد فيمي فرماج أحمر</span><span class="tag-spicy">حاد</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
-          <div class="item" role="listitem"><span class="name">طون فرماج أحمر</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون عادي</span><span class="dots"></span><span class="price"><span class="slot">9</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون فرماج</span><span class="dots"></span><span class="price"><span class="slot">10</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون كيري</span><span class="dots"></span><span class="price"><span class="slot">11</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون كاشير</span><span class="dots"></span><span class="price"><span class="slot">10</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون كاشير لانشون</span><span class="dots"></span><span class="price"><span class="slot">12</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون كاشير فرماج أحمر</span><span class="dots"></span><span class="price"><span class="slot">15</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون كاشير لانشون فرماج أحمر</span><span class="dots"></span><span class="price"><span class="slot">18</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون لانشون</span><span class="dots"></span><span class="price"><span class="slot">11</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون لانشون فرماج أحمر</span><span class="dots"></span><span class="price"><span class="slot">16</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون حاد فيمي</span><span class="tag-spicy">حاد</span><span class="dots"></span><span class="price"><span class="slot">14</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون حاد فيمي كاشير</span><span class="tag-spicy">حاد</span><span class="dots"></span><span class="price"><span class="slot">15</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون حاد فيمي فرماج أحمر</span><span class="tag-spicy">حاد</span><span class="dots"></span><span class="price"><span class="slot">18</span>درهم</span></div>
+          <div class="item" role="listitem"><span class="name">طون فرماج أحمر</span><span class="dots"></span><span class="price"><span class="slot">14</span>درهم</span></div>
         </div>
       </section>
 
@@ -283,15 +285,15 @@
         <div class="menu-list" role="list">
           <div class="item" role="listitem">
             <span class="name-wrap"><span class="name">سلطة المعكرونة</span><span class="desc">المعكرونة · الذرة · البيض · التونة · الصلصة</span></span>
-            <span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span>
+            <span class="dots"></span><span class="price"><span class="slot">20</span>درهم</span>
           </div>
           <div class="item" role="listitem">
             <span class="name-wrap"><span class="name">سلطة الأرز</span><span class="desc">الأرز · الذرة · البيض · التونة · الصلصة</span></span>
-            <span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span>
+            <span class="dots"></span><span class="price"><span class="slot">20</span>درهم</span>
           </div>
           <div class="item" role="listitem">
             <span class="name-wrap"><span class="name">السلطة النيسوازية</span><span class="desc">الخس · الطماطم · التونة · البيض · الزيتون · الصلصة</span></span>
-            <span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span>
+            <span class="dots"></span><span class="price"><span class="slot">20</span>درهم</span>
           </div>
         </div>
       </section>
@@ -304,19 +306,19 @@
         <div class="menu-list" role="list">
           <div class="item" role="listitem">
             <span class="drink-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12l-1.2 18H7.2L6 3z"/><path d="M6.6 9h10.8"/><path d="M15 3l1.5-2"/></svg></span>
-            <span class="name">كاس مشروب غازي</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span>
+            <span class="name">كاس مشروب غازي</span><span class="dots"></span><span class="price"><span class="slot">2</span>درهم</span>
           </div>
           <div class="item" role="listitem">
             <span class="drink-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"/><path d="M10 2v3l-1.5 2.5V20a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V7.5L14 5V2"/><path d="M8.5 13h7"/></svg></span>
-            <span class="name">قرعة مشروب غازي صغيرة</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span>
+            <span class="name">قرعة مشروب غازي صغيرة</span><span class="dots"></span><span class="price"><span class="slot">4</span>درهم</span>
           </div>
           <div class="item" role="listitem">
             <span class="drink-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"/><path d="M10 2v3l-1.5 2.5V20a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V7.5L14 5V2"/><path d="M8.7 15c1.2-1.4 2.2 1 3.3 0s2.1 1.4 3.3 0"/></svg></span>
-            <span class="name">قرعة ماء صغيرة</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span>
+            <span class="name">قرعة ماء صغيرة</span><span class="dots"></span><span class="price"><span class="slot">2</span>درهم</span>
           </div>
           <div class="item" role="listitem">
             <span class="drink-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h13v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5V9z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M7 5c0-1 .8-1 .8-2M11 5c0-1 .8-1 .8-2"/></svg></span>
-            <span class="name">قهوة</span><span class="dots"></span><span class="price"><span class="slot" aria-label="الثمن"></span>درهم</span>
+            <span class="name">قهوة</span><span class="dots"></span><span class="price"><span class="slot">5</span>درهم</span>
           </div>
         </div>
 
