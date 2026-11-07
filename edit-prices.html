@@ -193,6 +193,46 @@
   .rename-box .ok{background:var(--orange);border-color:var(--orange);color:#fff}
   .empty-note{font-size:13.5px;color:var(--ink-soft);background:#fff;border:1.5px dashed var(--line);border-radius:14px;padding:12px 14px;text-align:center;line-height:1.6}
 
+  /* ---------- Category tools (rename / delete any category) ---------- */
+  .group-head{flex-wrap:wrap}
+  .cat-tools{display:flex;gap:6px;flex-shrink:0}
+  .cat-del-btn{
+    appearance:none;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;line-height:1.3;
+    background:var(--red-bg);color:var(--red);border:1.5px solid var(--red);
+    border-radius:999px;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;
+    transition:background .12s ease,color .12s ease,transform .12s ease;
+  }
+  .cat-del-btn:hover{background:#fbd9d6}
+  .cat-del-btn:active{transform:scale(.97)}
+  .cat-del-btn.confirm{
+    background:var(--red);color:#fff;border-color:var(--red);
+    border-radius:14px;white-space:normal;text-align:center;max-width:360px;padding:10px 14px;
+    box-shadow:0 8px 20px rgba(179,38,30,.35);
+  }
+  .cat-rename{display:flex;gap:6px;align-items:center;min-width:0}
+  .cat-rename input{
+    width:180px;max-width:52vw;font-family:'Cairo',sans-serif;font-weight:800;font-size:16px;color:var(--ink);
+    background:#fff;border:2px solid var(--orange);border-radius:10px;padding:7px 10px;outline:none;
+  }
+  .cat-rename .mini-btn{width:34px;height:34px;flex-shrink:0}
+  .cat-rename .ok{background:var(--orange);border-color:var(--orange);color:#fff}
+
+  /* ---------- Category photo (upload / lien + preview mdawra) ---------- */
+  .btn-small{padding:8px 13px;font-size:12.5px}
+  .cat-photo{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-2px 0 12px}
+  .cat-thumb{
+    width:46px;height:46px;border-radius:50%;flex-shrink:0;position:relative;overflow:hidden;
+    border:2px solid var(--line);background:var(--brown-800);color:var(--cream);
+    display:inline-flex;align-items:center;justify-content:center;font-size:19px;
+  }
+  .cat-thumb.orange{background:var(--orange)}
+  .cat-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .cat-photo input[type="url"]{
+    flex:1 1 160px;min-width:0;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--ink);
+    background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;outline:none;
+  }
+  .cat-photo input[type="url"]:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,130,11,.14)}
+
   /* ---------- Result panel ---------- */
   .result{
     display:none;margin-top:22px;border-radius:16px;padding:16px;
@@ -264,6 +304,9 @@
         <li>Wrrek <b>Save</b> l-te7t — ghadi y-nzel lik <b>2 fichiers</b> : <b>prices.json</b> o <b>menu-thon3s.html</b> (l-menu m-jdoud b l-prix).</li>
         <li>Sift l-fichiers l <b>Muse</b> f chat, o howa y-7athom lik f GitHub Pages — nafs l-link o nafs l-QR kay-bqaw.</li>
         <li>T-qder <b>t-zid plat jdid</b> mn l-bloc « Zid plat jdid », <b>t-bdel smiya</b> dyal ay plat b bouton ✎, wla <b>t-ms7o</b> b bouton 🗑 — kolchi kay-tzad f Save.</li>
+        <li>T-qder ta <b>t-zid catégorie jdida</b> (b7al Pizza, Tacos...) mn l-bloc « Zid catégorie jdida » — ghadi t-ban section jdida b smiytha, t-qder t-zid fiha plats, <b>t-bdel smiytha</b> b ✎ wla <b>t-mse7ha</b> b 🗑, o hiya ta hiya kat-khroj f Save.</li>
+        <li>Kol catégorie 3ndha <b>photo</b> : uploadi taswira mn telephone b bouton 📷 wla lsse9 <b>lien dyal taswira</b> o wrrek OK — ghadi t-ban <b>mdawra</b> 7da titre dyal section f l-menu. Ila ma khtarti walo, l-catégories l-qdam kay-bqaw kifma homa, o catégorie jdida bla photo kay-khroj liha placeholder b 7arf smiytha.</li>
+        <li>T-qder <b>t-mse7 ay catégorie</b> — 7ta l-qdam (Sandwich, Salade, Boisson, Plat) — b bouton <b>🗑 Mse7 had catégorie</b> li 7da kol section. Ghadi y-tlb lik <b>confirmation</b>, o mli t-2aked, l-catégorie o ga3 plats dyalha o photo dyalha kay-t-ms7o, o kat-7yed ta mn selector dyal « Zid plat jdid » o mn Save.</li>
       </ol>
     </div>
   </header>
@@ -277,6 +320,16 @@
         <button class="btn btn-ghost" id="clearBtn" type="button">🗑 Kolchi khawi</button>
       </div>
     </div>
+
+    <section class="addbox" aria-label="Zid catégorie jdida">
+      <h2>＋ Zid catégorie jdida</h2>
+      <p>Kteb smiya dyal catégorie jdida (b7al Pizza, Tacos, Jus...) — ghadi t-tzad section jdida b smiytha l-te7t, o t-ban ta f l-selector dyal « Zid plat jdid » bach t-zid fiha plats. B bouton ✎ t-bdel smiytha, o b 🗑 t-mse7ha (o l-plats dyalha kay-t-ms7o m3aha).</p>
+      <div class="addgrid">
+        <input type="text" id="newCatName" class="f-name" dir="auto" placeholder="سمية الفئة الجديدة — ex : Pizza" aria-label="Smiya dyal catégorie jdida">
+        <button class="btn btn-add" id="addCatBtn" type="button">＋ Zid</button>
+      </div>
+      <div class="addmsg" id="addCatMsg" role="status"></div>
+    </section>
 
     <section class="addbox" aria-label="Zid plat jdid">
       <h2>＋ Zid plat jdid</h2>
@@ -355,19 +408,43 @@ var CATS = {
 };
 var CAT_ORDER = ['sandwiches','salades','boissons','plats'];
 var CUSTOM = [];      /* plats zaydin b l-éditeur */
+var CUSTOM_CATS = []; /* catégories jdad zaydin b l-éditeur : {id, name} */
+var DELETED_CATS = []; /* catégories l-qdam li t-ms7o b l-éditeur (sandwiches/salades/boissons/plats) */
+var CAT_PHOTOS = {};  /* photo dyal kol catégorie : catId -> lien wla data URL (upload) */
 var RENAMES = {};     /* smiyat m-bdla dyal l-plats l-qdam */
 var priceCache = {};  /* prix m-7fod 9bel ma t-3awd t-bna l-liste */
 var uidSeq = 0;
+var catUidSeq = 0;
 
 function esc(s){
   return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function displayName(it){ return RENAMES[it.id] || it.name; }
+function isCustomCat(cat){
+  var found = false;
+  CUSTOM_CATS.forEach(function(c){ if(c.id===cat) found = true; });
+  return found;
+}
+function isDeletedCat(cat){ return DELETED_CATS.indexOf(cat) !== -1; }
+function catLabel(cat){
+  if(CATS[cat]) return { ar:CATS[cat].ar, fr:CATS[cat].fr, orange:CATS[cat].orange, custom:false };
+  var name = cat;
+  CUSTOM_CATS.forEach(function(c){ if(c.id===cat) name = c.name; });
+  var idx = 0;
+  CUSTOM_CATS.forEach(function(c, i){ if(c.id===cat) idx = i; });
+  return { ar:name, fr:name, orange:(idx % 2 === 0), custom:true };
+}
+function catOrder(){
+  var order = CAT_ORDER.filter(function(cat){ return !isDeletedCat(cat); });
+  CUSTOM_CATS.forEach(function(c){ order.push(c.id); });
+  return order;
+}
 function groupsData(){
-  var groups = MENU.map(function(g){
+  var groups = MENU.filter(function(g){ return !isDeletedCat(g.cat); }).map(function(g){
     return { cat:g.cat, items:g.items.map(function(it){ return {id:it.id, name:it.name, sub:it.sub||'', custom:false}; }) };
   });
-  groups.push({ cat:'plats', items:[] });
+  if(!isDeletedCat('plats')) groups.push({ cat:'plats', items:[] });
+  CUSTOM_CATS.forEach(function(c){ groups.push({ cat:c.id, items:[] }); });
   CUSTOM.forEach(function(it){
     var g = null;
     groups.forEach(function(x){ if(x.cat===it.cat) g = x; });
@@ -400,6 +477,7 @@ function fmtPrice(n){
 
 /* ---------- Build editor rows ---------- */
 var renamingId = null;
+var renamingCat = null;
 
 function rowHtml(it){
   var name = displayName(it);
@@ -428,13 +506,79 @@ function rowHtml(it){
     + '</div></div>';
 }
 
+function refreshCatSelect(){
+  var sel = el('newCat');
+  if(!sel) return;
+  var current = sel.value;
+  var html = '';
+  catOrder().forEach(function(cat){
+    if(CATS[cat]){
+      var c = CATS[cat];
+      html += '<option value="'+cat+'">'+esc(c.fr)+' — '+esc(c.ar)+'</option>';
+    } else {
+      var lbl = catLabel(cat);
+      html += '<option value="'+cat+'">'+esc(lbl.ar)+'</option>';
+    }
+  });
+  sel.innerHTML = html;
+  var exists = false;
+  for(var i=0;i<sel.options.length;i++){ if(sel.options[i].value===current) exists = true; }
+  if(exists) sel.value = current;
+}
+
+function groupHeadHtml(g){
+  var c = catLabel(g.cat);
+  var head = '';
+  if(c.custom && renamingCat === g.cat){
+    head = '<div class="cat-rename">'
+      + '<input type="text" data-cat-rename="'+g.cat+'" dir="auto" value="'+esc(c.ar)+'" aria-label="Smiya jdida dyal catégorie">'
+      + '<button class="mini-btn ok" type="button" data-cat-save-rename="'+g.cat+'" title="Sauvegarder" aria-label="Sauvegarder smiya">✓</button>'
+      + '<button class="mini-btn" type="button" data-cat-cancel-rename title="Annuler" aria-label="Annuler">✕</button>'
+      + '</div>';
+  } else {
+    head = '<span class="pill'+(c.orange?' orange':'')+'" dir="auto">'+esc(c.ar)+'</span>'
+      + (c.custom ? '<span class="tag-new">JDIDA</span>' : '');
+    if(c.custom){
+      head += '<span class="cat-tools">'
+        + '<button class="mini-btn" type="button" data-cat-rename-btn="'+g.cat+'" title="Bdel smiya dyal catégorie" aria-label="Bdel smiya dyal catégorie '+esc(c.ar)+'">✎</button>'
+        + '</span>';
+    }
+    head += '<button class="cat-del-btn" type="button" data-cat-del="'+g.cat+'" title="Mse7 had catégorie" aria-label="Mse7 had catégorie '+esc(c.ar)+'">🗑 Mse7 had catégorie</button>';
+  }
+  return '<div class="group-head">'+head
+    + '<span class="group-count">'+g.items.length+' plats</span><span class="rule"></span></div>';
+}
+
+function catThumbHtml(g){
+  var c = catLabel(g.cat);
+  var photo = CAT_PHOTOS[g.cat];
+  var inner = '📷';
+  if(photo) inner = '<img data-cat-img="'+g.cat+'" src="'+esc(photo)+'" alt="">';
+  return '<span class="cat-thumb'+(c.orange?' orange':'')+'">'+inner+'</span>';
+}
+function photoBarHtml(g){
+  var cat = g.cat;
+  var photo = CAT_PHOTOS[cat];
+  var isUrl = !!(photo && /^https?:\/\//i.test(photo));
+  return '<div class="cat-photo">'
+    + catThumbHtml(g)
+    + '<label class="btn btn-small btn-ghost" for="photofile-'+cat+'">📷 Photo</label>'
+    + '<input type="file" id="photofile-'+cat+'" data-photo-file="'+cat+'" accept="image/*" hidden>'
+    + '<input type="url" dir="ltr" data-photo-url="'+cat+'" placeholder="'
+      + (photo && !isUrl ? 'Taswira m-uploadea mn telephone ✓ — lsse9 lien bach t-bdelha' : 'wla lsse9 lien dyal taswira https://…')
+      + '" value="'+(isUrl ? esc(photo) : '')+'" aria-label="Lien dyal photo dyal catégorie">'
+    + '<button class="btn btn-small btn-add" type="button" data-photo-url-btn="'+cat+'">OK</button>'
+    + (photo ? '<button class="mini-btn del" type="button" data-photo-clear="'+cat+'" title="7yed l-photo o rje3 l-asliya" aria-label="7yed photo dyal catégorie">✕</button>' : '')
+    + '</div>';
+}
+
 function render(){
   var html='';
   groupsData().forEach(function(g){
-    var c = CATS[g.cat] || {ar:g.cat, fr:g.cat, orange:false};
-    html += '<section class="group" aria-label="'+esc(c.fr)+'">'
-      + '<div class="group-head"><span class="pill'+(c.orange?' orange':'')+'" dir="rtl" lang="ar">'+esc(c.ar)+'</span>'
-      + '<span class="group-count">'+g.items.length+' plats</span><span class="rule"></span></div>'
+    var c = catLabel(g.cat);
+    html += '<section class="group" id="group-'+g.cat+'" aria-label="'+esc(c.fr)+'">'
+      + groupHeadHtml(g)
+      + photoBarHtml(g)
       + '<div class="rows">';
     if(g.items.length===0){
       html += '<div class="empty-note">Ma kayn 7ta plat daba f had l-catégorie — zid wa7ed mn l-bloc « Zid plat jdid » l-foq.</div>';
@@ -444,6 +588,7 @@ function render(){
   });
   el('groups').innerHTML = html;
   wireRows();
+  refreshCatSelect();
   refresh();
 }
 
@@ -486,6 +631,132 @@ function wireRows(){
       }, 3000);
     });
   });
+  document.querySelectorAll('[data-cat-rename-btn]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      renamingCat = btn.getAttribute('data-cat-rename-btn');
+      render();
+      var inp = document.querySelector('input[data-cat-rename="'+renamingCat+'"]');
+      if(inp){ inp.focus(); inp.select(); }
+    });
+  });
+  document.querySelectorAll('[data-cat-save-rename]').forEach(function(btn){
+    btn.addEventListener('click', function(){ saveCatRename(btn.getAttribute('data-cat-save-rename')); });
+  });
+  document.querySelectorAll('input[data-cat-rename]').forEach(function(inp){
+    inp.addEventListener('keydown', function(ev){
+      if(ev.key==='Enter'){ ev.preventDefault(); saveCatRename(inp.getAttribute('data-cat-rename')); }
+      if(ev.key==='Escape'){ renamingCat = null; render(); }
+    });
+  });
+  document.querySelectorAll('[data-cat-cancel-rename]').forEach(function(btn){
+    btn.addEventListener('click', function(){ renamingCat = null; render(); });
+  });
+  document.querySelectorAll('[data-cat-del]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-cat-del');
+      if(btn.getAttribute('data-armed')==='1'){ deleteCategory(id); return; }
+      btn.setAttribute('data-armed','1');
+      btn.classList.add('confirm');
+      btn.textContent = 'Wach mt2ked? Ghadi t-mse7 l-catégorie o ga3 plats dyalha — wrrek hna bach t-2ked 🗑';
+      setTimeout(function(){
+        if(document.body.contains(btn)){ btn.removeAttribute('data-armed'); btn.classList.remove('confirm'); btn.textContent = '🗑 Mse7 had catégorie'; }
+      }, 6000);
+    });
+  });
+  document.querySelectorAll('input[data-photo-file]').forEach(function(inp){
+    inp.addEventListener('change', function(){
+      var file = inp.files && inp.files[0];
+      if(file) handlePhotoFile(inp.getAttribute('data-photo-file'), file);
+      inp.value = '';
+    });
+  });
+  document.querySelectorAll('[data-photo-url-btn]').forEach(function(btn){
+    btn.addEventListener('click', function(){ applyPhotoUrl(btn.getAttribute('data-photo-url-btn')); });
+  });
+  document.querySelectorAll('input[data-photo-url]').forEach(function(inp){
+    inp.addEventListener('keydown', function(ev){
+      if(ev.key==='Enter'){ ev.preventDefault(); applyPhotoUrl(inp.getAttribute('data-photo-url')); }
+    });
+  });
+  document.querySelectorAll('[data-photo-clear]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      delete CAT_PHOTOS[btn.getAttribute('data-photo-clear')];
+      render();
+    });
+  });
+  document.querySelectorAll('img[data-cat-img]').forEach(function(img){
+    img.addEventListener('error', function(){ img.remove(); });
+  });
+}
+
+function handlePhotoFile(cat, file){
+  if(!file || !/^image\//.test(file.type || '')) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      var max = 480;
+      var scale = Math.min(1, max / Math.max(img.width, img.height));
+      var cw = Math.max(1, Math.round(img.width * scale));
+      var ch = Math.max(1, Math.round(img.height * scale));
+      var dataUrl = null;
+      try{
+        var canvas = document.createElement('canvas');
+        canvas.width = cw; canvas.height = ch;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fdf6e7'; ctx.fillRect(0, 0, cw, ch);
+        ctx.drawImage(img, 0, 0, cw, ch);
+        dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      }catch(e){ dataUrl = null; }
+      CAT_PHOTOS[cat] = dataUrl || reader.result;
+      render();
+    };
+    img.onerror = function(){ CAT_PHOTOS[cat] = reader.result; render(); };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+function applyPhotoUrl(cat){
+  var inp = document.querySelector('input[data-photo-url="'+cat+'"]');
+  if(!inp) return;
+  var v = inp.value.trim();
+  if(!v) return;
+  CAT_PHOTOS[cat] = v;
+  render();
+}
+
+function saveCatRename(id){
+  var inp = document.querySelector('input[data-cat-rename="'+id+'"]');
+  if(!inp) return;
+  var v = inp.value.trim();
+  if(v){
+    CUSTOM_CATS.forEach(function(c){ if(c.id===id) c.name = v; });
+  }
+  renamingCat = null;
+  render();
+}
+function deleteCategory(id){
+  delete CAT_PHOTOS[id];
+  if(isCustomCat(id)){
+    CUSTOM_CATS = CUSTOM_CATS.filter(function(c){ return c.id!==id; });
+  } else if(CATS[id] && !isDeletedCat(id)){
+    DELETED_CATS.push(id);
+    /* nqy prix o renames dyal l-plats l-qdam dyal had catégorie */
+    MENU.forEach(function(g){
+      if(g.cat===id) g.items.forEach(function(it){ delete priceCache[it.id]; delete RENAMES[it.id]; });
+    });
+  }
+  CUSTOM = CUSTOM.filter(function(it){
+    if(it.cat===id){ delete priceCache[it.id]; delete RENAMES[it.id]; return false; }
+    return true;
+  });
+  if(renamingCat===id) renamingCat = null;
+  if(renamingId){
+    var still = false;
+    allItems().forEach(function(it){ if(it.id===renamingId) still = true; });
+    if(!still) renamingId = null;
+  }
+  render();
 }
 
 function saveRename(id){
@@ -541,11 +812,16 @@ function buildData(){
   });
   var prices = {};
   items.forEach(function(it){ prices[it.id] = it.price; });
+  var categories = catOrder().map(function(cat){
+    var c = catLabel(cat);
+    return { id:cat, name:c.fr, name_ar:c.custom ? c.ar : CATS[cat].ar, custom:!!c.custom, photo: CAT_PHOTOS[cat] || '' };
+  });
   return {
     restaurant: 'THON <3S — Sandwichs & Salades <3 S',
     currency: 'MAD',
     unit: 'درهم',
     updated: new Date().toISOString(),
+    categories: categories,
     prices: prices,
     items: items
   };
@@ -580,6 +856,9 @@ function buildMenuHTML(){
     '.ghead{display:flex;align-items:center;gap:12px;margin-bottom:10px}',
     '.pill{font-weight:900;font-size:19px;color:#fff;background:#3a2312;padding:7px 20px;border-radius:999px 999px 999px 8px}',
     '.pill.o{background:#f5820b}',
+    '.cphoto{width:54px;height:54px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #e7d6b4}',
+    '.cphoto.ph{display:inline-flex;align-items:center;justify-content:center;background:#3a2312;color:#fdf6e7;font-weight:900;font-size:23px}',
+    '.cphoto.ph.o{background:#f5820b}',
     '.grule{flex:1;border-top:3px dotted #e7d6b4}',
     '.mrow{display:flex;align-items:flex-end;gap:12px;padding:9px 2px;border-bottom:1px dashed #eadfc2}',
     '.mrow:last-child{border-bottom:0}',
@@ -591,10 +870,18 @@ function buildMenuHTML(){
     'footer{text-align:center;color:#b99c72;font-size:13px;margin-top:22px;line-height:1.7}'
   ].join('\n');
   var sections = '';
-  CAT_ORDER.forEach(function(cat){
+  catOrder().forEach(function(cat){
     if(allItems().filter(function(it){ return it.group===cat; }).length===0) return;
-    var c = CATS[cat];
-    sections += '<section class="group"><div class="ghead"><span class="pill'+(c.orange?' o':'')+'" dir="rtl" lang="ar">'+c.ar+'</span><span class="grule"></span></div>'
+    var c = catLabel(cat);
+    var photo = CAT_PHOTOS[cat];
+    var photoHtml = '';
+    if(photo){
+      photoHtml = '<img class="cphoto" src="'+esc(photo)+'" alt="">';
+    } else if(c.custom){
+      var letter = (c.ar || '').trim().charAt(0);
+      photoHtml = '<span class="cphoto ph'+(c.orange?' o':'')+'">'+esc(letter)+'</span>';
+    }
+    sections += '<section class="group"><div class="ghead">'+photoHtml+'<span class="pill'+(c.orange?' o':'')+'" dir="auto">'+esc(c.ar)+'</span><span class="grule"></span></div>'
       + menuRows(cat) + '</section>\n';
   });
   return '<!doctype html>\n<html lang="ar">\n<head>\n<meta charset="utf-8">\n'
@@ -709,6 +996,29 @@ el('addBtn').addEventListener('click', function(){
 el('newName').addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); el('addBtn').click(); } });
 el('newPrice').addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); el('addBtn').click(); } });
 
+/* ---------- Zid catégorie jdida ---------- */
+el('addCatBtn').addEventListener('click', function(){
+  var name = el('newCatName').value.trim();
+  var msg = el('addCatMsg');
+  if(!name){
+    msg.className = 'addmsg err';
+    msg.textContent = '⚠ Kteb smiya dyal catégorie awal.';
+    el('newCatName').focus();
+    return;
+  }
+  var id = 'cat-' + Date.now().toString(36) + '-' + (++catUidSeq);
+  CUSTOM_CATS.push({ id:id, name:name });
+  el('newCatName').value = '';
+  msg.className = 'addmsg ok';
+  msg.textContent = '✓ T-zadat catégorie « ' + name + ' » — section jdida b smiytha l-te7t, o t-qder t-zid fiha plats mn « Zid plat jdid ». Ghadi t-khroj f l-menu mli t-dir Save.';
+  render();
+  var sel = el('newCat');
+  if(sel) sel.value = id;
+  var sec = el('group-'+id);
+  if(sec) sec.scrollIntoView({behavior:'smooth', block:'center'});
+});
+el('newCatName').addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); el('addCatBtn').click(); } });
+
 /* ---------- Import an existing prices.json ---------- */
 el('importFile').addEventListener('change', function(ev){
   var file = ev.target.files && ev.target.files[0];
@@ -723,6 +1033,25 @@ el('importFile').addEventListener('change', function(ev){
         data.items.forEach(function(it){ if(it && it.id && (map[it.id]===undefined || map[it.id]===null) && it.price!==undefined) map[it.id] = it.price; });
       }
       var added = 0;
+      var addedCats = 0;
+      var addedPhotos = 0;
+      var catNames = {};
+      if(Array.isArray(data.categories)){
+        var importedCatIds = [];
+        data.categories.forEach(function(c){ if(c && c.id) importedCatIds.push(c.id); });
+        /* catégorie qdima ghayba mn l-fichier = t-ms7at : khliha m-msou7a, o li kayna rje3ha */
+        DELETED_CATS = CAT_ORDER.filter(function(cat){ return importedCatIds.indexOf(cat) === -1; });
+        DELETED_CATS.forEach(function(cat){ delete CAT_PHOTOS[cat]; });
+        data.categories.forEach(function(c){
+          if(!c || !c.id) return;
+          if(c.name) catNames[c.id] = c.name;
+          if(c.photo){ CAT_PHOTOS[c.id] = c.photo; addedPhotos++; }
+          if(!CATS[c.id] && !isCustomCat(c.id) && c.name){
+            CUSTOM_CATS.push({ id:c.id, name:c.name });
+            addedCats++;
+          }
+        });
+      }
       if(Array.isArray(data.items)){
         data.items.forEach(function(it){
           if(!it || !it.id || !it.name) return;
@@ -732,7 +1061,14 @@ el('importFile').addEventListener('change', function(ev){
           if(base){
             if(it.name !== base.name) RENAMES[it.id] = it.name;
           } else if(!known){
-            var cat = CATS[it.category] ? it.category : 'plats';
+            var cat = it.category;
+            if(!CATS[cat] && !isCustomCat(cat)){
+              if(cat && typeof cat === 'string'){
+                CUSTOM_CATS.push({ id:cat, name:catNames[cat] || cat });
+                addedCats++;
+              } else { cat = 'plats'; }
+            }
+            if(!cat) cat = 'plats';
             CUSTOM.push({ id:it.id, cat:cat, name:it.name, sub:it.sub||'' });
             added++;
           }
@@ -749,6 +1085,8 @@ el('importFile').addEventListener('change', function(ev){
       box.className = 'result ok';
       box.innerHTML = '<b>✓ T-importa prices.json</b> — l9ina <b>'+count+' prix</b> m-3mer'
         + (added ? ' o <b>'+added+' plat zayd</b> t-rstoraw mn l-fichier' : '')
+        + (addedCats ? ' o <b>'+addedCats+' catégorie jdida</b> t-rstoraw ta homa' : '')
+        + (addedPhotos ? ' o <b>'+addedPhotos+' photo</b> dyal catégories t-rstoraw' : '')
         + '. Bdel li bghiti o 3awd Save.';
     }catch(e){
       box.className = 'result warn';
