@@ -1,0 +1,150 @@
+{
+  "restaurant": "THON <3S — Sandwichs & Salades <3 S",
+  "currency": "MAD",
+  "unit": "درهم",
+  "updated": "2026-11-07T00:28:10.674Z",
+  "prices": {
+    "thon-adi": 9,
+    "thon-fromage": 10,
+    "thon-kiri": 11,
+    "thon-kachir": 10,
+    "thon-kachir-lanchon": 12,
+    "thon-kachir-fromage-ahmar": 15,
+    "thon-kachir-lanchon-fromage-ahmar": 18,
+    "thon-lanchon": 11,
+    "thon-lanchon-fromage-ahmar": 16,
+    "thon-had-fume": 14,
+    "thon-had-fume-kachir": 15,
+    "thon-had-fume-fromage-ahmar": 18,
+    "thon-fromage-ahmar": 14,
+    "salade-pates": 20,
+    "salade-riz": 20,
+    "salade-nicoise": 20,
+    "verre-soda": 2,
+    "bouteille-soda-petite": 4,
+    "bouteille-eau-petite": 2,
+    "cafe": 5
+  },
+  "items": [
+    {
+      "id": "thon-adi",
+      "category": "sandwiches",
+      "name": "طون عادي",
+      "price": 9
+    },
+    {
+      "id": "thon-fromage",
+      "category": "sandwiches",
+      "name": "طون فرماج",
+      "price": 10
+    },
+    {
+      "id": "thon-kiri",
+      "category": "sandwiches",
+      "name": "طون كيري",
+      "price": 11
+    },
+    {
+      "id": "thon-kachir",
+      "category": "sandwiches",
+      "name": "طون كاشير",
+      "price": 10
+    },
+    {
+      "id": "thon-kachir-lanchon",
+      "category": "sandwiches",
+      "name": "طون كاشير لانشون",
+      "price": 12
+    },
+    {
+      "id": "thon-kachir-fromage-ahmar",
+      "category": "sandwiches",
+      "name": "طون كاشير فرماج احمر",
+      "price": 15
+    },
+    {
+      "id": "thon-kachir-lanchon-fromage-ahmar",
+      "category": "sandwiches",
+      "name": "طون كاشير لانشون فرماج احمر",
+      "price": 18
+    },
+    {
+      "id": "thon-lanchon",
+      "category": "sandwiches",
+      "name": "طون لانشون",
+      "price": 11
+    },
+    {
+      "id": "thon-lanchon-fromage-ahmar",
+      "category": "sandwiches",
+      "name": "طون لانشون فرماج احمر",
+      "price": 16
+    },
+    {
+      "id": "thon-had-fume",
+      "category": "sandwiches",
+      "name": "طون حاد فيمي",
+      "price": 14
+    },
+    {
+      "id": "thon-had-fume-kachir",
+      "category": "sandwiches",
+      "name": "طون حاد فيمي كاشير",
+      "price": 15
+    },
+    {
+      "id": "thon-had-fume-fromage-ahmar",
+      "category": "sandwiches",
+      "name": "طون حاد فيمي فرماج احمر",
+      "price": 18
+    },
+    {
+      "id": "thon-fromage-ahmar",
+      "category": "sandwiches",
+      "name": "طون فرماج احمر",
+      "price": 14
+    },
+    {
+      "id": "salade-pates",
+      "category": "salades",
+      "name": "سلطة المعكرونة",
+      "price": 20
+    },
+    {
+      "id": "salade-riz",
+      "category": "salades",
+      "name": "سلطة الأرز",
+      "price": 20
+    },
+    {
+      "id": "salade-nicoise",
+      "category": "salades",
+      "name": "السلطة النيسوازية",
+      "price": 20
+    },
+    {
+      "id": "verre-soda",
+      "category": "boissons",
+      "name": "كاس مشروب غازي",
+      "price": 2
+    },
+    {
+      "id": "bouteille-soda-petite",
+      "category": "boissons",
+      "name": "قرعة مشروب غازي صغيرة",
+      "price": 4
+    },
+    {
+      "id": "bouteille-eau-petite",
+      "category": "boissons",
+      "name": "قرعة ماء صغيرة",
+      "price": 2
+    },
+    {
+      "id": "cafe",
+      "category": "boissons",
+      "name": "قهوة",
+      "price": 5
+    }
+  ]
+}
