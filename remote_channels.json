@@ -2,7 +2,7 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 65,
+  "version": 66,
   "appUpdate": {
     "versionCode": 77,
     "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code77.apk",
@@ -12,84 +12,44 @@
   },
   "lines": [
     {
-      "u": "quPF2P5S",
-      "p": "nXF2Hmh"
+      "u": "uDzF9eEy",
+      "p": "bz7eUwK"
     },
     {
-      "u": "mdSCnHd7",
-      "p": "c3GyNaY"
+      "u": "zq1uGxA4",
+      "p": "mmNUfxB"
     },
     {
-      "u": "tRMTgrrQ",
-      "p": "eEg32ug"
+      "u": "a5gtb652",
+      "p": "bqFJbN1"
     },
     {
-      "u": "ghNRRX5g",
-      "p": "jZFAFZW"
+      "u": "uMzZ9K5d",
+      "p": "fPx3GQx"
     },
     {
-      "u": "cSUJnW2P",
-      "p": "dSEhUcz"
+      "u": "q9XT87xE",
+      "p": "n9aghJp"
     },
     {
-      "u": "ed9BRCY0",
-      "p": "cz5tnjP"
+      "u": "fadW8s96",
+      "p": "a77B6CR"
     },
     {
-      "u": "aAFjtJaW",
-      "p": "qb1bHUx"
+      "u": "cyXq6h08",
+      "p": "xEB38dT"
     },
     {
-      "u": "bwY3rc2f",
-      "p": "g2m6CJD"
+      "u": "k1twq2Fb",
+      "p": "n31eTek"
     },
     {
-      "u": "kBmPDC0H",
-      "p": "g2mjArn"
+      "u": "h1ueNEjs",
+      "p": "peSeBbB"
     },
     {
-      "u": "ebzkB3F4",
-      "p": "wdjDTnq"
-    },
-    {
-      "u": "md5pwbdR",
-      "p": "gAfn7KJ"
-    },
-    {
-      "u": "sMDb2XtJ",
-      "p": "cSNccx1"
-    },
-    {
-      "u": "qeapnTEr",
-      "p": "bscuJms"
-    },
-    {
-      "u": "zwHd4T9Z",
-      "p": "wZWrU5y"
-    },
-    {
-      "u": "cARdS8Dj",
-      "p": "cj83X8Z"
-    },
-    {
-      "u": "p4egRJhB",
-      "p": "aS284zA"
-    },
-    {
-      "u": "uQUS3Jbj",
-      "p": "czC7efX"
-    },
-    {
-      "u": "hEpzt5Wu",
-      "p": "fbFF6Au"
-    },
-    {
-      "u": "gYNM4SUQ",
-      "p": "dkC2n15"
-    },
-    {
-      "u": "jJrbf8Mg",
-      "p": "kRdh8zd"
+      "u": "j2Dz6NSy",
+      "p": "etqXHKx"
     },
     {
       "u": "hZhNYTU7",
@@ -104,5 +64,5 @@
       "p": "c9yBUpQ"
     }
   ],
-  "linesExp": 1794088860000
+  "linesExp": 1794132120000
 }
