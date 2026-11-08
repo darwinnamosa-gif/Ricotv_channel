@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light" />
+<link rel="icon" href="data:," />
+<title>THON 3S - Commander à table</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+  :root{
+    --orange-1:#FFA94D;
+    --orange-2:#FFB26B;
+    --orange-deep:#F08C1E;
+    --black:#111111;
+    --black-2:#1C1C1C;
+    --paper:#FFF8F0;
+    --card:#FFFFFF;
+    --ink:#1A1208;
+    --muted:#6B5A44;
+    --line:#F1DFC8;
+    --red-bg:#FDECEC;
+    --red-ink:#7A1F1F;
+    --green:#1B7A3D;
+  }
+  *{box-sizing:border-box}
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0;
+    background:var(--black);
+    color:var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  button{ font-family:inherit; -webkit-tap-highlight-color:transparent; }
+  button:focus-visible{ outline:3px solid #111; outline-offset:2px; }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background: linear-gradient(135deg, var(--orange-1) 0%, var(--orange-2) 100%);
+    color:#111;
+    padding: 26px 18px 22px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; inset:auto -40px -70px -40px; height:90px;
+    background: rgba(0,0,0,.08);
+    transform: rotate(-2deg);
+    border-radius:50%;
+  }
+  .hero-kicker{
+    font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    opacity:.75; margin:0 0 2px;
+  }
+  .hero-title{
+    margin:0;
+    font-size: clamp(56px, 17vw, 92px);
+    line-height:.92;
+    font-weight:900;
+    letter-spacing:-.02em;
+    font-family: "Arial Black", system-ui, sans-serif;
+  }
+  .hero-title .heart{ color:#C21807; }
+  .hero-sub{
+    margin:8px 0 0;
+    font-size:17px; font-weight:700;
+  }
+  .hero-sub-ar{
+    margin:2px 0 0;
+    font-size:19px; font-weight:700;
+  }
+  .table-badge{
+    display:none;
+    margin:16px auto 0;
+    background:#111; color:var(--orange-2);
+    font-size:22px; font-weight:900;
+    padding:10px 22px; border-radius:999px;
+    width:fit-content; position:relative; z-index:1;
+    box-shadow:0 6px 18px rgba(0,0,0,.25);
+  }
+  .table-badge.show{ display:block; }
+  .change-table{
+    display:none; margin:10px auto 0; position:relative; z-index:1;
+    background:transparent; border:1.5px solid rgba(0,0,0,.55); color:#111;
+    font-size:13px; font-weight:700; padding:6px 14px; border-radius:999px; cursor:pointer;
+  }
+  .change-table.show{ display:block; }
+
+  /* ---------- Layout ---------- */
+  .wrap{ max-width:640px; margin:0 auto; padding:0 14px 120px; }
+  .panel{
+    background:var(--paper);
+    margin-top:-6px;
+    border-radius:22px 22px 0 0;
+    padding:18px 14px 8px;
+    min-height:60vh;
+  }
+
+  /* ---------- Picker ---------- */
+  .picker{ text-align:center; padding:16px 6px 30px; }
+  .picker h2{ margin:6px 0 4px; font-size:26px; font-weight:900; color:#111; }
+  .picker .ar{ font-size:22px; font-weight:800; color:#111; margin:0 0 6px; }
+  .picker p{ color:var(--muted); font-size:15px; margin:0 0 22px; }
+  .picker-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:380px; margin:0 auto; }
+  .picker-btn{
+    aspect-ratio:1.15; border:none; cursor:pointer;
+    background:#111; color:var(--orange-2);
+    font-size:34px; font-weight:900; border-radius:18px;
+    box-shadow:0 6px 14px rgba(0,0,0,.18);
+  }
+  .picker-btn:active{ transform:scale(.96); }
+  .picker-btn small{ display:block; font-size:12px; font-weight:700; color:#fff; opacity:.75; letter-spacing:.08em; }
+
+  /* ---------- Sections ---------- */
+  .section{ margin-top:26px; }
+  .section:first-child{ margin-top:6px; }
+  .section-head{
+    background:var(--black); color:#fff;
+    border-radius:14px; padding:12px 16px;
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  }
+  .section-head .fr{ font-size:19px; font-weight:900; color:var(--orange-2); letter-spacing:.01em; }
+  .section-head .ar{ font-size:19px; font-weight:800; color:#fff; }
+  .dish-list{ display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+  .dish{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:12px 12px 12px 14px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .dish-names{ flex:1; min-width:0; text-align:right; }
+  .dish-name-ar{ font-size:18px; font-weight:800; line-height:1.35; color:#161006; overflow-wrap:break-word; }
+  .dish-name-fr{ font-size:13.5px; font-weight:600; color:var(--muted); margin-top:1px; direction:ltr; text-align:right; }
+  .dish-side{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .price-badge{
+    background:#111; color:var(--orange-2);
+    font-size:14.5px; font-weight:900; white-space:nowrap;
+    padding:7px 10px; border-radius:999px;
+  }
+  .price-badge.free{ background:#111; color:#7EE2A0; }
+  .add-btn{
+    width:46px; height:46px; border-radius:50%; border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--orange-1), var(--orange-2));
+    color:#111; font-size:28px; font-weight:900; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 10px rgba(240,140,30,.4);
+    flex-shrink:0;
+  }
+  .add-btn:active{ transform:scale(.93); }
+  .stepper{
+    display:none; align-items:center; gap:2px;
+    background:#111; border-radius:999px; padding:3px;
+    flex-shrink:0;
+  }
+  .stepper.show{ display:flex; }
+  .stepper button{
+    width:40px; height:40px; border-radius:50%; border:none; cursor:pointer;
+    background:transparent; color:var(--orange-2); font-size:24px; font-weight:900; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .stepper button:active{ background:rgba(255,255,255,.15); }
+  .stepper .qty{ min-width:26px; text-align:center; color:#fff; font-size:17px; font-weight:900; }
+
+  .hint{ text-align:center; color:var(--muted); font-size:14px; margin:26px 8px 10px; line-height:1.6; }
+
+  /* ---------- Cart bar ---------- */
+  .cart-bar{
+    position:fixed; left:0; right:0; bottom:0; z-index:40;
+    background:#111; color:#fff;
+    padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+    display:none;
+    box-shadow:0 -6px 24px rgba(0,0,0,.35);
+  }
+  .cart-bar.show{ display:block; }
+  .cart-bar-inner{ max-width:640px; margin:0 auto; display:flex; align-items:center; gap:12px; }
+  .cart-total{ flex:1; min-width:0; }
+  .cart-total .lbl{ font-size:12.5px; color:#D8C7AE; font-weight:600; }
+  .cart-total .val{ font-size:24px; font-weight:900; color:var(--orange-2); line-height:1.1; white-space:nowrap; }
+  .cart-total .count{ font-size:13px; color:#fff; opacity:.8; font-weight:600; }
+  .order-btn{
+    border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--orange-1), var(--orange-2));
+    color:#111; font-size:18px; font-weight:900;
+    padding:15px 26px; border-radius:999px; white-space:nowrap;
+    box-shadow:0 6px 16px rgba(240,140,30,.45);
+  }
+  .order-btn:active{ transform:scale(.97); }
+  .order-btn:disabled{ opacity:.45; box-shadow:none; }
+
+  /* ---------- Sheet ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:60; background:rgba(10,6,2,.62);
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .overlay.show{ display:flex; }
+  .sheet{
+    background:var(--paper); width:100%; max-width:640px;
+    border-radius:24px 24px 0 0; padding:20px 18px calc(20px + env(safe-area-inset-bottom));
+    max-height:88vh; overflow-y:auto;
+  }
+  .sheet h3{ margin:0 0 2px; font-size:22px; font-weight:900; }
+  .sheet .sheet-ar{ font-size:18px; font-weight:800; margin:0 0 4px; text-align:right; }
+  .sheet .sheet-table{ display:inline-block; background:#111; color:var(--orange-2); font-weight:900; font-size:15px; padding:5px 14px; border-radius:999px; margin:6px 0 12px; }
+  .confirm-row{
+    display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px dashed var(--line);
+  }
+  .confirm-row .names{ flex:1; min-width:0; text-align:right; }
+  .confirm-row .n-ar{ font-weight:800; font-size:16px; }
+  .confirm-row .n-fr{ font-size:12.5px; color:var(--muted); direction:ltr; text-align:right; }
+  .confirm-row .q{ font-weight:900; background:#FFE3C2; border-radius:8px; padding:3px 9px; font-size:15px; white-space:nowrap; }
+  .confirm-row .lt{ font-weight:900; font-size:15.5px; white-space:nowrap; min-width:64px; text-align:left; direction:ltr; }
+  .confirm-total{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 2px 4px; font-size:19px; font-weight:900;
+  }
+  .confirm-total .t-val{ color:#B35E00; font-size:23px; }
+  .error-box{
+    display:none; background:var(--red-bg); color:var(--red-ink);
+    border-radius:14px; padding:13px 15px; font-size:15px; font-weight:600; line-height:1.6; margin-top:14px;
+  }
+  .error-box.show{ display:block; }
+  .error-box .ar{ display:block; font-weight:800; margin-top:4px; }
+  .sheet-actions{ display:flex; flex-direction:column; gap:10px; margin-top:18px; }
+  .confirm-btn{
+    border:none; cursor:pointer; width:100%;
+    background:#111; color:var(--orange-2);
+    font-size:18px; font-weight:900; padding:16px; border-radius:999px;
+  }
+  .confirm-btn:disabled{ opacity:.55; }
+  .cancel-btn{
+    border:1.5px solid #D9C6A8; cursor:pointer; width:100%;
+    background:transparent; color:#5C4A30;
+    font-size:16px; font-weight:800; padding:13px; border-radius:999px;
+  }
+
+  /* ---------- Success ---------- */
+  .success{ display:none; text-align:center; padding:34px 10px 40px; }
+  .success.show{ display:block; }
+  .check{
+    width:104px; height:104px; margin:0 auto 18px; border-radius:50%;
+    background:var(--green); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 26px rgba(27,122,61,.35);
+  }
+  .check svg{ width:56px; height:56px; }
+  .success h2{ margin:0 0 6px; font-size:30px; font-weight:900; }
+  .success .s-table{ font-size:19px; font-weight:800; margin:4px 0; }
+  .success .s-total{ font-size:19px; font-weight:800; margin:4px 0 14px; }
+  .success .s-total b{ color:#B35E00; font-size:24px; }
+  .success .pay-note{
+    background:#FFE3C2; border-radius:14px; padding:14px 16px;
+    font-size:17px; font-weight:800; line-height:1.6; margin:0 auto 22px; max-width:420px;
+  }
+  .success .pay-note .fr{ display:block; font-size:14.5px; font-weight:700; color:#6B4A1A; margin-top:4px; }
+  .new-btn{
+    border:none; cursor:pointer;
+    background:#111; color:var(--orange-2);
+    font-size:17px; font-weight:900; padding:15px 30px; border-radius:999px;
+  }
+
+  .hidden{ display:none !important; }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="hero-kicker">Sandwichs &amp; Salades</p>
+  <h1 class="hero-title">THON <span class="heart">&lt;3</span>S</h1>
+  <p class="hero-sub-ar" dir="rtl">طون &lt;3 س — سندويشات وسلطات</p>
+  <p class="hero-sub">Commandez depuis votre table</p>
+  <div class="table-badge" id="tableBadge">Table 1</div>
+  <button class="change-table" id="changeTableBtn" type="button">Changer de table · تغيير الطاولة</button>
+</header>
+
+<div class="wrap">
+  <div class="panel">
+
+    <!-- Table picker -->
+    <section class="picker" id="pickerView">
+      <p class="ar" dir="rtl">اختر طاولتك</p>
+      <h2>Choisir votre table</h2>
+      <p>Sélectionnez le numéro de votre table pour voir le menu.<br><span dir="rtl">اختر رقم الطاولة ديالك باش يبان ليك المنيو.</span></p>
+      <div class="picker-grid" id="pickerGrid"></div>
+    </section>
+
+    <!-- Menu -->
+    <main id="menuView" class="hidden">
+      <div id="menuSections"></div>
+      <p class="hint">Ajoutez vos plats avec le bouton +<br><span dir="rtl">زيد الأطباق ديالك بزر + وعاود راجع الطلب قبل ما تصيفطو.</span></p>
+    </main>
+
+    <!-- Success -->
+    <section class="success" id="successView">
+      <div class="check" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h2>Commande envoyée !</h2>
+      <p class="s-table" id="successTable">Table 1</p>
+      <p class="s-total">Total : <b id="successTotal">0 DH</b></p>
+      <div class="pay-note">
+        L-khlass f l-contoire mli t-sali
+        <span class="fr">Paiement au comptoir quand vous aurez terminé.</span>
+      </div>
+      <button class="new-btn" id="newOrderBtn" type="button">Nouvelle commande · طلب جديد</button>
+    </section>
+
+  </div>
+</div>
+
+<!-- Sticky cart bar -->
+<div class="cart-bar" id="cartBar">
+  <div class="cart-bar-inner">
+    <div class="cart-total">
+      <div class="lbl">Total · <span dir="rtl">المجموع</span> — <span class="count" id="cartCount">0 article</span></div>
+      <div class="val" id="cartTotalVal">0 DH</div>
+    </div>
+    <button class="order-btn" id="orderBtn" type="button">Commander</button>
+  </div>
+</div>
+
+<!-- Confirmation sheet -->
+<div class="overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-label="Confirmation de la commande">
+  <div class="sheet">
+    <p class="sheet-ar" dir="rtl">تأكيد الطلب</p>
+    <h3>Votre commande</h3>
+    <span class="sheet-table" id="confirmTable">Table 1</span>
+    <div id="confirmList"></div>
+    <div class="confirm-total"><span>Total · <span dir="rtl">المجموع</span></span><span class="t-val" id="confirmTotalVal">0 DH</span></div>
+    <div class="error-box" id="errorBox">
+      La commande n'a pas pu être envoyée. Merci d'appeler un serveur pour commander.
+      <span class="ar" dir="rtl">ما قدرناش نصيفطو الطلب. عيط على النادل من فضلك باش تدير الطلب ديالك.</span>
+    </div>
+    <div class="sheet-actions">
+      <button class="confirm-btn" id="confirmBtn" type="button">Confirmer la commande</button>
+      <button class="cancel-btn" id="cancelBtn" type="button">Retour · رجوع</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   FIREBASE_CONFIG — collez ici la configuration Firebase du restaurant
+   (Console Firebase > Paramètres du projet > Vos applications > Web)
+   ============================================================ */
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDz8e2BUfNhCl3e_E449nMtZsYA47TDFKg",
+  authDomain: "thon-3s-orders.firebaseapp.com",
+  databaseURL: "https://thon-3s-orders-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "thon-3s-orders",
+  storageBucket: "thon-3s-orders.firebasestorage.app",
+  messagingSenderId: "60533964819",
+  appId: "1:60533964819:web:5e5f8fced88484f55cbfe6"
+};
+
+/* ---------------- Menu data ---------------- */
+var MENU = [
+  {
+    id: "sandwichs", fr: "Sandwichs", ar: "السندويشات",
+    items: [
+      { id: "thon-adi", name: "طون عادي", name_fr: "", price: 9 },
+      { id: "thon-fromage", name: "طون فرماج", name_fr: "", price: 10 },
+      { id: "thon-kiri", name: "طون كيري", name_fr: "", price: 11 },
+      { id: "thon-kachir", name: "طون كاشير", name_fr: "", price: 10 },
+      { id: "thon-kachir-lanchon", name: "طون كاشير لانشون", name_fr: "", price: 12 },
+      { id: "thon-kachir-fromage-ahmar", name: "طون كاشير فرماج احمر", name_fr: "", price: 15 },
+      { id: "thon-kachir-lanchon-fromage-ahmar", name: "طون كاشير لانشون فرماج احمر", name_fr: "", price: 18 },
+      { id: "thon-lanchon", name: "طون لانشون", name_fr: "", price: 11 },
+      { id: "thon-lanchon-fromage-ahmar", name: "طون لانشون فرماج احمر", name_fr: "", price: 16 },
+      { id: "thon-dand-fume", name: "طون داند فيمي", name_fr: "", price: 14 },
+      { id: "thon-dand-fume-kachir", name: "طون داند فيمي كاشير", name_fr: "", price: 15 },
+      { id: "thon-dand-fume-fromage-ahmar", name: "طون داند فيمي فرماج احمر", name_fr: "", price: 18 },
+      { id: "thon-fromage-ahmar", name: "طون فرماج احمر", name_fr: "", price: 14 },
+      { id: "thon-double", name: "طون دوبل", name_fr: "Thon Double", price: 13 }
+    ]
+  },
+  {
+    id: "salades", fr: "Salades", ar: "السلطات",
+    items: [
+      { id: "salade-pates", name: "سلطة المعكرونة", name_fr: "", price: 20 },
+      { id: "salade-riz", name: "سلطة الأرز", name_fr: "", price: 20 },
+      { id: "salade-nicoise", name: "السلطة النيسوازية", name_fr: "", price: 20 }
+    ]
+  },
+  {
+    id: "boissons", fr: "Boissons", ar: "المشروبات",
+    items: [
+      { id: "verre-soda", name: "كاس مشروب غازي", name_fr: "", price: 2 },
+      { id: "bouteille-soda-petite", name: "قرعة مشروب غازي صغيرة", name_fr: "", price: 4 },
+      { id: "bouteille-eau-petite", name: "قرعة ماء صغيرة", name_fr: "", price: 2 },
+      { id: "cafe", name: "قهوة", name_fr: "", price: 6 }
+    ]
+  },
+  {
+    id: "sauces", fr: "Sauces", ar: "الصلصات",
+    items: [
+      { id: "mayonnaise", name: "مايونيز", name_fr: "Mayonaise", price: 0 },
+      { id: "ketchup", name: "كيتشاب", name_fr: "Ketchup", price: 0 },
+      { id: "ranch", name: "رانش", name_fr: "Ranch", price: 1 },
+      { id: "sauce-3", name: "صلصة 3>", name_fr: "Sauce <3", price: 1 },
+      { id: "sauce-fromages", name: "صوص فروماج (بيكي، الجيريان)", name_fr: "Sauce fromages (Biggy, algérienne)", price: 0 }
+    ]
+  },
+  {
+    id: "special", fr: "Spécial <3S", ar: "وجبات 3> سبيسيال",
+    items: [
+      { id: "sandwich-royale", name: "سندويش رويال", name_fr: "Sandwich Royale", price: 25 },
+      { id: "salade-royale", name: "سلطة رويال", name_fr: "Salade royale", price: 30 },
+      { id: "salade-avocat", name: "سلطة الافوكادو", name_fr: "Salade acocado", price: 35 }
+    ]
+  }
+];
+
+var ITEM_INDEX = {};
+MENU.forEach(function(cat){ cat.items.forEach(function(it){ ITEM_INDEX[it.id] = it; }); });
+
+/* ---------------- State ---------------- */
+var selectedTable = null;
+var cart = {}; /* id -> qty */
+var sending = false;
+
+var pickerView = document.getElementById('pickerView');
+var menuView = document.getElementById('menuView');
+var successView = document.getElementById('successView');
+var tableBadge = document.getElementById('tableBadge');
+var changeTableBtn = document.getElementById('changeTableBtn');
+var cartBar = document.getElementById('cartBar');
+var cartTotalVal = document.getElementById('cartTotalVal');
+var cartCount = document.getElementById('cartCount');
+var orderBtn = document.getElementById('orderBtn');
+var confirmOverlay = document.getElementById('confirmOverlay');
+var confirmList = document.getElementById('confirmList');
+var confirmTable = document.getElementById('confirmTable');
+var confirmTotalVal = document.getElementById('confirmTotalVal');
+var confirmBtn = document.getElementById('confirmBtn');
+var cancelBtn = document.getElementById('cancelBtn');
+var errorBox = document.getElementById('errorBox');
+
+/* ---------------- Table from URL ---------------- */
+function tableFromUrl(){
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var t = parseInt(params.get('table'), 10);
+    if (t >= 1 && t <= 6) return t;
+  } catch(e) {}
+  return null;
+}
+
+function buildPicker(){
+  var grid = document.getElementById('pickerGrid');
+  for (var n = 1; n <= 6; n++) {
+    (function(num){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'picker-btn';
+      b.setAttribute('aria-label', 'Table ' + num);
+      var small = document.createElement('small');
+      small.textContent = 'TABLE';
+      b.appendChild(document.createTextNode(String(num)));
+      b.appendChild(small);
+      b.addEventListener('click', function(){ selectTable(num, true); });
+      grid.appendChild(b);
+    })(n);
+  }
+}
+
+function selectTable(num, updateUrl){
+  selectedTable = num;
+  tableBadge.textContent = 'Table ' + num;
+  tableBadge.classList.add('show');
+  changeTableBtn.classList.add('show');
+  pickerView.classList.add('hidden');
+  successView.classList.remove('show');
+  menuView.classList.remove('hidden');
+  updateCartBar();
+  if (updateUrl) {
+    try {
+      var url = new URL(window.location.href);
+      url.searchParams.set('table', String(num));
+      window.history.replaceState(null, '', url.toString());
+    } catch(e) {}
+  }
+  window.scrollTo(0, 0);
+}
+
+function showPicker(){
+  selectedTable = null;
+  tableBadge.classList.remove('show');
+  changeTableBtn.classList.remove('show');
+  menuView.classList.add('hidden');
+  successView.classList.remove('show');
+  pickerView.classList.remove('hidden');
+  cartBar.classList.remove('show');
+}
+
+/* ---------------- Menu rendering ---------------- */
+function renderMenu(){
+  var container = document.getElementById('menuSections');
+  container.innerHTML = '';
+  MENU.forEach(function(cat){
+    var section = document.createElement('section');
+    section.className = 'section';
+
+    var head = document.createElement('div');
+    head.className = 'section-head';
+    var fr = document.createElement('span'); fr.className = 'fr'; fr.textContent = cat.fr;
+    var ar = document.createElement('span'); ar.className = 'ar'; ar.setAttribute('dir','rtl'); ar.textContent = cat.ar;
+    head.appendChild(fr); head.appendChild(ar);
+    section.appendChild(head);
+
+    var list = document.createElement('div');
+    list.className = 'dish-list';
+
+    cat.items.forEach(function(item){
+      var row = document.createElement('div');
+      row.className = 'dish';
+
+      var names = document.createElement('div');
+      names.className = 'dish-names';
+      var nAr = document.createElement('div');
+      nAr.className = 'dish-name-ar'; nAr.setAttribute('dir','rtl'); nAr.textContent = item.name;
+      names.appendChild(nAr);
+      if (item.name_fr) {
+        var nFr = document.createElement('div');
+        nFr.className = 'dish-name-fr'; nFr.textContent = item.name_fr;
+        names.appendChild(nFr);
+      }
+
+      var side = document.createElement('div');
+      side.className = 'dish-side';
+
+      var badge = document.createElement('span');
+      badge.className = 'price-badge' + (item.price === 0 ? ' free' : '');
+      badge.textContent = item.price + ' DH';
+      side.appendChild(badge);
+
+      var addBtn = document.createElement('button');
+      addBtn.type = 'button'; addBtn.className = 'add-btn';
+      addBtn.textContent = '+';
+      addBtn.setAttribute('aria-label', 'Ajouter ' + item.name);
+      addBtn.id = 'add-' + item.id;
+      addBtn.addEventListener('click', function(){ changeQty(item.id, 1); });
+      side.appendChild(addBtn);
+
+      var stepper = document.createElement('div');
+      stepper.className = 'stepper'; stepper.id = 'step-' + item.id;
+      var minus = document.createElement('button');
+      minus.type = 'button'; minus.textContent = '−';
+      minus.setAttribute('aria-label', 'Retirer ' + item.name);
+      minus.addEventListener('click', function(){ changeQty(item.id, -1); });
+      var qty = document.createElement('span');
+      qty.className = 'qty'; qty.id = 'qty-' + item.id; qty.textContent = '0';
+      var plus = document.createElement('button');
+      plus.type = 'button'; plus.textContent = '+';
+      plus.setAttribute('aria-label', 'Ajouter ' + item.name);
+      plus.addEventListener('click', function(){ changeQty(item.id, 1); });
+      stepper.appendChild(minus); stepper.appendChild(qty); stepper.appendChild(plus);
+      side.appendChild(stepper);
+
+      row.appendChild(names);
+      row.appendChild(side);
+      list.appendChild(row);
+    });
+
+    section.appendChild(list);
+    container.appendChild(section);
+  });
+}
+
+function changeQty(id, delta){
+  var q = (cart[id] || 0) + delta;
+  if (q <= 0) { delete cart[id]; } else { cart[id] = q; }
+  syncRow(id);
+  updateCartBar();
+}
+
+function syncRow(id){
+  var q = cart[id] || 0;
+  var addBtn = document.getElementById('add-' + id);
+  var stepper = document.getElementById('step-' + id);
+  var qtyEl = document.getElementById('qty-' + id);
+  if (!stepper) return;
+  if (q > 0) {
+    stepper.classList.add('show');
+    if (addBtn) addBtn.style.display = 'none';
+    qtyEl.textContent = String(q);
+  } else {
+    stepper.classList.remove('show');
+    if (addBtn) addBtn.style.display = '';
+  }
+}
+
+function cartItems(){
+  var out = [];
+  Object.keys(cart).forEach(function(id){
+    var it = ITEM_INDEX[id];
+    if (it && cart[id] > 0) out.push({ item: it, qty: cart[id] });
+  });
+  /* keep menu order */
+  out.sort(function(a, b){
+    var order = [];
+    MENU.forEach(function(c){ c.items.forEach(function(i){ order.push(i.id); }); });
+    return order.indexOf(a.item.id) - order.indexOf(b.item.id);
+  });
+  return out;
+}
+
+function cartTotal(){
+  return cartItems().reduce(function(sum, e){ return sum + e.item.price * e.qty; }, 0);
+}
+function cartCountTotal(){
+  return cartItems().reduce(function(sum, e){ return sum + e.qty; }, 0);
+}
+
+function updateCartBar(){
+  var total = cartTotal();
+  var count = cartCountTotal();
+  cartTotalVal.textContent = total + ' DH';
+  cartCount.textContent = count + (count > 1 ? ' articles' : ' article');
+  orderBtn.disabled = count === 0;
+  if (selectedTable !== null && !menuView.classList.contains('hidden')) {
+    cartBar.classList.add('show');
+  } else {
+    cartBar.classList.remove('show');
+  }
+}
+
+/* ---------------- Confirmation ---------------- */
+function openConfirm(){
+  if (cartCountTotal() === 0 || selectedTable === null) return;
+  errorBox.classList.remove('show');
+  confirmTable.textContent = 'Table ' + selectedTable;
+  confirmList.innerHTML = '';
+  cartItems().forEach(function(e){
+    var row = document.createElement('div');
+    row.className = 'confirm-row';
+    var lt = document.createElement('span');
+    lt.className = 'lt'; lt.textContent = (e.item.price * e.qty) + ' DH';
+    var names = document.createElement('div');
+    names.className = 'names';
+    var nAr = document.createElement('div');
+    nAr.className = 'n-ar'; nAr.setAttribute('dir','rtl'); nAr.textContent = e.item.name;
+    names.appendChild(nAr);
+    if (e.item.name_fr) {
+      var nFr = document.createElement('div');
+      nFr.className = 'n-fr'; nFr.textContent = e.item.name_fr;
+      names.appendChild(nFr);
+    }
+    var q = document.createElement('span');
+    q.className = 'q'; q.textContent = '× ' + e.qty;
+    row.appendChild(lt); row.appendChild(names); row.appendChild(q);
+    confirmList.appendChild(row);
+  });
+  confirmTotalVal.textContent = cartTotal() + ' DH';
+  confirmOverlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeConfirm(){
+  confirmOverlay.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+/* ---------------- Firebase ---------------- */
+function firebaseConfigured(){
+  var vals = [FIREBASE_CONFIG.apiKey, FIREBASE_CONFIG.authDomain, FIREBASE_CONFIG.databaseURL,
+    FIREBASE_CONFIG.projectId, FIREBASE_CONFIG.storageBucket, FIREBASE_CONFIG.messagingSenderId, FIREBASE_CONFIG.appId];
+  for (var i = 0; i < vals.length; i++) {
+    if (!vals[i] || String(vals[i]).indexOf('PASTE_') === 0 || String(vals[i]).indexOf('HERE') !== -1) return false;
+  }
+  return true;
+}
+
+var firebaseDb = null;
+function getDb(){
+  if (firebaseDb) return firebaseDb;
+  if (typeof firebase === 'undefined') throw new Error('Firebase SDK non chargé');
+  if (!firebase.apps || firebase.apps.length === 0) {
+    firebase.initializeApp(FIREBASE_CONFIG);
+  }
+  firebaseDb = firebase.database();
+  return firebaseDb;
+}
+
+function confirmOrder(){
+  if (sending) return;
+  errorBox.classList.remove('show');
+
+  if (!firebaseConfigured()) {
+    errorBox.classList.add('show');
+    return;
+  }
+
+  var items = cartItems().map(function(e){
+    return { name: e.item.name, name_fr: e.item.name_fr || '', price: e.item.price, qty: e.qty };
+  });
+  var total = cartTotal();
+  var table = selectedTable;
+
+  sending = true;
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Envoi en cours…';
+
+  var order = {
+    table: table,
+    items: items,
+    total: total,
+    status: 'new',
+    createdAt: firebase.database.ServerValue.TIMESTAMP
+  };
+
+  try {
+    getDb().ref('orders').push(order).then(function(){
+      sending = false;
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirmer la commande';
+      closeConfirm();
+      document.getElementById('successTable').textContent = 'Table ' + table;
+      document.getElementById('successTotal').textContent = total + ' DH';
+      cart = {};
+      Object.keys(ITEM_INDEX).forEach(syncRow);
+      menuView.classList.add('hidden');
+      cartBar.classList.remove('show');
+      successView.classList.add('show');
+      window.scrollTo(0, 0);
+    }).catch(function(){
+      sending = false;
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirmer la commande';
+      errorBox.classList.add('show');
+    });
+  } catch(e) {
+    sending = false;
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Confirmer la commande';
+    errorBox.classList.add('show');
+  }
+}
+
+/* ---------------- Init ---------------- */
+buildPicker();
+renderMenu();
+orderBtn.addEventListener('click', openConfirm);
+cancelBtn.addEventListener('click', closeConfirm);
+confirmBtn.addEventListener('click', confirmOrder);
+confirmOverlay.addEventListener('click', function(e){ if (e.target === confirmOverlay) closeConfirm(); });
+changeTableBtn.addEventListener('click', showPicker);
+document.getElementById('newOrderBtn').addEventListener('click', function(){
+  successView.classList.remove('show');
+  menuView.classList.remove('hidden');
+  updateCartBar();
+  window.scrollTo(0, 0);
+});
+
+var initialTable = tableFromUrl();
+if (initialTable !== null) {
+  selectTable(initialTable, false);
+} else {
+  showPicker();
+}
+updateCartBar();
+</script>
+</body>
+</html>
