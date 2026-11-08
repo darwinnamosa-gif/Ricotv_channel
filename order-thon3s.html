@@ -91,7 +91,7 @@
   .change-table.show{ display:block; }
 
   /* ---------- Layout ---------- */
-  .wrap{ max-width:640px; margin:0 auto; padding:0 14px 120px; }
+  .wrap{ max-width:640px; margin:0 auto; padding:0 14px 190px; }
   .panel{
     background:var(--paper);
     margin-top:-6px;
@@ -175,6 +175,23 @@
     box-shadow:0 -6px 24px rgba(0,0,0,.35);
   }
   .cart-bar.show{ display:block; }
+  .mode-toggle{
+    max-width:640px; margin:0 auto 12px;
+    display:flex; gap:10px;
+  }
+  .mode-btn{
+    flex:1; min-width:0; cursor:pointer;
+    background:#242424; color:#fff;
+    border:2px solid rgba(255,255,255,.28); border-radius:16px;
+    font-size:18px; font-weight:900; line-height:1.2;
+    padding:15px 8px; white-space:nowrap;
+  }
+  .mode-btn:active{ transform:scale(.97); }
+  .mode-btn.selected{
+    background:linear-gradient(135deg, var(--orange-1), var(--orange-2));
+    color:#111; border-color:transparent;
+    box-shadow:0 6px 16px rgba(240,140,30,.45);
+  }
   .cart-bar-inner{ max-width:640px; margin:0 auto; display:flex; align-items:center; gap:12px; }
   .cart-total{ flex:1; min-width:0; }
   .cart-total .lbl{ font-size:12.5px; color:#D8C7AE; font-weight:600; }
@@ -248,6 +265,10 @@
   .check svg{ width:56px; height:56px; }
   .success h2{ margin:0 0 6px; font-size:30px; font-weight:900; }
   .success .s-table{ font-size:19px; font-weight:800; margin:4px 0; }
+  .success .s-mode{
+    display:inline-block; font-size:17px; font-weight:900; margin:2px 0 4px;
+    background:#111; color:var(--orange-2); padding:6px 16px; border-radius:999px;
+  }
   .success .s-total{ font-size:19px; font-weight:800; margin:4px 0 14px; }
   .success .s-total b{ color:#B35E00; font-size:24px; }
   .success .pay-note{
@@ -302,6 +323,7 @@
       </div>
       <h2>Commande envoyée !</h2>
       <p class="s-table" id="successTable">Table 1</p>
+      <p><span class="s-mode" id="successMode">Sur place</span></p>
       <p class="s-total">Total : <b id="successTotal">0 DH</b></p>
       <div class="pay-note">
         L-khlass f l-contoire mli t-sali
@@ -315,6 +337,10 @@
 
 <!-- Sticky cart bar -->
 <div class="cart-bar" id="cartBar">
+  <div class="mode-toggle" role="group" aria-label="Mode de commande">
+    <button class="mode-btn selected" id="modeSurplaceBtn" type="button" aria-pressed="true">🍽️ Sur place</button>
+    <button class="mode-btn" id="modeEmporterBtn" type="button" aria-pressed="false">🥡 À emporter</button>
+  </div>
   <div class="cart-bar-inner">
     <div class="cart-total">
       <div class="lbl">Total · <span dir="rtl">المجموع</span> — <span class="count" id="cartCount">0 article</span></div>
@@ -423,6 +449,7 @@ MENU.forEach(function(cat){ cat.items.forEach(function(it){ ITEM_INDEX[it.id] = 
 var selectedTable = null;
 var cart = {}; /* id -> qty */
 var sending = false;
+var orderMode = 'surplace'; /* 'surplace' | 'emporter' */
 
 var pickerView = document.getElementById('pickerView');
 var menuView = document.getElementById('menuView');
@@ -440,6 +467,21 @@ var confirmTotalVal = document.getElementById('confirmTotalVal');
 var confirmBtn = document.getElementById('confirmBtn');
 var cancelBtn = document.getElementById('cancelBtn');
 var errorBox = document.getElementById('errorBox');
+var modeSurplaceBtn = document.getElementById('modeSurplaceBtn');
+var modeEmporterBtn = document.getElementById('modeEmporterBtn');
+
+/* ---------------- Mode (sur place / à emporter) ---------------- */
+function setMode(mode){
+  orderMode = (mode === 'emporter') ? 'emporter' : 'surplace';
+  var isSurplace = orderMode === 'surplace';
+  modeSurplaceBtn.classList.toggle('selected', isSurplace);
+  modeEmporterBtn.classList.toggle('selected', !isSurplace);
+  modeSurplaceBtn.setAttribute('aria-pressed', isSurplace ? 'true' : 'false');
+  modeEmporterBtn.setAttribute('aria-pressed', !isSurplace ? 'true' : 'false');
+}
+function modeLabel(mode){
+  return mode === 'emporter' ? 'À emporter' : 'Sur place';
+}
 
 /* ---------------- Table from URL ---------------- */
 function tableFromUrl(){
@@ -700,6 +742,7 @@ function confirmOrder(){
   });
   var total = cartTotal();
   var table = selectedTable;
+  var mode = orderMode;
 
   sending = true;
   confirmBtn.disabled = true;
@@ -709,6 +752,7 @@ function confirmOrder(){
     table: table,
     items: items,
     total: total,
+    mode: mode,
     status: 'new',
     createdAt: firebase.database.ServerValue.TIMESTAMP
   };
@@ -720,6 +764,7 @@ function confirmOrder(){
       confirmBtn.textContent = 'Confirmer la commande';
       closeConfirm();
       document.getElementById('successTable').textContent = 'Table ' + table;
+      document.getElementById('successMode').textContent = modeLabel(mode);
       document.getElementById('successTotal').textContent = total + ' DH';
       cart = {};
       Object.keys(ITEM_INDEX).forEach(syncRow);
@@ -744,6 +789,9 @@ function confirmOrder(){
 /* ---------------- Init ---------------- */
 buildPicker();
 renderMenu();
+setMode('surplace');
+modeSurplaceBtn.addEventListener('click', function(){ setMode('surplace'); });
+modeEmporterBtn.addEventListener('click', function(){ setMode('emporter'); });
 orderBtn.addEventListener('click', openConfirm);
 cancelBtn.addEventListener('click', closeConfirm);
 confirmBtn.addEventListener('click', confirmOrder);
