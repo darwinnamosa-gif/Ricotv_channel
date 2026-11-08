@@ -251,6 +251,20 @@
       .done.open .done-body { display: grid; gap: 12px; }
       .done .card { opacity: 0.88; }
       .done .card.is-paid { opacity: 0.55; }
+      .done-head { display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch; }
+      .done-head .done-toggle { flex: 1 1 220px; width: auto; }
+      .clear-all-btn {
+        border: 1px solid rgba(255, 107, 94, 0.55); background: var(--panel);
+        color: var(--red); border-radius: 12px; min-height: 48px; padding: 10px 16px;
+        font-size: 14px; font-weight: 900; white-space: nowrap;
+      }
+      .clear-all-btn.confirm { background: var(--red); color: #2a0a08; white-space: normal; }
+      .delete-btn {
+        border: 1px solid rgba(255, 107, 94, 0.5); background: transparent;
+        color: var(--red); border-radius: 10px; min-height: 40px; padding: 7px 13px;
+        font-size: 13.5px; font-weight: 900; white-space: nowrap;
+      }
+      .delete-btn.confirm { background: var(--red); color: #2a0a08; white-space: normal; }
 
       .foot-note { text-align: center; color: var(--dim); font-size: 12.5px; font-weight: 600; padding: 8px 16px 26px; }
 
@@ -294,10 +308,13 @@
         </div>
 
         <section class="done" id="doneSection" hidden>
-          <button class="done-toggle" id="doneToggle" type="button">
-            Terminées — servies <span id="doneCount"></span>
-            <span class="chev">▼</span>
-          </button>
+          <div class="done-head">
+            <button class="done-toggle" id="doneToggle" type="button">
+              Terminées — servies <span id="doneCount"></span>
+              <span class="chev">▼</span>
+            </button>
+            <button class="clear-all-btn" id="clearAllBtn" type="button">🗑 Tout effacer</button>
+          </div>
           <div class="done-body" id="doneBody"></div>
         </section>
       </section>
@@ -345,6 +362,8 @@
       var knownIds = {};
       var flashIds = {};          // ids that should flash on next render
       var payConfirm = {};        // table -> timestamp of first tap
+      var deleteConfirm = {};     // order id -> timestamp of first tap
+      var clearAllConfirmTs = 0;  // timestamp of first tap on "Tout effacer"
       var demoMode = !CONFIGURED;
 
       var STATUS_FLOW = {
@@ -492,10 +511,12 @@
           foot = '<button class="advance-btn" type="button" data-advance="' + esc(o._id) + '" data-next="' + flow.next + '">' +
             '<span class="darija">' + esc(flow.btnDarija) + '</span>' +
             '<span class="fr">' + esc(flow.btnFr) + '</span></button>';
-        } else if (o.paid) {
-          foot = '<span class="served-note">Payée ✓</span>';
         } else {
-          foot = '<span class="served-note">Servie — en attente de paiement</span>';
+          // Served (finished) orders only: note + delete button. Active orders never get one.
+          var confirmingDel = deleteConfirm[o._id] && (Date.now() - deleteConfirm[o._id] < 4000);
+          foot = '<span class="served-note">' + (o.paid ? 'Payée ✓' : 'Servie — en attente de paiement') + '</span>' +
+            '<button class="delete-btn' + (confirmingDel ? ' confirm' : '') + '" type="button" data-delete="' + esc(o._id) + '">' +
+            (confirmingDel ? 'Supprimer cette commande ?' : '🗑 Supprimer') + '</button>';
         }
         return '<article class="card st-' + st + (flashIds[o._id] ? ' flash' : '') + (inDone && o.paid ? ' is-paid' : '') + '">' +
           '<div class="card-head">' +
@@ -574,6 +595,10 @@
           document.getElementById("doneCount").textContent = "(" + doneOrders.length + ")";
           document.getElementById("doneBody").innerHTML =
             doneOrders.map(function (o) { return orderCard(o, true); }).join("");
+          var clearBtn = document.getElementById("clearAllBtn");
+          var confirmingClear = clearAllConfirmTs && (Date.now() - clearAllConfirmTs < 4000);
+          clearBtn.classList.toggle("confirm", !!confirmingClear);
+          clearBtn.textContent = confirmingClear ? "Effacer toutes les commandes terminées ?" : "🗑 Tout effacer";
         } else {
           doneSection.hidden = true;
         }
@@ -593,6 +618,31 @@
         }
         if (ordersRef) { ordersRef.child(id).update({ status: next }); }
       }
+      function deleteOrder(id) {
+        // Safety: only a finished (served) order can ever be deleted.
+        if (!orders[id] || orders[id].status !== "served") return;
+        if (demoMode) {
+          delete orders[id];
+          delete knownIds[id];
+          render();
+          return;
+        }
+        if (ordersRef) { ordersRef.child(id).remove(); }
+      }
+      function deleteAllServed() {
+        var updates = {};
+        var removed = false;
+        Object.keys(orders).forEach(function (id) {
+          if (orders[id].status === "served") {
+            removed = true;
+            if (demoMode) { delete orders[id]; delete knownIds[id]; }
+            else { updates[id] = null; }
+          }
+        });
+        if (!removed) return;
+        if (demoMode) { render(); return; }
+        if (ordersRef) { ordersRef.update(updates); }
+      }
       function markTablePaid(table) {
         var updates = {};
         Object.keys(orders).forEach(function (id) {
@@ -609,6 +659,30 @@
       document.addEventListener("click", function (e) {
         var adv = e.target.closest("[data-advance]");
         if (adv) { setStatus(adv.getAttribute("data-advance"), adv.getAttribute("data-next")); return; }
+        var del = e.target.closest("[data-delete]");
+        if (del) {
+          var delId = del.getAttribute("data-delete");
+          if (deleteConfirm[delId] && Date.now() - deleteConfirm[delId] < 4000) {
+            delete deleteConfirm[delId];
+            deleteOrder(delId);
+          } else {
+            deleteConfirm[delId] = Date.now();
+            render();
+            setTimeout(function () { if (deleteConfirm[delId]) { delete deleteConfirm[delId]; render(); } }, 4100);
+          }
+          return;
+        }
+        if (e.target.closest("#clearAllBtn")) {
+          if (clearAllConfirmTs && Date.now() - clearAllConfirmTs < 4000) {
+            clearAllConfirmTs = 0;
+            deleteAllServed();
+          } else {
+            clearAllConfirmTs = Date.now();
+            render();
+            setTimeout(function () { if (clearAllConfirmTs) { clearAllConfirmTs = 0; render(); } }, 4100);
+          }
+          return;
+        }
         var tab = e.target.closest("[data-filter]");
         if (tab) { currentFilter = tab.getAttribute("data-filter"); render(); return; }
         var pay = e.target.closest("[data-pay]");
