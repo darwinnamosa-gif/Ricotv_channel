@@ -288,6 +288,69 @@
       }
       .delete-btn.confirm { background: var(--red); color: #2a0a08; white-space: normal; }
 
+      /* ---------- Order note ---------- */
+      .order-note {
+        margin-top: 10px; padding: 9px 12px;
+        background: rgba(255, 169, 77, 0.14);
+        border: 1px solid rgba(255, 169, 77, 0.55);
+        border-radius: 10px;
+        color: var(--accent-2); font-size: 15.5px; font-weight: 800;
+        overflow-wrap: break-word;
+      }
+
+      /* ---------- Tables panel ---------- */
+      .tables-panel { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--line-soft); }
+      .tables-panel h2 { margin: 0; font-size: 18px; font-weight: 900; }
+      .tables-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      @media (max-width: 980px) { .tables-grid { grid-template-columns: repeat(3, 1fr); } }
+      @media (max-width: 420px) { .tables-grid { grid-template-columns: repeat(2, 1fr); } }
+      .table-tile {
+        border-radius: 12px; padding: 10px 12px;
+        background: var(--bg-soft); border: 1px solid var(--line-soft);
+      }
+      .table-tile .tt-num { font-size: 15.5px; font-weight: 900; }
+      .table-tile .tt-state { font-size: 13.5px; font-weight: 900; margin-top: 1px; }
+      .table-tile .tt-detail { font-size: 12px; color: var(--muted); font-weight: 700; margin-top: 2px; }
+      .table-tile.st-free { border-color: rgba(81, 207, 102, 0.35); }
+      .table-tile.st-free .tt-state { color: var(--green); }
+      .table-tile.st-new { border-color: rgba(255, 169, 77, 0.65); background: rgba(255, 169, 77, 0.10); }
+      .table-tile.st-new .tt-state { color: var(--accent-2); }
+      .table-tile.st-prep { border-color: rgba(255, 209, 102, 0.55); background: rgba(255, 209, 102, 0.08); }
+      .table-tile.st-prep .tt-state { color: var(--amber); }
+      .table-tile.st-owed { border-color: rgba(255, 107, 94, 0.6); background: rgba(255, 107, 94, 0.09); }
+      .table-tile.st-owed .tt-state { color: var(--red); }
+
+      /* ---------- Disponibilité ---------- */
+      .avail { margin-top: 22px; }
+      .avail-toggle {
+        width: 100%; display: flex; align-items: center; gap: 10px;
+        background: var(--panel); border: 1px solid var(--line-soft); border-radius: 12px;
+        color: var(--muted); padding: 12px 16px; min-height: 48px;
+        font-size: 15.5px; font-weight: 900; text-align: start;
+      }
+      .avail-toggle .chev { margin-inline-start: auto; transition: transform 0.2s; font-size: 13px; }
+      .avail.open .avail-toggle .chev { transform: rotate(180deg); }
+      .avail-body { display: none; margin-top: 12px; }
+      .avail.open .avail-body { display: block; }
+      .avail-cat { margin-bottom: 16px; }
+      .avail-cat:last-child { margin-bottom: 0; }
+      .avail-cat-name { font-size: 15px; font-weight: 900; color: var(--accent-2); margin-bottom: 7px; }
+      .avail-row {
+        display: flex; align-items: center; gap: 10px;
+        padding: 7px 8px 7px 12px; margin-bottom: 6px;
+        background: var(--panel); border: 1px solid var(--line-soft); border-radius: 10px;
+      }
+      .avail-row.is-out { background: var(--bg-soft); }
+      .avail-row.is-out .avail-name { color: var(--dim); }
+      .avail-name { flex: 1; min-width: 0; font-size: 15.5px; font-weight: 700; }
+      .avail-name small { display: block; font-size: 12.5px; color: var(--dim); font-weight: 600; }
+      .avail-btn {
+        border-radius: 999px; padding: 7px 14px; min-height: 38px; flex-shrink: 0;
+        font-size: 13.5px; font-weight: 900; border: 1px solid; white-space: nowrap;
+      }
+      .avail-btn.on { color: var(--green); border-color: rgba(81, 207, 102, 0.55); background: rgba(81, 207, 102, 0.10); }
+      .avail-btn.off { color: var(--red); border-color: rgba(255, 107, 94, 0.6); background: rgba(255, 107, 94, 0.12); }
+
       .foot-note { text-align: center; color: var(--dim); font-size: 12.5px; font-weight: 600; padding: 8px 16px 26px; }
 
       @media (max-width: 560px) {
@@ -339,9 +402,22 @@
           </div>
           <div class="done-body" id="doneBody"></div>
         </section>
+
+        <section class="avail" id="availSection">
+          <button class="avail-toggle" id="availToggle" type="button">
+            Disponibilité des plats <span id="availCount"></span>
+            <span class="chev">▼</span>
+          </button>
+          <div class="avail-body" id="availBody"></div>
+        </section>
       </section>
 
       <aside class="bills" aria-label="Additions par table">
+        <div class="tables-panel">
+          <h2>Tables</h2>
+          <p class="bills-sub">État de chaque table en direct.</p>
+          <div class="tables-grid" id="tablesGrid"></div>
+        </div>
         <h2>Additions par table</h2>
         <p class="bills-sub">Commandes servies, pas encore payées — le client paie au comptoir après le repas.</p>
         <div class="bills-total">
@@ -396,6 +472,51 @@
         "served":    { next: null, chip: "Servie" },
         "cancelled": { next: null, chip: "✕ Annulée" }
       };
+      /* Menu — mêmes identifiants que la page de commande (nœud Firebase 'availability/<id>'). */
+      var MENU = [
+        { id: "sandwichs", fr: "Sandwichs", ar: "السندويشات", items: [
+          { id: "thon-adi", name: "طون عادي", name_fr: "Thon Classique" },
+          { id: "thon-fromage", name: "طون فرماج", name_fr: "Thon • Fromage" },
+          { id: "thon-kiri", name: "طون كيري", name_fr: "Thon • Kiri" },
+          { id: "thon-kachir", name: "طون كاشير", name_fr: "Thon • Kachir" },
+          { id: "thon-kachir-lanchon", name: "طون كاشير لانشون", name_fr: "Thon • Kachir • Lanchon" },
+          { id: "thon-kachir-fromage-ahmar", name: "طون كاشير فرماج احمر", name_fr: "Thon • Kachir • Fromage Rouge" },
+          { id: "thon-kachir-lanchon-fromage-ahmar", name: "طون كاشير لانشون فرماج احمر", name_fr: "Thon • Kachir • Lanchon • Fromage Rouge" },
+          { id: "thon-lanchon", name: "طون لانشون", name_fr: "Thon • Lanchon" },
+          { id: "thon-lanchon-fromage-ahmar", name: "طون لانشون فرماج احمر", name_fr: "Thon • Lanchon • Fromage Rouge" },
+          { id: "thon-dand-fume", name: "طون داند فيمي", name_fr: "Thon • Dinde Fumée" },
+          { id: "thon-dand-fume-kachir", name: "طون داند فيمي كاشير", name_fr: "Thon • Dinde Fumée • Kachir" },
+          { id: "thon-dand-fume-fromage-ahmar", name: "طون داند فيمي فرماج احمر", name_fr: "Thon • Dinde Fumée • Fromage Rouge" },
+          { id: "thon-fromage-ahmar", name: "طون فرماج احمر", name_fr: "Thon • Fromage Rouge" },
+          { id: "thon-double", name: "طون دوبل", name_fr: "Thon Double" }
+        ]},
+        { id: "salades", fr: "Salades", ar: "السلطات", items: [
+          { id: "salade-pates", name: "سلطة المعكرونة", name_fr: "Salade de pâtes" },
+          { id: "salade-riz", name: "سلطة الأرز", name_fr: "Salade de riz" },
+          { id: "salade-nicoise", name: "السلطة النيسوازية", name_fr: "Salade niçoise" }
+        ]},
+        { id: "boissons", fr: "Boissons", ar: "المشروبات", items: [
+          { id: "verre-soda", name: "كاس مشروب غازي", name_fr: "Verre de soda" },
+          { id: "bouteille-soda-petite", name: "قرعة مشروب غازي صغيرة", name_fr: "Petite bouteille de soda" },
+          { id: "bouteille-eau-petite", name: "قرعة ماء صغيرة", name_fr: "Petite bouteille d'eau" },
+          { id: "cafe", name: "قهوة", name_fr: "Café" }
+        ]},
+        { id: "sauces", fr: "Sauces", ar: "الصلصات", items: [
+          { id: "mayonnaise", name: "مايونيز", name_fr: "Mayonaise" },
+          { id: "ketchup", name: "كيتشاب", name_fr: "Ketchup" },
+          { id: "ranch", name: "رانش", name_fr: "Ranch" },
+          { id: "sauce-3", name: "صلصة 3>", name_fr: "Sauce <3" },
+          { id: "sauce-fromages", name: "صوص فروماج (بيكي، الجيريان)", name_fr: "Sauce fromages (Biggy, algérienne)" }
+        ]},
+        { id: "special", fr: "Spécial <3S", ar: "وجبات 3> سبيسيال", items: [
+          { id: "sandwich-royale", name: "سندويش رويال", name_fr: "Sandwich Royale" },
+          { id: "salade-royale", name: "سلطة رويال", name_fr: "Salade royale" },
+          { id: "salade-avocat", name: "سلطة الافوكادو", name_fr: "Salade acocado" }
+        ]}
+      ];
+      var availability = {};      // itemId -> bool (absent = disponible)
+      var availRef = null;
+
       var FILTERS = [
         { key: "all",       label: "Toutes" },
         { key: "new",       label: "Nouvelles" },
@@ -409,6 +530,7 @@
       var DEMO_ORDERS = {
         "demo-1": {
           table: 3, status: "new", total: 33, createdAt: Date.now() - 4 * 60000,
+          note: "Bla bsla, o zid sauce ranch",
           items: [
             { name: "طون دوبل", name_fr: "Thon Double", price: 13, qty: 2 },
             { name: "قهوة", name_fr: "Café", price: 6, qty: 1 },
@@ -560,6 +682,7 @@
             '<div class="card-elapsed">' + elapsedLabel(o.createdAt) + '</div></div>' +
           '</div>' +
           '<ul class="items">' + items + '</ul>' +
+          ((o.note && String(o.note).trim()) ? '<div class="order-note" dir="auto">📝 Note : ' + esc(o.note) + '</div>' : '') +
           '<div class="card-foot"><div class="total">Total<strong>' + fmt(orderTotal(o)) + ' DH</strong></div>' + foot + '</div>' +
         '</article>';
       }
@@ -598,6 +721,58 @@
         }
         document.getElementById("billsGrid").innerHTML = html;
         document.getElementById("billsGrandTotal").textContent = fmt(grand) + " DH";
+      }
+
+      function renderTables() {
+        var list = sortedOrders();
+        var html = "";
+        for (var t = 1; t <= 6; t++) {
+          var owed = 0, hasNew = false, hasPrep = false, activeCount = 0;
+          list.forEach(function (o) {
+            if (Number(o.table) !== t) return;
+            var st = o.status || "new";
+            if (st === "served" && !o.paid) { owed += orderTotal(o); }
+            else if (st !== "served" && st !== "cancelled") {
+              activeCount++;
+              if (st === "new") hasNew = true;
+              else if (st === "preparing" || st === "ready") hasPrep = true;
+            }
+          });
+          // Priorité : addition impayée > commande nouvelle > en préparation/prête > libre.
+          var cls, label;
+          if (owed > 0) { cls = "owed"; label = "Khassha t-khls"; }
+          else if (hasNew) { cls = "new"; label = "Commande jdida"; }
+          else if (hasPrep) { cls = "prep"; label = "Kay-t-wjed"; }
+          else { cls = "free"; label = "Libre"; }
+          var detail = [];
+          if (owed > 0) detail.push(fmt(owed) + " DH à payer");
+          if (activeCount) detail.push(activeCount + " commande" + (activeCount > 1 ? "s" : "") + " en cours");
+          html += '<div class="table-tile st-' + cls + '">' +
+            '<div class="tt-num">Table ' + t + '</div>' +
+            '<div class="tt-state">' + label + '</div>' +
+            (detail.length ? '<div class="tt-detail">' + esc(detail.join(" · ")) + '</div>' : '') +
+            '</div>';
+        }
+        document.getElementById("tablesGrid").innerHTML = html;
+      }
+
+      function renderAvailability() {
+        var outCount = 0;
+        var html = MENU.map(function (cat) {
+          var rows = cat.items.map(function (it) {
+            var avail = availability[it.id] !== false;
+            if (!avail) outCount++;
+            return '<div class="avail-row' + (avail ? '' : ' is-out') + '">' +
+              '<div class="avail-name" dir="auto">' + esc(it.name) +
+              (it.name_fr ? '<small dir="auto">' + esc(it.name_fr) + '</small>' : '') + '</div>' +
+              '<button type="button" class="avail-btn ' + (avail ? 'on' : 'off') + '" data-avail="' + esc(it.id) + '">' +
+              (avail ? 'Disponible' : 'Makaynch') + '</button></div>';
+          }).join("");
+          return '<div class="avail-cat"><div class="avail-cat-name">' + esc(cat.fr) +
+            ' · <span dir="auto">' + esc(cat.ar) + '</span></div>' + rows + '</div>';
+        }).join("");
+        document.getElementById("availBody").innerHTML = html;
+        document.getElementById("availCount").textContent = outCount ? "(" + outCount + " makaynch)" : "";
       }
 
       function render() {
@@ -639,6 +814,7 @@
           doneSection.hidden = true;
         }
         renderBills();
+        renderTables();
         // Flash only once: clear flags after they have been painted.
         var hadFlash = Object.keys(flashIds).length > 0;
         if (hadFlash) { setTimeout(function () { flashIds = {}; }, 4600); }
@@ -749,6 +925,17 @@
           }
           return;
         }
+        var av = e.target.closest("[data-avail]");
+        if (av) {
+          // Mode démo : les boutons s'affichent mais n'écrivent rien.
+          if (demoMode || !availRef) return;
+          var avId = av.getAttribute("data-avail");
+          var newVal = availability[avId] === false; // Makaynch -> Disponible, sinon -> Makaynch
+          availability[avId] = newVal;
+          renderAvailability();
+          availRef.child(avId).set(newVal);
+          return;
+        }
         var tab = e.target.closest("[data-filter]");
         if (tab) { currentFilter = tab.getAttribute("data-filter"); render(); return; }
         var pay = e.target.closest("[data-pay]");
@@ -768,6 +955,9 @@
       document.getElementById("doneToggle").addEventListener("click", function () {
         document.getElementById("doneSection").classList.toggle("open");
       });
+      document.getElementById("availToggle").addEventListener("click", function () {
+        document.getElementById("availSection").classList.toggle("open");
+      });
 
       /* Refresh elapsed-time labels every 30 s */
       setInterval(render, 30000);
@@ -784,12 +974,19 @@
         Object.keys(orders).forEach(function (id) { knownIds[id] = true; });
         firstSyncDone = true;
         render();
+        renderAvailability();
       } else {
         try {
           firebase.initializeApp(FIREBASE_CONFIG);
           var db = firebase.database();
           ordersRef = db.ref("orders");
           cancelledRef = db.ref("cancelled");
+          availRef = db.ref("availability");
+          renderAvailability();
+          availRef.on("value", function (snap) {
+            availability = snap.val() || {};
+            renderAvailability();
+          });
           setConn("", "Connexion…");
           db.ref(".info/connected").on("value", function (snap) {
             if (snap.val() === true) { setConn("ok", "Connecté"); }
