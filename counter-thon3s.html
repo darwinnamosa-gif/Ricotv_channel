@@ -646,6 +646,7 @@
 
       /* ---------------- Actions ---------------- */
       var ordersRef = null;
+      var cancelledRef = null;
 
       function setStatus(id, next) {
         if (demoMode) {
@@ -656,6 +657,7 @@
       }
       function deleteOrder(id) {
         // Safety: only a finished order (served or cancelled) can ever be deleted.
+        // Deletes ONLY /orders/<id> — never touches /cancelled/<id>, which stays as stats history.
         if (!orders[id] || (orders[id].status !== "served" && orders[id].status !== "cancelled")) return;
         if (demoMode) {
           delete orders[id];
@@ -666,6 +668,7 @@
         if (ordersRef) { ordersRef.child(id).remove(); }
       }
       function deleteAllServed() {
+        // Only clears /orders — /cancelled history is intentionally preserved for stats.
         var updates = {};
         var removed = false;
         Object.keys(orders).forEach(function (id) {
@@ -700,6 +703,20 @@
           var canId = can.getAttribute("data-cancel");
           if (cancelConfirm[canId] && Date.now() - cancelConfirm[canId] < 4000) {
             delete cancelConfirm[canId];
+            // Durable cancellation record for stats: snapshot to /cancelled/<id>
+            // before marking cancelled, so deleting the order later never erases the stat.
+            // Real Firebase mode only — demo mode writes nothing.
+            if (!demoMode && cancelledRef && orders[canId]) {
+              var cancelSnap = orders[canId];
+              cancelledRef.child(canId).set({
+                table: cancelSnap.table != null ? cancelSnap.table : null,
+                total: orderTotal(cancelSnap),
+                items: cancelSnap.items || [],
+                mode: cancelSnap.mode || "surplace",
+                createdAt: cancelSnap.createdAt || null,
+                cancelledAt: firebase.database.ServerValue.TIMESTAMP
+              });
+            }
             setStatus(canId, "cancelled");
           } else {
             cancelConfirm[canId] = Date.now();
@@ -772,6 +789,7 @@
           firebase.initializeApp(FIREBASE_CONFIG);
           var db = firebase.database();
           ordersRef = db.ref("orders");
+          cancelledRef = db.ref("cancelled");
           setConn("", "Connexion…");
           db.ref(".info/connected").on("value", function (snap) {
             if (snap.val() === true) { setConn("ok", "Connecté"); }
