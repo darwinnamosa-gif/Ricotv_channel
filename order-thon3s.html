@@ -281,6 +281,17 @@
     background:#111; color:var(--orange-2);
     font-size:17px; font-weight:900; padding:15px 30px; border-radius:999px;
   }
+  .kiosk-controls{ margin-top:22px; }
+  .kiosk-countdown{
+    margin:0 0 12px; font-size:17px; font-weight:800; color:var(--muted);
+  }
+  .kiosk-countdown b{ color:#B35E00; font-size:19px; }
+  .kiosk-return-btn{
+    border:1.5px solid #111; cursor:pointer;
+    background:transparent; color:#111;
+    font-size:16px; font-weight:900; padding:13px 24px; border-radius:999px;
+  }
+  .kiosk-return-btn:active{ transform:scale(.97); }
 
   .hidden{ display:none !important; }
   @media (prefers-reduced-motion: reduce){
@@ -330,6 +341,10 @@
         <span class="fr">Paiement au comptoir quand vous aurez terminé.</span>
       </div>
       <button class="new-btn" id="newOrderBtn" type="button">Nouvelle commande · طلب جديد</button>
+      <div class="kiosk-controls hidden" id="kioskControls">
+        <p class="kiosk-countdown" id="kioskCountdown" aria-live="polite">Retour aux tables dans <b>30 s</b></p>
+        <button class="kiosk-return-btn" id="kioskReturnBtn" type="button">← Retour aux tables</button>
+      </div>
     </section>
 
   </div>
@@ -469,6 +484,45 @@ var cancelBtn = document.getElementById('cancelBtn');
 var errorBox = document.getElementById('errorBox');
 var modeSurplaceBtn = document.getElementById('modeSurplaceBtn');
 var modeEmporterBtn = document.getElementById('modeEmporterBtn');
+var kioskControls = document.getElementById('kioskControls');
+var kioskCountdownEl = document.getElementById('kioskCountdown');
+var kioskReturnBtn = document.getElementById('kioskReturnBtn');
+
+/* ---------------- Kiosk mode (?kiosk=1) ---------------- */
+var KIOSK_MODE = (function(){
+  try { return new URLSearchParams(window.location.search).get('kiosk') === '1'; } catch(e) { return false; }
+})();
+var kioskTimer = null;
+var kioskSecondsLeft = 30;
+
+function stopKioskCountdown(){
+  if (kioskTimer !== null) { clearInterval(kioskTimer); kioskTimer = null; }
+}
+function updateKioskCountdownLabel(){
+  if (kioskCountdownEl) kioskCountdownEl.innerHTML = 'Retour aux tables dans <b>' + kioskSecondsLeft + ' s</b>';
+}
+function returnToTables(){
+  stopKioskCountdown();
+  cart = {};
+  Object.keys(ITEM_INDEX).forEach(syncRow);
+  showPicker();
+  window.scrollTo(0, 0);
+}
+function startKioskCountdown(){
+  if (!KIOSK_MODE) return;
+  stopKioskCountdown();
+  if (kioskControls) kioskControls.classList.remove('hidden');
+  kioskSecondsLeft = 30;
+  updateKioskCountdownLabel();
+  kioskTimer = setInterval(function(){
+    kioskSecondsLeft -= 1;
+    if (kioskSecondsLeft <= 0) {
+      returnToTables();
+      return;
+    }
+    updateKioskCountdownLabel();
+  }, 1000);
+}
 
 /* ---------------- Mode (sur place / à emporter) ---------------- */
 function setMode(mode){
@@ -530,6 +584,7 @@ function selectTable(num, updateUrl){
 }
 
 function showPicker(){
+  stopKioskCountdown();
   selectedTable = null;
   tableBadge.classList.remove('show');
   changeTableBtn.classList.remove('show');
@@ -772,6 +827,7 @@ function confirmOrder(){
       cartBar.classList.remove('show');
       successView.classList.add('show');
       window.scrollTo(0, 0);
+      startKioskCountdown();
     }).catch(function(){
       sending = false;
       confirmBtn.disabled = false;
@@ -797,7 +853,9 @@ cancelBtn.addEventListener('click', closeConfirm);
 confirmBtn.addEventListener('click', confirmOrder);
 confirmOverlay.addEventListener('click', function(e){ if (e.target === confirmOverlay) closeConfirm(); });
 changeTableBtn.addEventListener('click', showPicker);
+if (kioskReturnBtn) kioskReturnBtn.addEventListener('click', returnToTables);
 document.getElementById('newOrderBtn').addEventListener('click', function(){
+  stopKioskCountdown();
   successView.classList.remove('show');
   menuView.classList.remove('hidden');
   updateCartBar();
