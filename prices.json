@@ -1,1 +1,286 @@
-{"categories":[{"custom":false,"id":"sandwiches","name":"Sandwichs","name_ar":"السندويشات","photo":""},{"custom":false,"id":"salades","name":"Salades","name_ar":"السلطات","photo":""},{"custom":false,"id":"boissons","name":"Boissons","name_ar":"المشروبات","photo":""},{"custom":false,"id":"plats","name":"Plats","name_ar":"الأطباق","photo":""},{"custom":true,"id":"cat-mw70x192-1","name":"Sauces:الصلصات","name_ar":"Sauces:الصلصات","photo":""},{"custom":true,"id":"cat-mw711v97-2","name":"وجبات 3> سبيسيال","name_ar":"وجبات 3> سبيسيال","photo":""}],"currency":"MAD","items":[{"category":"sandwiches","id":"thon-adi","name":"طون عادي","name_fr":"","price":9},{"category":"sandwiches","id":"thon-fromage","name":"طون فرماج","name_fr":"","price":10},{"category":"sandwiches","id":"thon-kiri","name":"طون كيري","name_fr":"","price":11},{"category":"sandwiches","id":"thon-kachir","name":"طون كاشير","name_fr":"","price":10},{"category":"sandwiches","id":"thon-kachir-lanchon","name":"طون كاشير لانشون","name_fr":"","price":12},{"category":"sandwiches","id":"thon-kachir-fromage-ahmar","name":"طون كاشير فرماج احمر","name_fr":"","price":15},{"category":"sandwiches","id":"thon-kachir-lanchon-fromage-ahmar","name":"طون كاشير لانشون فرماج احمر","name_fr":"","price":18},{"category":"sandwiches","id":"thon-lanchon","name":"طون لانشون","name_fr":"","price":11},{"category":"sandwiches","id":"thon-lanchon-fromage-ahmar","name":"طون لانشون فرماج احمر","name_fr":"","price":16},{"category":"sandwiches","id":"thon-had-fume","name":"طون داند فيمي","name_fr":"","price":14},{"category":"sandwiches","id":"thon-had-fume-kachir","name":"طون داند فيمي كاشير","name_fr":"","price":15},{"category":"sandwiches","id":"thon-had-fume-fromage-ahmar","name":"طون داند فيمي فرماج احمر","name_fr":"","price":18},{"category":"sandwiches","id":"thon-fromage-ahmar","name":"طون فرماج احمر","name_fr":"","price":14},{"category":"sandwiches","id":"custom-mw71k0lt-8","name":"طون دوبل","name_fr":"Thon Double","price":13},{"category":"salades","id":"salade-pates","name":"سلطة المعكرونة","name_fr":"","price":20},{"category":"salades","id":"salade-riz","name":"سلطة الأرز","name_fr":"","price":20},{"category":"salades","id":"salade-nicoise","name":"السلطة النيسوازية","name_fr":"","price":20},{"category":"boissons","id":"verre-soda","name":"كاس مشروب غازي","name_fr":"","price":2},{"category":"boissons","id":"bouteille-soda-petite","name":"قرعة مشروب غازي صغيرة","name_fr":"","price":4},{"category":"boissons","id":"bouteille-eau-petite","name":"قرعة ماء صغيرة","name_fr":"","price":2},{"category":"boissons","id":"cafe","name":"قهوة","name_fr":"","price":6},{"category":"cat-mw70x192-1","id":"custom-mw70xioc-1","name":"مايونيز","name_fr":"Mayonaise","price":0},{"category":"cat-mw70x192-1","id":"custom-mw70y0qr-2","name":"كيتشاب","name_fr":"Ketchup","price":0},{"category":"cat-mw70x192-1","id":"custom-mw70yiso-3","name":"رانش","name_fr":"Ranch","price":1},{"category":"cat-mw70x192-1","id":"custom-mw70zr8z-4","name":"صلصة 3>","name_fr":"Sauce <3","price":1},{"category":"cat-mw70x192-1","id":"custom-mw76fromage-9","name":"صوص فروماج (بيكي، الجيريان)","name_fr":"Sauce fromages (Biggy, algérienne)","price":0},{"category":"cat-mw711v97-2","id":"custom-mw712ndj-5","name":"سندويش رويال","name_fr":"Sandwich Royale","price":25},{"category":"cat-mw711v97-2","id":"custom-mw713ijm-6","name":"سلطة رويال(ارز او معكرونة) خص،زيتون،طماطم،بصل،خيار،ذرة،تونة،البيض،فرماج احمر،كاشير،داند فيمي،صوص)","name_fr":"Salade royale","price":30},{"category":"cat-mw711v97-2","id":"custom-mw714apv-7","name":"سلطة الافوكادو(افوكادو،خص،زيتون،طماطم،خيار،بصل،ذرة،التونة،البيضصلصة)","name_fr":"Salade acocado","price":35}],"prices":{"bouteille-eau-petite":2,"bouteille-soda-petite":4,"cafe":6,"custom-mw70xioc-1":0,"custom-mw70y0qr-2":0,"custom-mw70yiso-3":1,"custom-mw70zr8z-4":1,"custom-mw712ndj-5":25,"custom-mw713ijm-6":30,"custom-mw714apv-7":35,"custom-mw71k0lt-8":13,"custom-mw76fromage-9":0,"salade-nicoise":20,"salade-pates":20,"salade-riz":20,"thon-adi":9,"thon-fromage":10,"thon-fromage-ahmar":14,"thon-had-fume":14,"thon-had-fume-fromage-ahmar":18,"thon-had-fume-kachir":15,"thon-kachir":10,"thon-kachir-fromage-ahmar":15,"thon-kachir-lanchon":12,"thon-kachir-lanchon-fromage-ahmar":18,"thon-kiri":11,"thon-lanchon":11,"thon-lanchon-fromage-ahmar":16,"verre-soda":2},"restaurant":"THON <3S — Sandwichs & Salades <3 S","unit":"درهم","updated":"2026-11-08T01:10:45.004Z"}
+{
+  "categories": [
+    {
+      "custom": false,
+      "id": "sandwiches",
+      "name": "Sandwichs",
+      "name_ar": "السندويشات",
+      "photo": ""
+    },
+    {
+      "custom": false,
+      "id": "salades",
+      "name": "Salades",
+      "name_ar": "السلطات",
+      "photo": ""
+    },
+    {
+      "custom": false,
+      "id": "boissons",
+      "name": "Boissons",
+      "name_ar": "المشروبات",
+      "photo": ""
+    },
+    {
+      "custom": false,
+      "id": "plats",
+      "name": "Plats",
+      "name_ar": "الأطباق",
+      "photo": ""
+    },
+    {
+      "custom": true,
+      "id": "cat-mw70x192-1",
+      "name": "Sauces:الصلصات",
+      "name_ar": "Sauces:الصلصات",
+      "photo": ""
+    },
+    {
+      "custom": true,
+      "id": "cat-mw711v97-2",
+      "name": "وجبات 3> سبيسيال",
+      "name_ar": "وجبات 3> سبيسيال",
+      "photo": ""
+    }
+  ],
+  "currency": "MAD",
+  "items": [
+    {
+      "category": "sandwiches",
+      "id": "thon-adi",
+      "name": "طون عادي",
+      "name_fr": "Thon Classique",
+      "price": 9
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-fromage",
+      "name": "طون فرماج",
+      "name_fr": "Thon • Fromage",
+      "price": 10
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-kiri",
+      "name": "طون كيري",
+      "name_fr": "Thon • Kiri",
+      "price": 11
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-kachir",
+      "name": "طون كاشير",
+      "name_fr": "Thon • Kachir",
+      "price": 10
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-kachir-lanchon",
+      "name": "طون كاشير لانشون",
+      "name_fr": "Thon • Kachir • Lanchon",
+      "price": 12
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-kachir-fromage-ahmar",
+      "name": "طون كاشير فرماج احمر",
+      "name_fr": "Thon • Kachir • Fromage Rouge",
+      "price": 15
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-kachir-lanchon-fromage-ahmar",
+      "name": "طون كاشير لانشون فرماج احمر",
+      "name_fr": "Thon • Kachir • Lanchon • Fromage Rouge",
+      "price": 18
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-lanchon",
+      "name": "طون لانشون",
+      "name_fr": "Thon • Lanchon",
+      "price": 11
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-lanchon-fromage-ahmar",
+      "name": "طون لانشون فرماج احمر",
+      "name_fr": "Thon • Lanchon • Fromage Rouge",
+      "price": 16
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-had-fume",
+      "name": "طون داند فيمي",
+      "name_fr": "Thon • Dinde Fumée",
+      "price": 14
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-had-fume-kachir",
+      "name": "طون داند فيمي كاشير",
+      "name_fr": "Thon • Dinde Fumée • Kachir",
+      "price": 15
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-had-fume-fromage-ahmar",
+      "name": "طون داند فيمي فرماج احمر",
+      "name_fr": "Thon • Dinde Fumée • Fromage Rouge",
+      "price": 18
+    },
+    {
+      "category": "sandwiches",
+      "id": "thon-fromage-ahmar",
+      "name": "طون فرماج احمر",
+      "name_fr": "Thon • Fromage Rouge",
+      "price": 14
+    },
+    {
+      "category": "sandwiches",
+      "id": "custom-mw71k0lt-8",
+      "name": "طون دوبل",
+      "name_fr": "Thon Double",
+      "price": 13
+    },
+    {
+      "category": "salades",
+      "id": "salade-pates",
+      "name": "سلطة المعكرونة",
+      "name_fr": "Salade de pâtes",
+      "price": 20
+    },
+    {
+      "category": "salades",
+      "id": "salade-riz",
+      "name": "سلطة الأرز",
+      "name_fr": "Salade de riz",
+      "price": 20
+    },
+    {
+      "category": "salades",
+      "id": "salade-nicoise",
+      "name": "السلطة النيسوازية",
+      "name_fr": "Salade niçoise",
+      "price": 20
+    },
+    {
+      "category": "boissons",
+      "id": "verre-soda",
+      "name": "كاس مشروب غازي",
+      "name_fr": "Verre de soda",
+      "price": 2
+    },
+    {
+      "category": "boissons",
+      "id": "bouteille-soda-petite",
+      "name": "قرعة مشروب غازي صغيرة",
+      "name_fr": "Petite bouteille de soda",
+      "price": 4
+    },
+    {
+      "category": "boissons",
+      "id": "bouteille-eau-petite",
+      "name": "قرعة ماء صغيرة",
+      "name_fr": "Petite bouteille d'eau",
+      "price": 2
+    },
+    {
+      "category": "boissons",
+      "id": "cafe",
+      "name": "قهوة",
+      "name_fr": "Café",
+      "price": 6
+    },
+    {
+      "category": "cat-mw70x192-1",
+      "id": "custom-mw70xioc-1",
+      "name": "مايونيز",
+      "name_fr": "Mayonaise",
+      "price": 0
+    },
+    {
+      "category": "cat-mw70x192-1",
+      "id": "custom-mw70y0qr-2",
+      "name": "كيتشاب",
+      "name_fr": "Ketchup",
+      "price": 0
+    },
+    {
+      "category": "cat-mw70x192-1",
+      "id": "custom-mw70yiso-3",
+      "name": "رانش",
+      "name_fr": "Ranch",
+      "price": 1
+    },
+    {
+      "category": "cat-mw70x192-1",
+      "id": "custom-mw70zr8z-4",
+      "name": "صلصة 3>",
+      "name_fr": "Sauce <3",
+      "price": 1
+    },
+    {
+      "category": "cat-mw70x192-1",
+      "id": "custom-mw76fromage-9",
+      "name": "صوص فروماج (بيكي، الجيريان)",
+      "name_fr": "Sauce fromages (Biggy, algérienne)",
+      "price": 0
+    },
+    {
+      "category": "cat-mw711v97-2",
+      "id": "custom-mw712ndj-5",
+      "name": "سندويش رويال",
+      "name_fr": "Sandwich Royale",
+      "price": 25
+    },
+    {
+      "category": "cat-mw711v97-2",
+      "id": "custom-mw713ijm-6",
+      "name": "سلطة رويال(ارز او معكرونة) خص،زيتون،طماطم،بصل،خيار،ذرة،تونة،البيض،فرماج احمر،كاشير،داند فيمي،صوص)",
+      "name_fr": "Salade royale",
+      "price": 30
+    },
+    {
+      "category": "cat-mw711v97-2",
+      "id": "custom-mw714apv-7",
+      "name": "سلطة الافوكادو(افوكادو،خص،زيتون،طماطم،خيار،بصل،ذرة،التونة،البيضصلصة)",
+      "name_fr": "Salade acocado",
+      "price": 35
+    }
+  ],
+  "prices": {
+    "bouteille-eau-petite": 2,
+    "bouteille-soda-petite": 4,
+    "cafe": 6,
+    "custom-mw70xioc-1": 0,
+    "custom-mw70y0qr-2": 0,
+    "custom-mw70yiso-3": 1,
+    "custom-mw70zr8z-4": 1,
+    "custom-mw712ndj-5": 25,
+    "custom-mw713ijm-6": 30,
+    "custom-mw714apv-7": 35,
+    "custom-mw71k0lt-8": 13,
+    "custom-mw76fromage-9": 0,
+    "salade-nicoise": 20,
+    "salade-pates": 20,
+    "salade-riz": 20,
+    "thon-adi": 9,
+    "thon-fromage": 10,
+    "thon-fromage-ahmar": 14,
+    "thon-had-fume": 14,
+    "thon-had-fume-fromage-ahmar": 18,
+    "thon-had-fume-kachir": 15,
+    "thon-kachir": 10,
+    "thon-kachir-fromage-ahmar": 15,
+    "thon-kachir-lanchon": 12,
+    "thon-kachir-lanchon-fromage-ahmar": 18,
+    "thon-kiri": 11,
+    "thon-lanchon": 11,
+    "thon-lanchon-fromage-ahmar": 16,
+    "verre-soda": 2
+  },
+  "restaurant": "THON <3S — Sandwichs & Salades <3 S",
+  "unit": "درهم",
+  "updated": "2026-11-08T01:10:45.004Z"
+}
