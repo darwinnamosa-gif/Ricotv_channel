@@ -173,6 +173,7 @@
       .card.st-preparing { border-top-color: var(--amber); }
       .card.st-ready { border-top-color: var(--green); }
       .card.st-served { border-top-color: var(--dim); }
+      .card.st-cancelled { border-top-color: var(--red); }
       @keyframes flashRing {
         0%, 100% { box-shadow: 0 0 0 0 rgba(255, 169, 77, 0); }
         50% { box-shadow: 0 0 0 3px rgba(255, 169, 77, 0.95), 0 0 34px rgba(255, 169, 77, 0.4); }
@@ -207,6 +208,7 @@
       .chip.st-preparing { color: var(--amber); border-color: rgba(255, 209, 102, 0.5); }
       .chip.st-ready { color: var(--green); border-color: rgba(81, 207, 102, 0.5); }
       .chip.st-served { color: var(--dim); }
+      .chip.st-cancelled { color: var(--red); border-color: rgba(255, 107, 94, 0.55); }
       .chip.paid { color: var(--green); border-color: rgba(81, 207, 102, 0.5); }
       .chip.demo { color: #131009; background: var(--amber); border-color: transparent; }
       @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
@@ -233,7 +235,7 @@
       .total { font-size: 15px; color: var(--muted); font-weight: 700; }
       .total strong { font-size: 23px; font-weight: 900; color: var(--text); margin-inline-start: 4px; }
       .advance-btn {
-        margin-inline-start: auto; border: none; border-radius: 12px;
+        border: none; border-radius: 12px;
         min-height: 52px; padding: 9px 20px;
         background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--accent-ink);
         display: inline-flex; flex-direction: column; align-items: center; line-height: 1.15;
@@ -241,6 +243,13 @@
       .advance-btn .darija { font-size: 18px; font-weight: 900; }
       .advance-btn .fr { font-size: 12px; font-weight: 700; opacity: 0.85; }
       .advance-btn:active { transform: scale(0.98); }
+      .cancel-btn {
+        margin-inline-start: auto;
+        border: 1px solid rgba(255, 107, 94, 0.5); background: transparent;
+        color: var(--red); border-radius: 10px; min-height: 44px; padding: 8px 14px;
+        font-size: 14px; font-weight: 900; white-space: nowrap;
+      }
+      .cancel-btn.confirm { background: var(--red); color: #2a0a08; white-space: normal; }
       .served-note { margin-inline-start: auto; font-size: 13.5px; font-weight: 800; color: var(--dim); }
 
       .empty {
@@ -376,6 +385,7 @@
       var flashIds = {};          // ids that should flash on next render
       var payConfirm = {};        // table -> timestamp of first tap
       var deleteConfirm = {};     // order id -> timestamp of first tap
+      var cancelConfirm = {};     // order id -> timestamp of first tap
       var clearAllConfirmTs = 0;  // timestamp of first tap on "Tout effacer"
       var demoMode = !CONFIGURED;
 
@@ -383,14 +393,16 @@
         "new":       { next: "preparing", btnDarija: "Kay-t-wjed", btnFr: "En préparation", chip: "Nouvelle" },
         "preparing": { next: "ready",     btnDarija: "Wajda",      btnFr: "Prête",          chip: "En préparation" },
         "ready":     { next: "served",    btnDarija: "T-sifat",    btnFr: "Servie",         chip: "Prête" },
-        "served":    { next: null, chip: "Servie" }
+        "served":    { next: null, chip: "Servie" },
+        "cancelled": { next: null, chip: "✕ Annulée" }
       };
       var FILTERS = [
         { key: "all",       label: "Toutes" },
         { key: "new",       label: "Nouvelles" },
         { key: "preparing", label: "En préparation" },
         { key: "ready",     label: "Prêtes" },
-        { key: "served",    label: "Servies" }
+        { key: "served",    label: "Servies" },
+        { key: "cancelled", label: "Annulées" }
       ];
 
       /* ---------------- Demo data (preview only) ---------------- */
@@ -525,13 +537,18 @@
         if (st === "served" && o.paid) chips += ' <span class="chip paid">Payée</span>';
         var foot;
         if (flow.next) {
-          foot = '<button class="advance-btn" type="button" data-advance="' + esc(o._id) + '" data-next="' + flow.next + '">' +
+          // Active order: small cancel button (two-tap confirm) next to the advance button.
+          var confirmingCancel = cancelConfirm[o._id] && (Date.now() - cancelConfirm[o._id] < 4000);
+          foot = '<button class="cancel-btn' + (confirmingCancel ? ' confirm' : '') + '" type="button" data-cancel="' + esc(o._id) + '">' +
+            (confirmingCancel ? 'Annuler cette commande ?' : '✕ Annuler') + '</button>' +
+            '<button class="advance-btn" type="button" data-advance="' + esc(o._id) + '" data-next="' + flow.next + '">' +
             '<span class="darija">' + esc(flow.btnDarija) + '</span>' +
             '<span class="fr">' + esc(flow.btnFr) + '</span></button>';
         } else {
-          // Served (finished) orders only: note + delete button. Active orders never get one.
+          // Finished orders only (served or cancelled): note + delete button. Active orders never get one.
           var confirmingDel = deleteConfirm[o._id] && (Date.now() - deleteConfirm[o._id] < 4000);
-          foot = '<span class="served-note">' + (o.paid ? 'Payée ✓' : 'Servie — en attente de paiement') + '</span>' +
+          var note = st === "cancelled" ? 'Commande annulée' : (o.paid ? 'Payée ✓' : 'Servie — en attente de paiement');
+          foot = '<span class="served-note">' + note + '</span>' +
             '<button class="delete-btn' + (confirmingDel ? ' confirm' : '') + '" type="button" data-delete="' + esc(o._id) + '">' +
             (confirmingDel ? 'Supprimer cette commande ?' : '🗑 Supprimer') + '</button>';
         }
@@ -564,7 +581,7 @@
           list.forEach(function (o) {
             if (Number(o.table) !== t) return;
             if (o.status === "served" && !o.paid) { owed += orderTotal(o); servedCount++; }
-            else if (o.status !== "served") { activeCount++; }
+            else if (o.status !== "served" && o.status !== "cancelled") { activeCount++; }
           });
           grand += owed;
           var detail = [];
@@ -585,7 +602,7 @@
 
       function render() {
         var list = sortedOrders();
-        var counts = { all: list.length, "new": 0, preparing: 0, ready: 0, served: 0 };
+        var counts = { all: list.length, "new": 0, preparing: 0, ready: 0, served: 0, cancelled: 0 };
         list.forEach(function (o) {
           var st = o.status || "new";
           if (counts[st] != null) counts[st]++;
@@ -595,9 +612,11 @@
         var mainOrders, doneOrders = [];
         if (currentFilter === "served") {
           mainOrders = list.filter(function (o) { return o.status === "served"; });
+        } else if (currentFilter === "cancelled") {
+          mainOrders = list.filter(function (o) { return o.status === "cancelled"; });
         } else if (currentFilter === "all") {
-          mainOrders = list.filter(function (o) { return o.status !== "served"; });
-          doneOrders = list.filter(function (o) { return o.status === "served"; });
+          mainOrders = list.filter(function (o) { return o.status !== "served" && o.status !== "cancelled"; });
+          doneOrders = list.filter(function (o) { return o.status === "served" || o.status === "cancelled"; });
         } else {
           mainOrders = list.filter(function (o) { return (o.status || "new") === currentFilter; });
         }
@@ -636,8 +655,8 @@
         if (ordersRef) { ordersRef.child(id).update({ status: next }); }
       }
       function deleteOrder(id) {
-        // Safety: only a finished (served) order can ever be deleted.
-        if (!orders[id] || orders[id].status !== "served") return;
+        // Safety: only a finished order (served or cancelled) can ever be deleted.
+        if (!orders[id] || (orders[id].status !== "served" && orders[id].status !== "cancelled")) return;
         if (demoMode) {
           delete orders[id];
           delete knownIds[id];
@@ -650,7 +669,7 @@
         var updates = {};
         var removed = false;
         Object.keys(orders).forEach(function (id) {
-          if (orders[id].status === "served") {
+          if (orders[id].status === "served" || orders[id].status === "cancelled") {
             removed = true;
             if (demoMode) { delete orders[id]; delete knownIds[id]; }
             else { updates[id] = null; }
@@ -676,6 +695,19 @@
       document.addEventListener("click", function (e) {
         var adv = e.target.closest("[data-advance]");
         if (adv) { setStatus(adv.getAttribute("data-advance"), adv.getAttribute("data-next")); return; }
+        var can = e.target.closest("[data-cancel]");
+        if (can) {
+          var canId = can.getAttribute("data-cancel");
+          if (cancelConfirm[canId] && Date.now() - cancelConfirm[canId] < 4000) {
+            delete cancelConfirm[canId];
+            setStatus(canId, "cancelled");
+          } else {
+            cancelConfirm[canId] = Date.now();
+            render();
+            setTimeout(function () { if (cancelConfirm[canId]) { delete cancelConfirm[canId]; render(); } }, 4100);
+          }
+          return;
+        }
         var del = e.target.closest("[data-delete]");
         if (del) {
           var delId = del.getAttribute("data-delete");
