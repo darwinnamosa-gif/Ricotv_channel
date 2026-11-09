@@ -91,7 +91,7 @@
   .change-table.show{ display:block; }
 
   /* ---------- Layout ---------- */
-  .wrap{ max-width:640px; margin:0 auto; padding:0 14px 190px; }
+  .wrap{ max-width:640px; margin:0 auto; padding:0 14px 260px; }
   .panel{
     background:var(--paper);
     margin-top:-6px;
@@ -130,7 +130,19 @@
     background:var(--card); border:1px solid var(--line); border-radius:16px;
     padding:12px 12px 12px 14px;
     display:flex; align-items:center; gap:10px;
+    position:relative;
   }
+  .dish.soldout{ background:#EFE9E1; border-color:#E2D5C2; }
+  .dish.soldout .dish-name-ar,
+  .dish.soldout .dish-name-fr{ color:#8A7A64; }
+  .dish.soldout .price-badge{ opacity:.55; }
+  .soldout-badge{
+    display:none;
+    background:#7A1F1F; color:#fff;
+    font-size:12.5px; font-weight:900; letter-spacing:.02em;
+    padding:5px 10px; border-radius:999px; white-space:nowrap;
+  }
+  .dish.soldout .soldout-badge{ display:inline-block; }
   .dish-names{ flex:1; min-width:0; text-align:right; }
   .dish-name-ar{ font-size:18px; font-weight:800; line-height:1.35; color:#161006; overflow-wrap:break-word; }
   .dish-name-fr{ font-size:13.5px; font-weight:600; color:var(--muted); margin-top:1px; direction:ltr; text-align:right; }
@@ -150,6 +162,11 @@
     flex-shrink:0;
   }
   .add-btn:active{ transform:scale(.93); }
+  .add-btn:disabled{
+    background:#CFC4B2; color:#7A6E5C; cursor:not-allowed;
+    box-shadow:none; opacity:.75;
+  }
+  .add-btn:disabled:active{ transform:none; }
   .stepper{
     display:none; align-items:center; gap:2px;
     background:#111; border-radius:999px; padding:3px;
@@ -162,6 +179,8 @@
     display:flex; align-items:center; justify-content:center;
   }
   .stepper button:active{ background:rgba(255,255,255,.15); }
+  .stepper button:disabled{ color:#8A7A64; cursor:not-allowed; opacity:.55; }
+  .stepper button:disabled:active{ background:transparent; }
   .stepper .qty{ min-width:26px; text-align:center; color:#fff; font-size:17px; font-weight:900; }
 
   .hint{ text-align:center; color:var(--muted); font-size:14px; margin:26px 8px 10px; line-height:1.6; }
@@ -192,6 +211,17 @@
     color:#111; border-color:transparent;
     box-shadow:0 6px 16px rgba(240,140,30,.45);
   }
+  .note-wrap{ max-width:640px; margin:0 auto 12px; }
+  .note-wrap label{ display:block; font-size:12.5px; font-weight:700; color:#D8C7AE; margin:0 2px 6px; }
+  .note-input{
+    width:100%; box-sizing:border-box;
+    background:#242424; color:#fff;
+    border:2px solid rgba(255,255,255,.28); border-radius:14px;
+    font-size:16px; font-family:inherit; font-weight:600;
+    padding:12px 14px; outline:none;
+  }
+  .note-input::placeholder{ color:#B9A98F; font-weight:500; }
+  .note-input:focus{ border-color:var(--orange-2); background:#1C1C1C; }
   .cart-bar-inner{ max-width:640px; margin:0 auto; display:flex; align-items:center; gap:12px; }
   .cart-total{ flex:1; min-width:0; }
   .cart-total .lbl{ font-size:12.5px; color:#D8C7AE; font-weight:600; }
@@ -234,6 +264,12 @@
     padding:14px 2px 4px; font-size:19px; font-weight:900;
   }
   .confirm-total .t-val{ color:#B35E00; font-size:23px; }
+  .confirm-note{
+    display:none; background:#FFE3C2; border-radius:12px; padding:10px 13px;
+    font-size:15px; font-weight:700; line-height:1.5; margin-top:10px; overflow-wrap:break-word;
+  }
+  .confirm-note.show{ display:block; }
+  .confirm-note .lbl{ font-weight:900; }
   .error-box{
     display:none; background:var(--red-bg); color:var(--red-ink);
     border-radius:14px; padding:13px 15px; font-size:15px; font-weight:600; line-height:1.6; margin-top:14px;
@@ -271,6 +307,12 @@
   }
   .success .s-total{ font-size:19px; font-weight:800; margin:4px 0 14px; }
   .success .s-total b{ color:#B35E00; font-size:24px; }
+  .success .s-note{
+    display:none; max-width:420px; margin:0 auto 14px;
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+    padding:10px 14px; font-size:16px; font-weight:700; line-height:1.5; overflow-wrap:break-word;
+  }
+  .success .s-note.show{ display:block; }
   .success .pay-note{
     background:#FFE3C2; border-radius:14px; padding:14px 16px;
     font-size:17px; font-weight:800; line-height:1.6; margin:0 auto 22px; max-width:420px;
@@ -336,6 +378,7 @@
       <p class="s-table" id="successTable">Table 1</p>
       <p><span class="s-mode" id="successMode">Sur place</span></p>
       <p class="s-total">Total : <b id="successTotal">0 DH</b></p>
+      <p class="s-note" id="successNote"></p>
       <div class="pay-note">
         L-khlass f l-contoire mli t-sali
         <span class="fr">Paiement au comptoir quand vous aurez terminé.</span>
@@ -352,6 +395,10 @@
 
 <!-- Sticky cart bar -->
 <div class="cart-bar" id="cartBar">
+  <div class="note-wrap">
+    <label for="orderNoteInput">Note · <span dir="rtl">ملاحظة</span> (optionnel)</label>
+    <input class="note-input" id="orderNoteInput" type="text" maxlength="140" autocomplete="off" placeholder="Note (bla bsla, zid sauce, 7ar...)" />
+  </div>
   <div class="mode-toggle" role="group" aria-label="Mode de commande">
     <button class="mode-btn selected" id="modeSurplaceBtn" type="button" aria-pressed="true">🍽️ Sur place</button>
     <button class="mode-btn" id="modeEmporterBtn" type="button" aria-pressed="false">🥡 À emporter</button>
@@ -373,6 +420,7 @@
     <span class="sheet-table" id="confirmTable">Table 1</span>
     <div id="confirmList"></div>
     <div class="confirm-total"><span>Total · <span dir="rtl">المجموع</span></span><span class="t-val" id="confirmTotalVal">0 DH</span></div>
+    <div class="confirm-note" id="confirmNote"><span class="lbl">Note : </span><span id="confirmNoteText"></span></div>
     <div class="error-box" id="errorBox">
       La commande n'a pas pu être envoyée. Merci d'appeler un serveur pour commander.
       <span class="ar" dir="rtl">ما قدرناش نصيفطو الطلب. عيط على النادل من فضلك باش تدير الطلب ديالك.</span>
@@ -465,6 +513,8 @@ var selectedTable = null;
 var cart = {}; /* id -> qty */
 var sending = false;
 var orderMode = 'surplace'; /* 'surplace' | 'emporter' */
+var availability = {}; /* id -> false = sold out; true/absent = available */
+var availabilityListening = false;
 
 var pickerView = document.getElementById('pickerView');
 var menuView = document.getElementById('menuView');
@@ -487,6 +537,18 @@ var modeEmporterBtn = document.getElementById('modeEmporterBtn');
 var kioskControls = document.getElementById('kioskControls');
 var kioskCountdownEl = document.getElementById('kioskCountdown');
 var kioskReturnBtn = document.getElementById('kioskReturnBtn');
+var orderNoteInput = document.getElementById('orderNoteInput');
+var successNote = document.getElementById('successNote');
+var confirmNote = document.getElementById('confirmNote');
+var confirmNoteText = document.getElementById('confirmNoteText');
+
+function currentNote(){
+  if (!orderNoteInput) return '';
+  return String(orderNoteInput.value || '').trim().slice(0, 140);
+}
+function clearNote(){
+  if (orderNoteInput) orderNoteInput.value = '';
+}
 
 /* ---------------- Kiosk mode (?kiosk=1) ---------------- */
 var KIOSK_MODE = (function(){
@@ -504,6 +566,7 @@ function updateKioskCountdownLabel(){
 function returnToTables(){
   stopKioskCountdown();
   cart = {};
+  clearNote();
   Object.keys(ITEM_INDEX).forEach(syncRow);
   showPicker();
   window.scrollTo(0, 0);
@@ -615,6 +678,7 @@ function renderMenu(){
     cat.items.forEach(function(item){
       var row = document.createElement('div');
       row.className = 'dish';
+      row.id = 'dish-' + item.id;
 
       var names = document.createElement('div');
       names.className = 'dish-names';
@@ -629,6 +693,12 @@ function renderMenu(){
 
       var side = document.createElement('div');
       side.className = 'dish-side';
+
+      var soldBadge = document.createElement('span');
+      soldBadge.className = 'soldout-badge';
+      soldBadge.id = 'soldout-' + item.id;
+      soldBadge.textContent = 'Makaynch';
+      side.appendChild(soldBadge);
 
       var badge = document.createElement('span');
       badge.className = 'price-badge' + (item.price === 0 ? ' free' : '');
@@ -653,6 +723,7 @@ function renderMenu(){
       qty.className = 'qty'; qty.id = 'qty-' + item.id; qty.textContent = '0';
       var plus = document.createElement('button');
       plus.type = 'button'; plus.textContent = '+';
+      plus.id = 'plus-' + item.id;
       plus.setAttribute('aria-label', 'Ajouter ' + item.name);
       plus.addEventListener('click', function(){ changeQty(item.id, 1); });
       stepper.appendChild(minus); stepper.appendChild(qty); stepper.appendChild(plus);
@@ -668,7 +739,33 @@ function renderMenu(){
   });
 }
 
+/* ---------------- Availability (sold-out / Makaynch) ---------------- */
+function isAvailable(id){
+  return availability[id] !== false;
+}
+function applyAvailability(){
+  Object.keys(ITEM_INDEX).forEach(function(id){
+    var row = document.getElementById('dish-' + id);
+    var avail = isAvailable(id);
+    if (row) row.classList.toggle('soldout', !avail);
+    syncRow(id);
+  });
+}
+function startAvailabilityListener(){
+  if (availabilityListening) return;
+  if (!firebaseConfigured()) return; /* demo mode: everything stays available */
+  try {
+    getDb().ref('availability').on('value', function(snap){
+      var val = snap.val();
+      availability = (val && typeof val === 'object') ? val : {};
+      applyAvailability();
+    }, function(){ /* keep last known state on error */ });
+    availabilityListening = true;
+  } catch(e) { /* Firebase unavailable: everything stays available */ }
+}
+
 function changeQty(id, delta){
+  if (delta > 0 && !isAvailable(id)) return; /* sold out: cannot add/increase */
   var q = (cart[id] || 0) + delta;
   if (q <= 0) { delete cart[id]; } else { cart[id] = q; }
   syncRow(id);
@@ -677,9 +774,13 @@ function changeQty(id, delta){
 
 function syncRow(id){
   var q = cart[id] || 0;
+  var avail = isAvailable(id);
   var addBtn = document.getElementById('add-' + id);
   var stepper = document.getElementById('step-' + id);
   var qtyEl = document.getElementById('qty-' + id);
+  var plusBtn = document.getElementById('plus-' + id);
+  if (addBtn) addBtn.disabled = !avail;
+  if (plusBtn) plusBtn.disabled = !avail;
   if (!stepper) return;
   if (q > 0) {
     stepper.classList.add('show');
@@ -753,6 +854,11 @@ function openConfirm(){
     confirmList.appendChild(row);
   });
   confirmTotalVal.textContent = cartTotal() + ' DH';
+  var noteTxt = currentNote();
+  if (confirmNote && confirmNoteText) {
+    confirmNoteText.textContent = noteTxt;
+    confirmNote.classList.toggle('show', noteTxt.length > 0);
+  }
   confirmOverlay.classList.add('show');
   document.body.style.overflow = 'hidden';
 }
@@ -798,6 +904,7 @@ function confirmOrder(){
   var total = cartTotal();
   var table = selectedTable;
   var mode = orderMode;
+  var note = currentNote();
 
   sending = true;
   confirmBtn.disabled = true;
@@ -808,6 +915,7 @@ function confirmOrder(){
     items: items,
     total: total,
     mode: mode,
+    note: note,
     status: 'new',
     createdAt: firebase.database.ServerValue.TIMESTAMP
   };
@@ -821,6 +929,11 @@ function confirmOrder(){
       document.getElementById('successTable').textContent = 'Table ' + table;
       document.getElementById('successMode').textContent = modeLabel(mode);
       document.getElementById('successTotal').textContent = total + ' DH';
+      if (successNote) {
+        successNote.textContent = note ? ('Note: ' + note) : '';
+        successNote.classList.toggle('show', note.length > 0);
+      }
+      clearNote();
       cart = {};
       Object.keys(ITEM_INDEX).forEach(syncRow);
       menuView.classList.add('hidden');
@@ -845,6 +958,8 @@ function confirmOrder(){
 /* ---------------- Init ---------------- */
 buildPicker();
 renderMenu();
+applyAvailability();
+startAvailabilityListener();
 setMode('surplace');
 modeSurplaceBtn.addEventListener('click', function(){ setMode('surplace'); });
 modeEmporterBtn.addEventListener('click', function(){ setMode('emporter'); });
@@ -856,6 +971,7 @@ changeTableBtn.addEventListener('click', showPicker);
 if (kioskReturnBtn) kioskReturnBtn.addEventListener('click', returnToTables);
 document.getElementById('newOrderBtn').addEventListener('click', function(){
   stopKioskCountdown();
+  if (successNote) { successNote.textContent = ''; successNote.classList.remove('show'); }
   successView.classList.remove('show');
   menuView.classList.remove('hidden');
   updateCartBar();
