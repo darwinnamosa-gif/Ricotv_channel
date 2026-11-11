@@ -432,6 +432,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script>
       /* ============================================================
          FIREBASE_CONFIG — collez ici la configuration de votre
@@ -678,8 +679,7 @@
           '<div class="card-head">' +
             '<div class="table-main"><div class="table-num">Table ' + esc(o.table != null ? o.table : "?") + '</div>' + modeBadge + '</div>' +
             '<div>' + chips + '</div>' +
-            '<div class="card-meta"><div class="card-time">' + timeLabel(o.createdAt) + '</div>' +
-            '<div class="card-elapsed">' + elapsedLabel(o.createdAt) + '</div></div>' +
+            '<div class="card-meta"><div class="card-time">' + timeLabel(o.createdAt) + '</div></div>' +
           '</div>' +
           '<ul class="items">' + items + '</ul>' +
           ((o.note && String(o.note).trim()) ? '<div class="order-note" dir="auto">📝 Note : ' + esc(o.note) + '</div>' : '') +
@@ -979,35 +979,46 @@
         try {
           firebase.initializeApp(FIREBASE_CONFIG);
           var db = firebase.database();
-          ordersRef = db.ref("orders");
-          cancelledRef = db.ref("cancelled");
-          availRef = db.ref("availability");
           renderAvailability();
-          availRef.on("value", function (snap) {
-            availability = snap.val() || {};
-            renderAvailability();
-          });
           setConn("", "Connexion…");
-          db.ref(".info/connected").on("value", function (snap) {
-            if (snap.val() === true) { setConn("ok", "Connecté"); }
-            else { setConn("bad", "Déconnecté"); }
-          });
-          ordersRef.on("value", function (snap) {
-            var val = snap.val() || {};
-            if (firstSyncDone) {
-              Object.keys(val).forEach(function (id) {
-                if (!knownIds[id] && (val[id].status || "new") === "new") {
-                  flashIds[id] = true;
-                  beep();
-                }
-              });
-            }
-            orders = val;
-            Object.keys(val).forEach(function (id) { knownIds[id] = true; });
-            firstSyncDone = true;
-            render();
+          var listenersStarted = false;
+          firebase.auth().onAuthStateChanged(function (user) {
+            if (!user) return;
+            if (listenersStarted) return;
+            listenersStarted = true;
+            ordersRef = db.ref("orders");
+            cancelledRef = db.ref("cancelled");
+            availRef = db.ref("availability");
+            availRef.on("value", function (snap) {
+              availability = snap.val() || {};
+              renderAvailability();
+            });
+            db.ref(".info/connected").on("value", function (snap) {
+              if (snap.val() === true) { setConn("ok", "Connecté"); }
+              else { setConn("bad", "Déconnecté"); }
+            });
+            ordersRef.on("value", function (snap) {
+              var val = snap.val() || {};
+              if (firstSyncDone) {
+                Object.keys(val).forEach(function (id) {
+                  if (!knownIds[id] && (val[id].status || "new") === "new") {
+                    flashIds[id] = true;
+                    beep();
+                  }
+                });
+              }
+              orders = val;
+              Object.keys(val).forEach(function (id) { knownIds[id] = true; });
+              firstSyncDone = true;
+              render();
+            }, function () {
+              setConn("bad", "Déconnecté");
+            });
           }, function () {
-            setConn("bad", "Déconnecté");
+            setConn("bad", "Erreur Firebase");
+          });
+          firebase.auth().signInAnonymously().catch(function () {
+            setConn("bad", "Erreur Firebase");
           });
         } catch (err) {
           setConn("bad", "Erreur Firebase");
