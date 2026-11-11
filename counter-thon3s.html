@@ -358,9 +358,68 @@
         .brand-name { font-size: 20px; }
         .top-actions { width: 100%; justify-content: space-between; }
       }
+
+      /* ---------- PIN gate (écran neutre type 404) ---------- */
+      #appWrap[hidden], #pinGate[hidden] { display: none !important; }
+      #pinGate {
+        position: fixed; inset: 0; z-index: 100;
+        background: #f4f4f4; color: #333;
+        font-family: Arial, Helvetica, sans-serif;
+        display: flex; align-items: flex-start; justify-content: center;
+        padding: 12vh 20px 20px;
+        overflow-y: auto;
+      }
+      .gate-inner { max-width: 520px; width: 100%; text-align: left; }
+      .gate-inner h1 { font-size: 28px; font-weight: 400; margin: 0 0 8px; color: #222; }
+      .gate-inner p { font-size: 14px; line-height: 1.6; color: #555; margin: 0 0 6px; }
+      .gate-inner hr { border: none; border-top: 1px solid #ddd; margin: 18px 0; }
+      .gate-form { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .gate-form input {
+        width: 110px; padding: 7px 10px; font-size: 14px;
+        border: 1px solid #bbb; border-radius: 3px; background: #fff; color: #333;
+        letter-spacing: 4px; text-align: center; font-family: inherit;
+      }
+      .gate-form button {
+        padding: 7px 14px; font-size: 13px;
+        border: 1px solid #bbb; border-radius: 3px; background: #eee; color: #333;
+        cursor: pointer; font-family: inherit;
+      }
+      .gate-error { font-size: 13px; color: #b3261e; margin-top: 10px; width: 100%; }
+      .gate-wait { font-size: 13px; color: #555; margin-top: 6px; width: 100%; }
+      .gate-form input:disabled { background: #eee; color: #999; }
+      .gate-form button:disabled { background: #eee; color: #999; cursor: not-allowed; }
+      @keyframes gateShake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-8px); }
+        40% { transform: translateX(8px); }
+        60% { transform: translateX(-6px); }
+        80% { transform: translateX(6px); }
+      }
+      .gate-form.shake { animation: gateShake 0.4s ease-in-out; }
+      .lock-btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 38px; height: 38px; border-radius: 999px; flex-shrink: 0;
+        border: 1px solid var(--line); background: var(--panel);
+        font-size: 15px; line-height: 1; padding: 0;
+      }
     </style>
   </head>
   <body>
+    <div id="pinGate" hidden>
+      <div class="gate-inner">
+        <h1>Not Found</h1>
+        <p>The requested URL was not found on this server.</p>
+        <hr />
+        <form class="gate-form" id="pinForm" autocomplete="off">
+          <input type="password" id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" aria-label="Code" />
+          <button type="submit" id="pinSubmit">Ouvrir</button>
+          <div class="gate-error" id="pinError" hidden>Code incorrect</div>
+          <div class="gate-wait" id="pinWait" hidden>Veuillez patienter 30 s</div>
+        </form>
+      </div>
+    </div>
+
+    <div id="appWrap" hidden>
     <header class="topbar">
       <div>
         <div class="brand-name">THON <span class="heart">&lt;3S</span></div>
@@ -373,6 +432,7 @@
           <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor" stroke="none"/><line x1="16" y1="9" x2="22" y2="15"/><line x1="22" y1="9" x2="16" y2="15"/></svg>
           <span id="soundLabel">Son activé</span>
         </button>
+        <button class="lock-btn" id="lockBtn" type="button" title="Verrouiller" aria-label="Verrouiller le comptoir">🔒</button>
       </div>
     </header>
 
@@ -429,6 +489,7 @@
     </main>
 
     <p class="foot-note">THON &lt;3S — Sandwichs &amp; Salades · Les commandes se mettent à jour en temps réel.</p>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -962,7 +1023,112 @@
       /* Refresh elapsed-time labels every 30 s */
       setInterval(render, 30000);
 
-      /* ---------------- Boot ---------------- */
+      /* ---------------- PIN gate ----------------
+         Le comptoir ne démarre (aucune initialisation Firebase,
+         aucun écouteur, aucune donnée) qu'après la saisie du code,
+         ou si cet appareil a déjà été déverrouillé. */
+      var PIN_CODE = "4590";
+      /* Le PIN est partagé et ne se change que dans ce fichier : on supprime
+         toute ancienne surcharge par appareil qui aurait pu rester. */
+      try { localStorage.removeItem("thon3s_counter_pin_v1"); } catch (e) { /* ignore */ }
+      var UNLOCK_KEY = "thon3s_counter_unlocked_v1";
+      var LOCKOUT_KEY = "thon3s_counter_lockout_until_v1";
+      var LOCKOUT_MS = 30000;
+      var lockoutTimer = null;
+      var counterStarted = false;
+      var appWrap = document.getElementById("appWrap");
+      var pinGate = document.getElementById("pinGate");
+      var pinForm = document.getElementById("pinForm");
+      var pinInput = document.getElementById("pinInput");
+      var pinError = document.getElementById("pinError");
+      var pinSubmit = document.getElementById("pinSubmit");
+      var pinWait = document.getElementById("pinWait");
+
+      function isUnlocked() {
+        try { return localStorage.getItem(UNLOCK_KEY) === "1"; } catch (e) { return false; }
+      }
+      function rememberUnlock() {
+        try { localStorage.setItem(UNLOCK_KEY, "1"); } catch (e) { /* stockage indisponible : déverrouillage pour cette visite seulement */ }
+      }
+      function showAppAndStart() {
+        pinGate.hidden = true;
+        appWrap.hidden = false;
+        startCounter();
+      }
+      function getLockoutUntil() {
+        try {
+          var v = parseInt(localStorage.getItem(LOCKOUT_KEY), 10);
+          return isNaN(v) ? 0 : v;
+        } catch (e) { return 0; }
+      }
+      function clearLockoutTimer() {
+        if (lockoutTimer) { clearInterval(lockoutTimer); lockoutTimer = null; }
+      }
+      function endLockout() {
+        clearLockoutTimer();
+        try { localStorage.removeItem(LOCKOUT_KEY); } catch (e) { /* ignore */ }
+        pinInput.disabled = false;
+        pinSubmit.disabled = false;
+        pinWait.hidden = true;
+        pinInput.value = "";
+        pinInput.focus();
+      }
+      function tickLockout() {
+        var remaining = getLockoutUntil() - Date.now();
+        if (remaining <= 0) { endLockout(); return; }
+        pinInput.disabled = true;
+        pinSubmit.disabled = true;
+        pinWait.hidden = false;
+        pinWait.textContent = "Veuillez patienter " + Math.ceil(remaining / 1000) + " s";
+      }
+      function startLockoutTimer() {
+        clearLockoutTimer();
+        tickLockout();
+        if (getLockoutUntil() > Date.now()) {
+          lockoutTimer = setInterval(tickLockout, 250);
+        }
+      }
+      function startLockout() {
+        try { localStorage.setItem(LOCKOUT_KEY, String(Date.now() + LOCKOUT_MS)); } catch (e) { /* ignore */ }
+        startLockoutTimer();
+      }
+      function isLockedOut() {
+        return getLockoutUntil() > Date.now();
+      }
+      pinForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (isLockedOut()) { startLockoutTimer(); return; }
+        if (pinInput.value === PIN_CODE) {
+          pinError.hidden = true;
+          try { localStorage.removeItem(LOCKOUT_KEY); } catch (err) { /* ignore */ }
+          rememberUnlock();
+          pinInput.value = "";
+          showAppAndStart();
+        } else {
+          pinError.hidden = false;
+          pinInput.value = "";
+          pinForm.classList.remove("shake");
+          void pinForm.offsetWidth; // relance l'animation
+          pinForm.classList.add("shake");
+          startLockout();
+        }
+      });
+      /* ---------------- Verrouillage immédiat ----------------
+         Le 🔒 efface le déverrouillage mémorisé (ainsi qu'un éventuel
+         verrouillage de 30 s en cours) et recharge la page : le portail
+         de code réapparaît. Le PIN ne se change que dans ce fichier. */
+      document.getElementById("lockBtn").addEventListener("click", function () {
+        try {
+          localStorage.removeItem(UNLOCK_KEY);
+          localStorage.removeItem(LOCKOUT_KEY);
+        } catch (e) { /* ignore */ }
+        location.reload();
+      });
+
+      /* ---------------- Boot (après déverrouillage seulement) ---------------- */
+      function startCounter() {
+      if (counterStarted) return;
+      counterStarted = true;
       if (demoMode) {
         document.getElementById("configBanner").hidden = false;
         setConn("unconf", "Firebase non configuré");
@@ -1022,6 +1188,23 @@
           });
         } catch (err) {
           setConn("bad", "Erreur Firebase");
+        }
+      }
+      }
+
+      /* ---------------- État initial : verrouillé ou déjà déverrouillé ---------------- */
+      if (isUnlocked()) {
+        showAppAndStart();
+      } else {
+        appWrap.hidden = true;
+        pinGate.hidden = false;
+        if (isLockedOut()) {
+          pinError.hidden = false;
+          startLockoutTimer();
+        } else {
+          // Nettoie un éventuel verrouillage expiré.
+          if (getLockoutUntil()) { try { localStorage.removeItem(LOCKOUT_KEY); } catch (e) { /* ignore */ } }
+          pinInput.focus();
         }
       }
     </script>
