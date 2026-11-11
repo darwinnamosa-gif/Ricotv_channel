@@ -6,6 +6,17 @@
 <meta name="color-scheme" content="light" />
 <link rel="icon" href="data:," />
 <title>THON 3S - Commander à table</title>
+<script>
+(function(){
+  try {
+    var _t = new URLSearchParams(window.location.search).get('t');
+    window.__THON_TOKEN_OK = (_t === '85536c76eebe7180');
+  } catch(e) { window.__THON_TOKEN_OK = false; }
+  if (!window.__THON_TOKEN_OK) {
+    document.documentElement.classList.add('thon-blocked');
+  }
+})();
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -345,6 +356,47 @@
   }
   .toast.show{ display:block; }
 
+  /* ---------- QR Token Gate (blocked) ---------- */
+  #qrGate{ display:none; }
+  html.thon-blocked body{ background:#111111; overflow:hidden; }
+  html.thon-blocked body > *:not(#qrGate){ display:none !important; }
+  html.thon-blocked #qrGate{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    position:fixed; inset:0; z-index:9999;
+    background:
+      radial-gradient(ellipse 90% 55% at 50% -5%, rgba(255,169,77,.38) 0%, rgba(255,169,77,0) 62%),
+      linear-gradient(180deg, #1C1C1C 0%, #111111 55%, #0B0B0B 100%);
+    color:#fff; text-align:center; padding:32px 22px calc(32px + env(safe-area-inset-bottom));
+  }
+  .qr-gate-kicker{
+    font-size:12.5px; font-weight:800; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--orange-2); opacity:.9; margin:0 0 10px;
+  }
+  .qr-gate-title{
+    margin:0; font-family:"Arial Black", system-ui, sans-serif; font-weight:900;
+    font-size:clamp(58px, 18vw, 96px); line-height:.92; letter-spacing:-.02em; color:#fff;
+  }
+  .qr-gate-title .heart{ color:#C21807; }
+  .qr-gate-title .s{ color:var(--orange-1); }
+  .qr-gate-sub-ar{
+    margin:10px 0 0; font-size:20px; font-weight:800; color:var(--orange-2);
+  }
+  .qr-gate-icon{
+    width:92px; height:92px; margin:30px auto 22px;
+    border:2px solid rgba(255,178,107,.55); border-radius:22px;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,169,77,.08);
+  }
+  .qr-gate-icon svg{ width:52px; height:52px; }
+  .qr-gate-text{
+    margin:0; max-width:340px;
+    font-size:20px; font-weight:800; line-height:1.45; color:#fff;
+  }
+  .qr-gate-text-ar{
+    margin:8px 0 0; max-width:340px;
+    font-size:17px; font-weight:700; line-height:1.55; color:#D8C7AE;
+  }
+
   .hidden{ display:none !important; }
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; animation:none !important; }
@@ -352,6 +404,19 @@
 </style>
 </head>
 <body>
+
+<!-- QR Token Gate — shown only when the QR token is missing/invalid.
+     The gate check in <head> runs FIRST, before any Firebase init or menu render. -->
+<div id="qrGate" role="main" aria-label="THON 3S — scannez le QR code de votre table">
+  <p class="qr-gate-kicker">Sandwichs &amp; Salades</p>
+  <h1 class="qr-gate-title">THON <span class="heart">&lt;3</span><span class="s">S</span></h1>
+  <p class="qr-gate-sub-ar" dir="rtl">طون &lt;3 س — سندويشات وسلطات</p>
+  <div class="qr-gate-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#FFB26B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="3.2" height="3.2" rx=".6" fill="#FFB26B" stroke="none"/><rect x="13.8" y="7" width="3.2" height="3.2" rx=".6"/><rect x="7" y="13.8" width="3.2" height="3.2" rx=".6"/><path d="M13.8 13.8h3.2v3.2h-3.2z"/></svg>
+  </div>
+  <p class="qr-gate-text">Scannez le QR code de votre table pour commander</p>
+  <p class="qr-gate-text-ar" dir="rtl">سكاني QR كود ديال الطاولة ديالك باش تطلب</p>
+</div>
 
 <header class="hero">
   <p class="hero-kicker">Sandwichs &amp; Salades</p>
@@ -445,6 +510,9 @@
 </div>
 
 <script>
+/* Token gate — checked FIRST (see <head>). When the token is missing or
+   invalid, NOTHING below runs: no Firebase init, no menu render, no cart. */
+if (window.__THON_TOKEN_OK) {
 /* ============================================================
    FIREBASE_CONFIG — collez ici la configuration Firebase du restaurant
    (Console Firebase > Paramètres du projet > Vos applications > Web)
@@ -1070,6 +1138,7 @@ if (initialTable !== null) {
   showPicker();
 }
 updateCartBar();
+} /* end if (__THON_TOKEN_OK) — blocked visitors never reach Firebase/menu code */
 </script>
 </body>
 </html>
