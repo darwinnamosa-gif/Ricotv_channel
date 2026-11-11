@@ -404,35 +404,105 @@
         .top-actions { width: 100%; justify-content: space-between; }
       }
 
-      /* ---------- PIN gate (écran neutre type 404) ---------- */
+      /* ---------- PIN gate (écran d'accès brandé) ---------- */
       #appWrap[hidden], #pinGate[hidden] { display: none !important; }
       #pinGate {
         position: fixed; inset: 0; z-index: 100;
-        background: #f4f4f4; color: #333;
-        font-family: Arial, Helvetica, sans-serif;
-        display: flex; align-items: flex-start; justify-content: center;
-        padding: 12vh 20px 20px;
+        background:
+          radial-gradient(1100px 620px at 50% -180px, rgba(255, 169, 77, 0.24), transparent 62%),
+          radial-gradient(760px 520px at 92% 108%, rgba(255, 178, 107, 0.13), transparent 60%),
+          radial-gradient(620px 420px at 4% 92%, rgba(255, 169, 77, 0.07), transparent 60%),
+          var(--bg);
+        color: var(--text);
+        font-family: inherit;
+        display: flex; align-items: center; justify-content: center;
+        padding: 32px 20px 40px;
         overflow-y: auto;
       }
-      .gate-inner { max-width: 520px; width: 100%; text-align: left; }
-      .gate-inner h1 { font-size: 28px; font-weight: 400; margin: 0 0 8px; color: #222; }
-      .gate-inner p { font-size: 14px; line-height: 1.6; color: #555; margin: 0 0 6px; }
-      .gate-inner hr { border: none; border-top: 1px solid #ddd; margin: 18px 0; }
-      .gate-form { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .gate-inner {
+        width: 100%; max-width: 460px;
+        display: flex; flex-direction: column; align-items: center;
+        text-align: center;
+      }
+      .gate-brand { margin-bottom: 28px; }
+      .gate-logo {
+        font-size: clamp(58px, 13vw, 84px);
+        font-weight: 900; line-height: 0.95; letter-spacing: 0.5px;
+        color: var(--text);
+      }
+      .gate-logo .heart {
+        background: linear-gradient(120deg, var(--accent), var(--accent-2));
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+      }
+      .gate-brand-sub {
+        margin-top: 12px;
+        font-size: clamp(22px, 5vw, 28px); font-weight: 800; line-height: 1.1;
+        color: var(--accent-2);
+      }
+      .gate-brand-tag {
+        margin-top: 7px;
+        font-size: 14.5px; font-weight: 600; line-height: 1.5;
+        color: var(--muted);
+      }
+      .gate-card {
+        width: 100%;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-top: 4px solid var(--accent);
+        border-radius: 20px;
+        padding: 26px 24px 24px;
+        box-shadow: 0 28px 70px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 169, 77, 0.04);
+        text-align: center;
+      }
+      .gate-card-title { font-size: 19px; font-weight: 900; line-height: 1.2; }
+      .gate-card-text { font-size: 14px; font-weight: 600; line-height: 1.55; color: var(--muted); margin: 6px 0 0; }
+      .gate-form {
+        display: flex; flex-direction: column; gap: 14px;
+        margin-top: 20px; text-align: start;
+      }
+      .gate-label {
+        font-size: 13.5px; font-weight: 800; color: var(--muted);
+        margin-bottom: -6px;
+      }
       .gate-form input {
-        width: 110px; padding: 7px 10px; font-size: 14px;
-        border: 1px solid #bbb; border-radius: 3px; background: #fff; color: #333;
-        letter-spacing: 4px; text-align: center; font-family: inherit;
+        width: 100%; height: 58px; padding: 10px 14px;
+        font-size: 24px; font-weight: 800;
+        border: 1px solid var(--line); border-radius: 13px;
+        background: var(--bg-soft); color: var(--text);
+        letter-spacing: 10px; text-align: center; font-family: inherit;
+      }
+      .gate-form input::placeholder { color: var(--dim); letter-spacing: 6px; }
+      .gate-form input:focus {
+        outline: none; border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(255, 169, 77, 0.28);
       }
       .gate-form button {
-        padding: 7px 14px; font-size: 13px;
-        border: 1px solid #bbb; border-radius: 3px; background: #eee; color: #333;
+        width: 100%; min-height: 54px; padding: 12px 18px;
+        font-size: 17px; font-weight: 900;
+        border: none; border-radius: 13px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: var(--accent-ink);
+        box-shadow: 0 10px 26px rgba(255, 169, 77, 0.28);
         cursor: pointer; font-family: inherit;
       }
-      .gate-error { font-size: 13px; color: #b3261e; margin-top: 10px; width: 100%; }
-      .gate-wait { font-size: 13px; color: #555; margin-top: 6px; width: 100%; }
-      .gate-form input:disabled { background: #eee; color: #999; }
-      .gate-form button:disabled { background: #eee; color: #999; cursor: not-allowed; }
+      .gate-form button:active { transform: scale(0.99); }
+      .gate-error {
+        font-size: 14px; font-weight: 800; line-height: 1.45; text-align: center;
+        color: #ffb0a6; background: rgba(255, 107, 94, 0.12);
+        border: 1px solid rgba(255, 107, 94, 0.45);
+        border-radius: 10px; padding: 9px 12px; width: 100%;
+      }
+      .gate-wait {
+        font-size: 13.5px; font-weight: 700; line-height: 1.45; text-align: center;
+        color: var(--amber); width: 100%;
+      }
+      .gate-form input:disabled { background: var(--panel-2); color: var(--dim); opacity: 0.75; }
+      .gate-form button:disabled { background: var(--panel-2); color: var(--dim); box-shadow: none; cursor: not-allowed; }
+      @media (max-width: 420px) {
+        #pinGate { padding: 24px 16px 32px; align-items: flex-start; padding-top: 7vh; }
+        .gate-card { padding: 22px 18px 20px; }
+        .gate-brand { margin-bottom: 22px; }
+      }
       @keyframes gateShake {
         0%, 100% { transform: translateX(0); }
         20% { transform: translateX(-8px); }
@@ -452,15 +522,22 @@
   <body>
     <div id="pinGate" hidden>
       <div class="gate-inner">
-        <h1>Not Found</h1>
-        <p>The requested URL was not found on this server.</p>
-        <hr />
-        <form class="gate-form" id="pinForm" autocomplete="off">
-          <input type="password" id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" aria-label="Code" />
-          <button type="submit" id="pinSubmit">Ouvrir</button>
-          <div class="gate-error" id="pinError" hidden>Code incorrect</div>
-          <div class="gate-wait" id="pinWait" hidden>Veuillez patienter 30 s</div>
-        </form>
+        <div class="gate-brand">
+          <div class="gate-logo">THON <span class="heart">&lt;3S</span></div>
+          <div class="gate-brand-sub">Comptoir</div>
+          <div class="gate-brand-tag">Sandwichs &amp; Salades — Commandes en direct</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-card-title">Accès au comptoir</div>
+          <p class="gate-card-text">Entrez le code pour ouvrir le comptoir.</p>
+          <form class="gate-form" id="pinForm" autocomplete="off">
+            <label class="gate-label" for="pinInput">Code</label>
+            <input type="password" id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" aria-label="Code" />
+            <button type="submit" id="pinSubmit">Ouvrir</button>
+            <div class="gate-error" id="pinError" hidden>Code incorrect</div>
+            <div class="gate-wait" id="pinWait" hidden>Veuillez patienter 30 s</div>
+          </form>
+        </div>
       </div>
     </div>
 
