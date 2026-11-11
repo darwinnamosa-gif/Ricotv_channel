@@ -8,6 +8,7 @@
 <title>THON 3S - Commander à table</title>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <style>
   :root{
     --orange-1:#FFA94D;
@@ -91,7 +92,7 @@
   .change-table.show{ display:block; }
 
   /* ---------- Layout ---------- */
-  .wrap{ max-width:640px; margin:0 auto; padding:0 14px 260px; }
+  .wrap{ max-width:640px; margin:0 auto; padding:0 14px 330px; }
   .panel{
     background:var(--paper);
     margin-top:-6px;
@@ -335,6 +336,15 @@
   }
   .kiosk-return-btn:active{ transform:scale(.97); }
 
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:90;
+    background:#111; color:#fff; font-size:15px; font-weight:700;
+    padding:12px 20px; border-radius:999px; box-shadow:0 8px 22px rgba(0,0,0,.35);
+    display:none; max-width:92vw; text-align:center;
+  }
+  .toast.show{ display:block; }
+
   .hidden{ display:none !important; }
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; animation:none !important; }
@@ -411,6 +421,8 @@
     <button class="order-btn" id="orderBtn" type="button">Commander</button>
   </div>
 </div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <!-- Confirmation sheet -->
 <div class="overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-label="Confirmation de la commande">
@@ -548,6 +560,17 @@ function currentNote(){
 }
 function clearNote(){
   if (orderNoteInput) orderNoteInput.value = '';
+}
+
+/* ---------------- Toast ---------------- */
+var toastTimer = null;
+function showToast(msg){
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  if (toastTimer !== null) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); toastTimer = null; }, 2600);
 }
 
 /* ---------------- Kiosk mode (?kiosk=1) ---------------- */
@@ -889,6 +912,59 @@ function getDb(){
   return firebaseDb;
 }
 
+/* ---------------- Firebase Auth (anonymous) ----------------
+   The database rules require a signed-in user (auth != null).
+   The page signs in anonymously on load, before any database
+   read or write; all database access below waits for this. */
+var authState = 'pending'; /* 'pending' | 'ok' | 'failed' */
+var authWaiters = [];
+
+function setAuthState(state){
+  authState = state;
+  if (state !== 'pending') {
+    var waiters = authWaiters;
+    authWaiters = [];
+    waiters.forEach(function(fn){ fn(state === 'ok'); });
+  }
+}
+
+function waitForAuth(timeoutMs){
+  if (authState === 'ok') return Promise.resolve(true);
+  if (authState === 'failed') return Promise.resolve(false);
+  return new Promise(function(resolve){
+    var done = false;
+    var timer = setTimeout(function(){
+      if (done) return;
+      done = true;
+      resolve(authState === 'ok');
+    }, timeoutMs || 6000);
+    authWaiters.push(function(ok){
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve(ok);
+    });
+  });
+}
+
+function initAuth(){
+  if (!firebaseConfigured()) { setAuthState('failed'); return; }
+  try {
+    getDb(); /* ensures the Firebase app is initialized */
+    firebase.auth().onAuthStateChanged(function(user){
+      if (user) {
+        setAuthState('ok');
+        startAvailabilityListener();
+      }
+    });
+    firebase.auth().signInAnonymously().catch(function(){
+      setAuthState('failed');
+    });
+  } catch(e) {
+    setAuthState('failed');
+  }
+}
+
 function confirmOrder(){
   if (sending) return;
   errorBox.classList.remove('show');
@@ -920,46 +996,55 @@ function confirmOrder(){
     createdAt: firebase.database.ServerValue.TIMESTAMP
   };
 
-  try {
-    getDb().ref('orders').push(order).then(function(){
-      sending = false;
-      confirmBtn.disabled = false;
-      confirmBtn.textContent = 'Confirmer la commande';
-      closeConfirm();
-      document.getElementById('successTable').textContent = 'Table ' + table;
-      document.getElementById('successMode').textContent = modeLabel(mode);
-      document.getElementById('successTotal').textContent = total + ' DH';
-      if (successNote) {
-        successNote.textContent = note ? ('Note: ' + note) : '';
-        successNote.classList.toggle('show', note.length > 0);
-      }
-      clearNote();
-      cart = {};
-      Object.keys(ITEM_INDEX).forEach(syncRow);
-      menuView.classList.add('hidden');
-      cartBar.classList.remove('show');
-      successView.classList.add('show');
-      window.scrollTo(0, 0);
-      startKioskCountdown();
-    }).catch(function(){
+  waitForAuth(6000).then(function(authOk){
+    if (!authOk) {
       sending = false;
       confirmBtn.disabled = false;
       confirmBtn.textContent = 'Confirmer la commande';
       errorBox.classList.add('show');
-    });
-  } catch(e) {
-    sending = false;
-    confirmBtn.disabled = false;
-    confirmBtn.textContent = 'Confirmer la commande';
-    errorBox.classList.add('show');
-  }
+      return;
+    }
+    try {
+      getDb().ref('orders').push(order).then(function(){
+        sending = false;
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirmer la commande';
+        closeConfirm();
+        document.getElementById('successTable').textContent = 'Table ' + table;
+        document.getElementById('successMode').textContent = modeLabel(mode);
+        document.getElementById('successTotal').textContent = total + ' DH';
+        if (successNote) {
+          successNote.textContent = note ? ('Note: ' + note) : '';
+          successNote.classList.toggle('show', note.length > 0);
+        }
+        clearNote();
+        cart = {};
+        Object.keys(ITEM_INDEX).forEach(syncRow);
+        menuView.classList.add('hidden');
+        cartBar.classList.remove('show');
+        successView.classList.add('show');
+        window.scrollTo(0, 0);
+        startKioskCountdown();
+      }).catch(function(){
+        sending = false;
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirmer la commande';
+        errorBox.classList.add('show');
+      });
+    } catch(e) {
+      sending = false;
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirmer la commande';
+      errorBox.classList.add('show');
+    }
+  });
 }
 
 /* ---------------- Init ---------------- */
 buildPicker();
 renderMenu();
 applyAvailability();
-startAvailabilityListener();
+initAuth();
 setMode('surplace');
 modeSurplaceBtn.addEventListener('click', function(){ setMode('surplace'); });
 modeEmporterBtn.addEventListener('click', function(){ setMode('emporter'); });
