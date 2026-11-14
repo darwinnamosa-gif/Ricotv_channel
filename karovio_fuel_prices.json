@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "updated": "2026-11-01",
+  "updatedLabel": "1er novembre 2026",
+  "source": "Relevés presse Casablanca — révision du 1er novembre 2026",
+  "essenceAvg": 15.57,
+  "gasoilAvg": 16.85,
+  "brands": [
+    {
+      "name": "Afriquia",
+      "gasoil": 16.4,
+      "essence": 15.09
+    },
+    {
+      "name": "Yoom",
+      "gasoil": 16.89,
+      "essence": 14.99
+    },
+    {
+      "name": "TotalEnergies",
+      "gasoil": 16.99,
+      "essence": 15.69
+    },
+    {
+      "name": "Winxo",
+      "gasoil": 16.95,
+      "essence": 15.38
+    },
+    {
+      "name": "Shell",
+      "gasoil": 16.95,
+      "essence": 15.38
+    },
+    {
+      "name": "Petromin",
+      "gasoil": 16.95,
+      "essence": 15.38
+    }
+  ]
+}
