@@ -864,7 +864,21 @@ function applyMenuOverrides(overrides){
     if (!nm) return;
     var fr = (s.fr && String(s.fr).trim()) || nm;
     var ar = (s.ar && String(s.ar).trim()) || nm;
-    for (var i = 0; i < MENU.length; i++) if (MENU[i].id === id) return;
+    var editPhoto = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
+    for (var i = 0; i < MENU.length; i++) {
+      if (MENU[i].id === id) {
+        /* Section DÉJÀ dans le menu imprimé (base) :
+           l'enregistrement porte le renommage / la photo
+           (édition de catégorie) — il gagne sur le libellé
+           imprimé. Un enregistrement {order: N} seul
+           n'arrive jamais ici (pas de nom : retour
+           anticipé ci-dessus). */
+        MENU[i].fr = fr;
+        MENU[i].ar = ar;
+        MENU[i].photo = editPhoto;
+        return;
+      }
+    }
     var photo = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
     MENU.push({ id: id, fr: fr, ar: ar, photo: photo, groups: [{ name: '', items: [] }] });
   });
@@ -1192,6 +1206,62 @@ function syncMenuSectionPhoto(sec, cat){
   }
   if (img.getAttribute('src') !== photo) img.setAttribute('src', photo);
 }
+var PRINTED_SECTION_NAME = {};
+function syncMenuSectionName(sec, cat){
+  /* Titre bilingue de l'en-tête de section (statique + créée) :
+     réécrit à chaque sync depuis MENU, donc un renommage de catégorie
+     arrivé par l'écoute en direct s'affiche sans rechargement — comme
+     la photo (syncMenuSectionPhoto, même appel). L'en-tête imprimé
+     porte le nom arabe en premier nœud texte puis le nom français dans
+     <span class="fr"> ; la section créée par menuSectionFor a la même
+     structure. Le h2 est en flex avec un gap, donc l'espace entre les
+     deux noms ne dépend pas du nœud texte.
+     Sans renommage effectif, le titre IMPRIMÉ reste strictement
+     intact : on ne touche au DOM que si le texte diffère, et la cible
+     est alors le titre imprimé (photographié au premier passage) —
+     jamais le libellé MENU. C'est indispensable : l'impression ne dit
+     pas partout comme MENU (« Sandwiches » imprimé contre « Sandwichs »
+     dans MENU, « Spécial » contre « Spécial <3S ») — écrire MENU à
+     chaque sync changerait deux en-têtes sans qu'aucun override
+     existe. Un renommage (MENU ≠ MENU_BASE) écrit les noms de MENU ;
+     un retour aux noms d'origine (renommage annulé, nœud vidé) restaure
+     l'impression. Une section créée n'a pas d'entrée dans MENU_BASE :
+     elle suit toujours MENU (ses noms imprimés en sont déjà issus). */
+  if (!sec) return;
+  var head = sec.querySelector('.col-head h2');
+  if (!head) return;
+  if (!PRINTED_SECTION_NAME[cat.id]) {
+    var fr0 = head.querySelector('span.fr');
+    var ar0 = null;
+    for (var j = 0; j < head.childNodes.length; j++) {
+      var nj = head.childNodes[j];
+      if (nj.nodeType === 3 && nj.nodeValue.trim() !== '') { ar0 = nj.nodeValue.trim(); break; }
+    }
+    PRINTED_SECTION_NAME[cat.id] = {
+      ar: ar0 !== null ? ar0 : (cat.ar || cat.fr || ''),
+      fr: fr0 ? fr0.textContent : (cat.fr || '')
+    };
+  }
+  var base = null;
+  for (var i = 0; i < MENU_BASE.length; i++) {
+    if (MENU_BASE[i].id === cat.id) { base = MENU_BASE[i]; break; }
+  }
+  var renamed = !base || base.fr !== cat.fr || base.ar !== cat.ar;
+  var target = renamed
+    ? { ar: cat.ar || cat.fr || '', fr: cat.fr || '' }
+    : PRINTED_SECTION_NAME[cat.id];
+  var fr = head.querySelector('span.fr');
+  if (fr && fr.textContent !== target.fr) fr.textContent = target.fr;
+  for (var k = 0; k < head.childNodes.length; k++) {
+    var n = head.childNodes[k];
+    if (n.nodeType === 3 && n.nodeValue.trim() !== '') {
+      if (n.nodeValue.trim() !== target.ar) n.nodeValue = target.ar;
+      break;
+    }
+  }
+  var label = sec.getAttribute('aria-label');
+  if (label !== null && label !== target.ar) sec.setAttribute('aria-label', target.ar);
+}
 function syncMenuDOM(){
   var seen = {};
   MENU.forEach(function(cat){
@@ -1200,6 +1270,7 @@ function syncMenuDOM(){
         seen[it.id] = true;
         var sec = menuSectionFor(cat);
         syncMenuSectionPhoto(sec, cat);
+        syncMenuSectionName(sec, cat);
         var div = menuDishDiv(it.id);
         var created = false;
         if (!div) {
