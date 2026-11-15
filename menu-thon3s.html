@@ -802,15 +802,21 @@ var MENU_BASE = JSON.parse(JSON.stringify(MENU));
      edited/<dishId>  : plat complet {name, note, price} ou {name, note,
                         options:[{label, price}]} (+ flavours si applicable,
                         + sectionId seulement si le plat change de section)
+                        desc (facultatif) : texte affiché sous le
+                        nom du plat sur le menu QR ; absent ou vide
+                        = description imprimée. `note` est conservé
+                        (ancien champ, jamais affiché).
      added/<dishId>   : plat complet + sectionId (id Firebase-safe,
                         ex. added-<timestamp>-<aléatoire>)
-     sections/<secId> : {name, fr, ar, createdAt, order?, photo?} — une
+     sections/<secId> : {name, fr, ar, createdAt, order?, photo?, desc?} — une
                         catégorie créée depuis « Ajouter un plat »
                         (id sec-<timestamp>-<aléatoire>). `name` est
                         le nom français (champ historique, conservé
                         comme repli) ; `fr` / `ar` font foi quand ils
                         sont présents. Une section ancienne {name}
                         seul s'affiche avec fr = ar = name.
+                        desc (facultatif) : sous-titre affiché sous
+                        le titre de la catégorie sur le menu QR.
                         photo (facultatif) : data URL JPEG ≤480 px
                         choisie dans la galerie du téléphone.
                         order (facultatif) : nombre — position de
@@ -864,6 +870,7 @@ function applyMenuOverrides(overrides){
     if (!nm) return;
     var fr = (s.fr && String(s.fr).trim()) || nm;
     var ar = (s.ar && String(s.ar).trim()) || nm;
+    var editDesc = (s.desc && typeof s.desc === 'string' && s.desc.trim()) ? s.desc.trim() : '';
     var editPhoto = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
     for (var i = 0; i < MENU.length; i++) {
       if (MENU[i].id === id) {
@@ -876,11 +883,12 @@ function applyMenuOverrides(overrides){
         MENU[i].fr = fr;
         MENU[i].ar = ar;
         MENU[i].photo = editPhoto;
+        MENU[i].desc = editDesc;
         return;
       }
     }
     var photo = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
-    MENU.push({ id: id, fr: fr, ar: ar, photo: photo, groups: [{ name: '', items: [] }] });
+    MENU.push({ id: id, fr: fr, ar: ar, photo: photo, desc: editDesc, groups: [{ name: '', items: [] }] });
   });
   var del = overrides.deleted || {};
   var edt = overrides.edited || {};
@@ -894,6 +902,8 @@ function applyMenuOverrides(overrides){
         var e = edt[it.id];
         if (e && typeof e === 'object' && e.name) {
           var rep = { id: it.id, name: e.name, name_fr: (e.name_fr !== undefined && e.name_fr !== null && e.name_fr !== '') ? e.name_fr : (it.name_fr || ''), note: e.note || '' };
+          if (e.desc && String(e.desc).trim()) rep.desc = e.desc;
+          else if (it.desc) rep.desc = it.desc;
           if (e.options && e.options.length) {
             rep.options = e.options.map(function(o){ return { label: String(o.label), price: Math.max(0, +o.price || 0) }; });
           } else if (e.price !== undefined && e.price !== null && e.price !== '') {
@@ -939,6 +949,7 @@ function applyMenuOverrides(overrides){
     for (var i = 0; i < MENU.length; i++) if (MENU[i].id === a.sectionId) { cat = MENU[i]; break; }
     if (!cat || !cat.groups.length) return;
     var dish = { id: id, name: a.name, name_fr: a.name_fr || '', note: a.note || '', added: true };
+    if (a.desc && String(a.desc).trim()) dish.desc = a.desc;
     if (a.options && a.options.length) {
       dish.options = a.options.map(function(o){ return { label: String(o.label), price: Math.max(0, +o.price || 0) }; });
     } else if (a.price !== undefined && a.price !== null && a.price !== '') {
@@ -1120,12 +1131,14 @@ MENU_BASE.forEach(function(cat){ cat.groups.forEach(function(grp){ grp.items.for
    (salades, spécial) / un libellé propre (boissons) ? Seul le premier cas
    suit un renommage en français. */
 var DISH_DESC_FOLLOWS_FR = {};
+var PRINTED_DISH_DESC = {};
 Object.keys(MENU_BASE_DISH_BY_ID).forEach(function(id){
   var base = MENU_BASE_DISH_BY_ID[id];
   var div = document.querySelector('.dish[data-dish-id="' + id + '"]');
   if (!div) return;
   var ds = div.querySelector('.d-desc');
   DISH_DESC_FOLLOWS_FR[id] = !!(ds && base.name_fr && normMenuName(ds.textContent) === normMenuName(base.name_fr));
+  if (ds) PRINTED_DISH_DESC[id] = ds.textContent;
 });
 function menuDishDiv(id){
   var el = document.querySelector('.dish[data-dish-id="' + id + '"]');
@@ -1262,6 +1275,43 @@ function syncMenuSectionName(sec, cat){
   var label = sec.getAttribute('aria-label');
   if (label !== null && label !== target.ar) sec.setAttribute('aria-label', target.ar);
 }
+var PRINTED_SECTION_DESC = {};
+function syncMenuSectionDesc(sec, cat){
+  /* Sous-titre de la section (<p class="col-intro">, frère direct de
+     .col-head, juste après lui) : la description personnalisée
+     (compteur, sections/<id>.desc) gagne ; vide = sous-titre imprimé —
+     ou rien du tout, si la section n'en avait pas. Créé / mis à jour /
+     retiré à chaque sync, donc un changement arrivé par l'écoute en
+     direct s'affiche sans rechargement — comme la photo et le nom.
+     Comme eux, ne tourne que pour les catégories qui ont au moins un
+     plat (appel depuis la boucle par plat de syncMenuDOM) : une
+     catégorie vide renommée / décrite garde son ancien sous-titre
+     imprimé jusqu'à l'ajout d'un plat. */
+  if (!sec) return;
+  if (!(cat.id in PRINTED_SECTION_DESC)) {
+    var p0 = sec.querySelector('p.col-intro');
+    PRINTED_SECTION_DESC[cat.id] = p0 ? p0.textContent : null;
+  }
+  var customDesc = (cat.desc && String(cat.desc).trim()) ? String(cat.desc).trim() : '';
+  var base = null;
+  for (var i = 0; i < MENU_BASE.length; i++) if (MENU_BASE[i].id === cat.id) { base = MENU_BASE[i]; break; }
+  var baseDesc = base ? (base.desc || '') : '';
+  var target = (customDesc && customDesc !== baseDesc) ? customDesc : PRINTED_SECTION_DESC[cat.id];
+  var head = sec.querySelector('.col-head');
+  var p = sec.querySelector('p.col-intro');
+  if (target === null || target === '') {
+    if (p) p.remove();
+  } else {
+    if (!p) {
+      p = document.createElement('p');
+      p.className = 'col-intro';
+      if (head && head.nextSibling) sec.insertBefore(p, head.nextSibling);
+      else if (head) sec.appendChild(p);
+      else sec.insertBefore(p, sec.firstChild);
+    }
+    if (p.textContent !== target) p.textContent = target;
+  }
+}
 function syncMenuDOM(){
   var seen = {};
   MENU.forEach(function(cat){
@@ -1271,6 +1321,7 @@ function syncMenuDOM(){
         var sec = menuSectionFor(cat);
         syncMenuSectionPhoto(sec, cat);
         syncMenuSectionName(sec, cat);
+        syncMenuSectionDesc(sec, cat);
         var div = menuDishDiv(it.id);
         var created = false;
         if (!div) {
@@ -1302,8 +1353,24 @@ function syncMenuDOM(){
           var wantPrice = (it.price !== undefined && it.price !== null ? String(it.price) : '') + ' DH';
           if (normMenuName(pr.textContent) !== normMenuName(wantPrice)) pr.innerHTML = escMenu(String(it.price)) + ' <small>DH</small>';
         }
-        if (ds && DISH_DESC_FOLLOWS_FR[it.id]) {
-          if (normMenuName(ds.textContent) !== normMenuName(it.name_fr || '')) ds.textContent = it.name_fr || '';
+        if (ds) {
+          /* Description du plat : la description personnalisée
+             (compteur, edited/<id>.desc / added/<id>.desc) gagne ;
+             sinon la .d-desc suit le nom français quand elle en est
+             issue (sandwichs, sauces — un renommage en français la
+             met à jour), sinon elle revient à l'impression (une
+             description effacée restaure le texte imprimé). */
+          var customDesc = (it.desc && String(it.desc).trim()) ? String(it.desc).trim() : '';
+          var baseDish = MENU_BASE_DISH_BY_ID[it.id];
+          var baseDesc = baseDish ? (baseDish.desc || '') : '';
+          if (customDesc && customDesc !== baseDesc) {
+            if (normMenuName(ds.textContent) !== normMenuName(customDesc)) ds.textContent = customDesc;
+          } else if (DISH_DESC_FOLLOWS_FR[it.id]) {
+            if (normMenuName(ds.textContent) !== normMenuName(it.name_fr || '')) ds.textContent = it.name_fr || '';
+          } else {
+            var printedDesc = PRINTED_DISH_DESC[it.id];
+            if (printedDesc !== undefined && normMenuName(ds.textContent) !== normMenuName(printedDesc)) ds.textContent = printedDesc;
+          }
         }
       });
     });
