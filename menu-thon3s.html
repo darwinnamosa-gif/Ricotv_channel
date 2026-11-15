@@ -199,6 +199,7 @@
     font-family:"Archivo",sans-serif;font-style:italic;font-weight:700;
     font-size:.52em;letter-spacing:.16em;text-transform:uppercase;opacity:.85;
   }
+  .col-head .cat-photo{ width:40px; height:40px; object-fit:cover; border-radius:10px; flex-shrink:0; align-self:center; border:2px solid var(--yellow); }
   .col-intro{color:var(--ink-soft);font-weight:700;font-size:.92rem;margin:12px 2px 4px}
 
   .dish{padding:13px 2px 15px;border-bottom:3px solid rgba(17,17,17,.8)}
@@ -545,7 +546,7 @@ var MENU = [
           },
           {
             "id": "thon-kachir-fromage-ahmar",
-            "name": "طون كاشير فرماج احمر",
+            "name": "طون كاشير فرماج أحمر",
             "name_fr": "Thon • Kachir • Fromage Rouge",
             "note": "",
             "price": 15,
@@ -553,7 +554,7 @@ var MENU = [
           },
           {
             "id": "thon-kachir-lanchon-fromage-ahmar",
-            "name": "طون كاشير لانشون فرماج احمر",
+            "name": "طون كاشير لانشون فرماج أحمر",
             "name_fr": "Thon • Kachir • Lanchon • Fromage Rouge",
             "note": "",
             "price": 18,
@@ -569,7 +570,7 @@ var MENU = [
           },
           {
             "id": "thon-lanchon-fromage-ahmar",
-            "name": "طون لانشون فرماج احمر",
+            "name": "طون لانشون فرماج أحمر",
             "name_fr": "Thon • Lanchon • Fromage Rouge",
             "note": "",
             "price": 16,
@@ -601,7 +602,7 @@ var MENU = [
           },
           {
             "id": "thon-fromage-ahmar",
-            "name": "طون فرماج احمر",
+            "name": "طون فرماج أحمر",
             "name_fr": "Thon • Fromage Rouge",
             "note": "",
             "price": 14,
@@ -803,13 +804,19 @@ var MENU_BASE = JSON.parse(JSON.stringify(MENU));
                         + sectionId seulement si le plat change de section)
      added/<dishId>   : plat complet + sectionId (id Firebase-safe,
                         ex. added-<timestamp>-<aléatoire>)
-     sections/<secId> : {name, fr, ar, createdAt} — une
+     sections/<secId> : {name, fr, ar, createdAt, order?, photo?} — une
                         catégorie créée depuis « Ajouter un plat »
                         (id sec-<timestamp>-<aléatoire>). `name` est
                         le nom français (champ historique, conservé
                         comme repli) ; `fr` / `ar` font foi quand ils
                         sont présents. Une section ancienne {name}
                         seul s'affiche avec fr = ar = name.
+                        photo (facultatif) : data URL JPEG ≤480 px
+                        choisie dans la galerie du téléphone.
+                        order (facultatif) : nombre — position de
+                        la section (glisser-déposer ; tri en fin
+                        d'applyMenuOverrides) ; sans order, la
+                        section garde sa place actuelle.
      sections/<secId> : {deleted: true} — une section de BASE
                         supprimée par le propriétaire : elle
                         disparaît du menu, des commandes, de
@@ -823,7 +830,8 @@ var MENU_BASE = JSON.parse(JSON.stringify(MENU));
    (le déplacement est retiré de son override edited/<id> ; si le
    déplacement était la seule modification, l'override disparaît).
    Le menu embarqué (menu.json) reste la base imprimée : les overrides ne
-   font que le modifier en mémoire, au chargement. FAIL-OPEN : si la
+   font que le modifier en mémoire, au chargement, puis en direct
+   (listenMenuOverrides, ci-dessous). FAIL-OPEN : si la
    lecture échoue (pas de réseau, Firebase indisponible), le menu
    embarqué s'affiche tel quel. */
 var MENU_OVERRIDES = null; /* dernier objet overrides chargé (ou null) */
@@ -857,7 +865,8 @@ function applyMenuOverrides(overrides){
     var fr = (s.fr && String(s.fr).trim()) || nm;
     var ar = (s.ar && String(s.ar).trim()) || nm;
     for (var i = 0; i < MENU.length; i++) if (MENU[i].id === id) return;
-    MENU.push({ id: id, fr: fr, ar: ar, groups: [{ name: '', items: [] }] });
+    var photo = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
+    MENU.push({ id: id, fr: fr, ar: ar, photo: photo, groups: [{ name: '', items: [] }] });
   });
   var del = overrides.deleted || {};
   var edt = overrides.edited || {};
@@ -924,6 +933,34 @@ function applyMenuOverrides(overrides){
     if (a.flavours && a.flavours.length) dish.flavours = a.flavours.slice();
     cat.groups[cat.groups.length - 1].items.push(dish);
   });
+  /* Tri des sections (glisser-déposer, « Gérer le menu ») : une
+     section avec un ordre explicite (sections/<id>.order, nombre)
+     se trie par cet ordre croissant ; sans ordre, elle garde sa
+     place actuelle (sections de base dans l'ordre imprimé,
+     sections créées par ordre de création) ; égalité d'ordre :
+     createdAt puis id. Sans aucune valeur order, l'ordre affiché
+     est exactement l'historique. Le tri réordonne le tableau en
+     place (sans le remplacer), donc menu / commande / comptoir /
+     disponibilité (qui itèrent MENU) voient le même ordre, et
+     l'écoute en direct (rebuild sur chaque changement) propage
+     un nouvel ordre sans rechargement. */
+  var _orderOf = overrides.sections || {};
+  var _indexed = MENU.map(function(cat, idx){ return { cat: cat, idx: idx }; });
+  _indexed.sort(function(a, b){
+    var _oa = _orderOf[a.cat.id], _ob = _orderOf[b.cat.id];
+    var _na = (_oa && typeof _oa.order === "number" && isFinite(_oa.order)) ? _oa.order : null;
+    var _nb = (_ob && typeof _ob.order === "number" && isFinite(_ob.order)) ? _ob.order : null;
+    if (_na !== null && _nb !== null) {
+      if (_na !== _nb) return _na - _nb;
+      var _ca = (_oa && _oa.createdAt) || 0, _cb = (_ob && _ob.createdAt) || 0;
+      if (_ca !== _cb) return _ca - _cb;
+      return a.cat.id < b.cat.id ? -1 : (a.cat.id > b.cat.id ? 1 : 0);
+    }
+    if (_na !== null) return -1;
+    if (_nb !== null) return 1;
+    return a.idx - b.idx;
+  });
+  for (var _si = 0; _si < _indexed.length; _si++) MENU[_si] = _indexed[_si].cat;
 }
 function rebuildMenuFromOverrides(){
   /* Repart du menu imprimé, puis réapplique les overrides : idempotent,
@@ -965,6 +1002,82 @@ function loadMenuOverrides(timeoutMs){
       });
     } catch (e) { finish(false); }
   });
+}
+var _menuOverridesListener = null; /* db.ref('thon-3s-menu-overrides') avec .on('value') attaché, ou null */
+var _menuOverridesListenerPromise = null; /* promesse rendue par le premier appel à listenMenuOverrides */
+function listenMenuOverrides(onUpdate, timeoutMs){
+  /* Écoute EN DIRECT du nœud thon-3s-menu-overrides : chaque changement
+     (ajout / modification / suppression d'un plat ou d'une catégorie,
+     depuis le comptoir ou un autre appareil) reconstruit le menu affiché
+     sans rechargement de la page. Même attente de l'authentification
+     anonyme que loadMenuOverrides, puis db.ref(...).on('value', ...).
+     Résout true au premier changement reçu (ou à la première valeur),
+     false après timeoutMs (défaut 8000 ms) sans valeur reçue — comme
+     loadMenuOverrides — MAIS l'écoute RESTE attachée après la résolution :
+     les changements ultérieurs mettent toujours le menu à jour.
+     onUpdate(true) est appelé à chaque valeur reçue (menu reconstruit).
+     Valeur null (nœud vidé) : MENU_OVERRIDES = {} et le menu revient
+     à la base imprimée — c'est toujours un changement.
+     Erreur d'écoute : FAIL-OPEN — le dernier menu connu reste affiché,
+     rien n'est effacé, rien n'est levé, rien n'est rejeté.
+     Double appel : si une écoute est déjà attachée, le second appel ne
+     rattache rien et renvoie la promesse existante (le premier onUpdate
+     reste le seul appelé). Si l'attache a échoué (Firebase absent),
+     un nouvel appel peut réessayer. Ne rejette jamais. Aucun sondage :
+     pas de setInterval ni de relecture périodique (le minuteur du premier
+     déclenchement n'est pas un sondage). */
+  if (_menuOverridesListener) return _menuOverridesListenerPromise;
+  var cb = (typeof onUpdate === 'function') ? onUpdate : function(){};
+  var ms = (typeof timeoutMs === 'number' && timeoutMs > 0) ? timeoutMs : 8000;
+  var db = null;
+  var done = false;
+  var resolveFn = null;
+  var dead = false; /* échec synchrone, avant que la promesse soit stockée */
+  function finish(v){ if (!done && resolveFn) { done = true; resolveFn(v); } }
+  function fail(){
+    /* Échec d'attache (Firebase absent, .on indisponible) : la promesse
+       résout false et un appel ultérieur pourra réessayer — rien n'est
+       attaché, donc pas de double attache à craindre. */
+    if (_menuOverridesListenerPromise) _menuOverridesListenerPromise = null;
+    else dead = true;
+    finish(false);
+  }
+  function attach(){
+    if (_menuOverridesListener) return; /* déjà attachée (deux appels en attente d'auth) */
+    try {
+      var ref = db.ref('thon-3s-menu-overrides');
+      _menuOverridesListener = ref;
+      ref.on('value', function(snap){
+        var val = snap.val();
+        if (val && typeof val === 'object') MENU_OVERRIDES = val;
+        else MENU_OVERRIDES = {}; /* nœud vidé : retour à la base */
+        rebuildMenuFromOverrides();
+        try { cb(true); } catch (e) {}
+        finish(true);
+      }, function(){
+        /* FAIL-OPEN : l'écoute a échoué (droits, réseau) — on garde
+           le dernier menu connu à l'écran, on n'efface rien. */
+      });
+    } catch (e) { _menuOverridesListener = null; fail(); }
+  }
+  var p = new Promise(function(resolve){
+    resolveFn = resolve;
+    setTimeout(function(){ finish(false); }, ms);
+    try {
+      if (typeof firebase === 'undefined' || typeof firebase.database !== 'function') { fail(); return; }
+      try { db = (typeof getDb === 'function') ? getDb() : firebase.database(); }
+      catch (e) { fail(); return; }
+      var auth = (firebase.auth && typeof firebase.auth === 'function') ? firebase.auth() : null;
+      if (!auth) { attach(); return; }
+      if (auth.currentUser) { attach(); return; }
+      var off = auth.onAuthStateChanged(function(user){
+        if (user) { try { off(); } catch (e) {} attach(); }
+      });
+    } catch (e) { fail(); }
+  });
+  _menuOverridesListenerPromise = p;
+  if (dead) _menuOverridesListenerPromise = null;
+  return p;
 }
 
 /* ---------- Menu statique + overrides (thon-3s-menu-overrides) ----------
@@ -1037,7 +1150,15 @@ function menuSectionFor(cat){
   var head = document.createElement('div');
   head.className = 'col-head';
   var h2 = document.createElement('h2');
-  h2.textContent = cat.ar || cat.fr;
+  if (cat.photo) {
+    var catPhoto = document.createElement('img');
+    catPhoto.className = 'cat-photo';
+    catPhoto.setAttribute('src', cat.photo);
+    catPhoto.setAttribute('alt', '');
+    catPhoto.setAttribute('onerror', 'this.remove()');
+    h2.appendChild(catPhoto);
+  }
+  h2.appendChild(document.createTextNode(cat.ar || cat.fr));
   h2.appendChild(document.createTextNode(' '));
   var fr = document.createElement('span');
   fr.className = 'fr';
@@ -1049,6 +1170,28 @@ function menuSectionFor(cat){
   grid.appendChild(sec);
   return sec;
 }
+function syncMenuSectionPhoto(sec, cat){
+  /* Vignette photo sur l'en-tête de la section (statique + créée) :
+     créée / mise à jour / retirée à chaque sync, donc un changement de
+     photo arrivé par l'écoute en direct s'affiche sans rechargement.
+     Sans photo, l'en-tête statique reste strictement intact. Seules les
+     data URL data:image/ sont acceptées (galerie uniquement) ; une image
+     cassée se retire toute seule (onerror). */
+  if (!sec) return;
+  var head = sec.querySelector('.col-head h2');
+  if (!head) return;
+  var photo = (cat.photo && typeof cat.photo === 'string' && cat.photo.indexOf('data:image/') === 0) ? cat.photo : '';
+  var img = head.querySelector('img.cat-photo');
+  if (!photo) { if (img) img.remove(); return; }
+  if (!img) {
+    img = document.createElement('img');
+    img.className = 'cat-photo';
+    img.setAttribute('alt', '');
+    img.setAttribute('onerror', 'this.remove()');
+    head.insertBefore(img, head.firstChild);
+  }
+  if (img.getAttribute('src') !== photo) img.setAttribute('src', photo);
+}
 function syncMenuDOM(){
   var seen = {};
   MENU.forEach(function(cat){
@@ -1056,6 +1199,7 @@ function syncMenuDOM(){
       grp.items.forEach(function(it){
         seen[it.id] = true;
         var sec = menuSectionFor(cat);
+        syncMenuSectionPhoto(sec, cat);
         var div = menuDishDiv(it.id);
         var created = false;
         if (!div) {
@@ -1112,6 +1256,12 @@ function syncMenuDOM(){
   for (var s = 0; s < secs.length; s++) {
     if (!liveSecs[secs[s].id]) secs[s].remove();
   }
+  /* Ordre des sections : la grille suit l'ordre de MENU (glisser-déposer
+     depuis « Gérer le menu ») — appendChild déplace les <section>
+     existantes sans les recréer ; sans overrides, l'ordre est déjà celui
+     de MENU, donc le DOM statique reste visuellement identique. */
+  var grid = document.querySelector('main.menu-grid');
+  if (grid) MENU.forEach(function(cat){ var s2 = document.getElementById(cat.id); if (s2) grid.appendChild(s2); });
 }
 /* Kill-switch — the status check (see <head>) runs FIRST. When the
    service is suspended, NOTHING below runs: no menu render, no Firebase. */
@@ -1119,7 +1269,7 @@ window.__THON_STATUS_PROMISE.then(function(){
   document.documentElement.classList.remove('thon-checking');
   window.__THON_GATE_DONE = true;
   if (window.__THON_DISABLED) { window.__THON_SHOW_SUSPENDED(); return; }
-  initMenuFirebase().then(function(){ return loadMenuOverrides(); }).then(function(applied){ if (applied) syncMenuDOM(); });
+  initMenuFirebase().then(function(){ listenMenuOverrides(function(){ syncMenuDOM(); }); });
 });
 </script>
 </body>
