@@ -620,7 +620,7 @@
       .manage-add-btn {
         width: 100%; min-height: 48px; margin-bottom: 14px;
         border: none; cursor: pointer; border-radius: 999px;
-        background: var(--yellow); color: #22303F;
+        background: var(--yellow); color: #211a10;
         font-size: 16px; font-weight: 900; font-family: inherit;
       }
       .manage-add-btn:active { filter: brightness(.96); }
@@ -653,14 +653,14 @@
       /* ---------- Modales Gérer le menu ---------- */
       .bb-modal-overlay {
         display: none; position: fixed; inset: 0; z-index: 200;
-        background: rgba(34,48,63,.55);
+        background: rgba(33,26,16,.55);
         align-items: center; justify-content: center; padding: 20px 16px;
       }
       .bb-modal-overlay.show { display: flex; }
       .bb-modal {
         background: var(--panel); color: var(--text); border-radius: 18px;
         width: 100%; max-width: 440px; padding: 22px 20px;
-        box-shadow: 0 18px 50px rgba(34,48,63,.3);
+        box-shadow: 0 18px 50px rgba(33,26,16,.3);
         font-family: inherit;
       }
       .bb-modal h3 { margin: 0 0 16px; font-size: 19px; font-weight: 900; }
@@ -678,17 +678,17 @@
         min-height: 48px; padding: 10px 20px; border-radius: 999px;
         font-size: 15.5px; font-weight: 900; font-family: inherit; cursor: pointer;
       }
-      .bb-btn.primary { border: none; background: #FFA94D; color: #22303F; }
+      .bb-btn.primary { border: none; background: #FFA94D; color: #211a10; }
       .bb-btn.ghost { border: 2px solid #3a2d1a; background: var(--bg-soft); color: var(--text); }
       .bb-btn.danger { border: none; background: #FF6B5E; color: #fff; }
       /* ---------- Toast Gérer le menu ---------- */
       .bb-toast {
         display: none; position: fixed; left: 50%; bottom: 24px; z-index: 300;
         transform: translateX(-50%);
-        background: #22303F; color: #fff; border: 2px solid #FFA94D;
+        background: #211a10; color: #fff; border: 2px solid #FFA94D;
         border-radius: 999px; padding: 12px 22px;
         font-size: 15px; font-weight: 800; font-family: inherit;
-        box-shadow: 0 10px 30px rgba(34,48,63,.35);
+        box-shadow: 0 10px 30px rgba(33,26,16,.35);
         max-width: calc(100vw - 32px); text-align: center;
       }
       .bb-toast.show { display: block; }
@@ -741,17 +741,17 @@
         border: none; background: none; cursor: pointer;
         color: #FFB26B; font-size: 16px; font-weight: 900; font-family: inherit;
       }
-      .bb-back:active { color: #22303F; }
+      .bb-back:active { color: #FFA94D; }
       /* Tiroir latéral gauche */
       .bb-drawer-backdrop {
         position: fixed; inset: 0; z-index: 140;
-        background: rgba(34,48,63,.55);
+        background: rgba(33,26,16,.55);
       }
       .bb-drawer-backdrop[hidden] { display: none; }
       .bb-drawer {
         position: fixed; top: 0; bottom: 0; left: 0; z-index: 150;
         width: min(280px, 85vw);
-        background: #22303F; color: #F4F8FC;
+        background: #211a10; color: #f7efe3;
         transform: translateX(-105%); visibility: hidden;
         transition: transform .25s ease, visibility 0s linear .25s;
         display: flex; flex-direction: column; padding: 18px 0 12px;
@@ -761,22 +761,22 @@
       .bb-drawer-head {
         display: flex; align-items: center; justify-content: space-between; gap: 10px;
         padding: 0 14px 14px; margin-bottom: 10px;
-        border-bottom: 1px solid rgba(244,248,252,.16);
+        border-bottom: 1px solid rgba(247,239,227,.16);
       }
       .bb-drawer-logo .bb-lockup { font-size: 20px; }
-      .bb-drawer-logo .bb-since { color: #B9C9E2; }
+      .bb-drawer-logo .bb-since { color: #c9b894; }
       .bb-drawer-close {
         width: 40px; height: 40px; flex-shrink: 0; cursor: pointer;
-        border: 2px solid rgba(244,248,252,.3); border-radius: 999px;
-        background: transparent; color: #F4F8FC; font-size: 17px; line-height: 1;
+        border: 2px solid rgba(247,239,227,.3); border-radius: 999px;
+        background: transparent; color: #f7efe3; font-size: 17px; line-height: 1;
       }
       .bb-drawer-item {
         display: flex; align-items: center; gap: 12px; width: 100%;
         min-height: 56px; padding: 10px 18px; cursor: pointer;
         border: none; border-left: 4px solid transparent; background: none;
-        color: #F4F8FC; font-size: 16.5px; font-weight: 800; font-family: inherit; text-align: start;
+        color: #f7efe3; font-size: 16.5px; font-weight: 800; font-family: inherit; text-align: start;
       }
-      .bb-drawer-item:active { background: rgba(244,248,252,.08); border-left-color: #FFA94D; }
+      .bb-drawer-item:active { background: rgba(247,239,227,.08); border-left-color: #FFA94D; }
 
       /* ---------- THON : variables partagées (Gérer le menu + tiroir) ---------- */
       :root { --line-dark: #3a2d1a; --yellow: #ffa94d; --ink: #f7efe3; --black: #f7efe3; --red-soft: rgba(255,107,94,.12); }
