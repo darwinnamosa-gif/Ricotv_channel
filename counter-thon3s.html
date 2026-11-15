@@ -726,6 +726,8 @@
       .manage-collapse-btn { display: inline-block; flex-shrink: 0; min-width: 44px; min-height: 44px; padding: 10px 12px; border: none; background: transparent; color: #c9b894; font-size: 16px; line-height: 1; cursor: pointer; font-family: inherit; border-radius: 8px; vertical-align: middle; }
       .manage-collapse-btn:active { background: #f7efe3; color: #211a10; }
       .manage-cat-count { font-size: 13px; font-weight: 800; color: #c9b894; margin-inline-start: 6px; white-space: nowrap; }
+      /* ---------- Modification de catégorie (nom + photo) ---------- */
+      .manage-cat-edit { flex-shrink: 0; min-height: 34px; padding: 5px 11px; }
 
       /* ---------- Tiroir latéral + vues (2026-11-15) : comptoir propre, commandes uniquement ---------- */
       .drawer-btn {
@@ -1036,6 +1038,18 @@
         <div class="bb-modal-actions">
           <button type="button" class="bb-btn ghost" id="deleteSectionCancel">Annuler</button>
           <button type="button" class="bb-btn danger" id="deleteSectionConfirm">Supprimer</button>
+        </div>
+      </div>
+    </div>
+    <div class="bb-modal-overlay" id="editSectionModal" role="dialog" aria-modal="true" aria-labelledby="editSectionModalTitle">
+      <div class="bb-modal">
+        <h3 id="editSectionModalTitle">Modifier la catégorie « <span id="editSectionName"></span> » ?</h3>
+                <div class="bb-field"><label for="editSectionNameAr">Nom de la catégorie (arabe)</label><input id="editSectionNameAr" type="text" autocomplete="off" placeholder="Nom de la catégorie en arabe" dir="rtl" /></div>
+        <div class="bb-field"><label for="editSectionNameFr">Nom de la catégorie (français)</label><input id="editSectionNameFr" type="text" autocomplete="off" placeholder="Nom de la catégorie en français" /></div>
+        <div class="bb-field" id="editSectionPhotoField"><label>Photo de la catégorie</label><img id="editSectionPhotoPreview" class="cat-photo-preview" alt="" style="display:none" /><label for="editSectionPhotoFile">Changer la photo</label><input id="editSectionPhotoFile" type="file" accept="image/*" /><button type="button" class="cat-photo-clear" id="editSectionPhotoRemove" style="display:none">✕ Supprimer la photo</button><div class="bb-hint">Choisissez une photo depuis la galerie du téléphone.</div></div>
+        <div class="bb-modal-actions">
+          <button type="button" class="bb-btn ghost" id="editSectionCancel">Annuler</button>
+          <button type="button" class="bb-btn primary" id="editSectionSave">Enregistrer</button>
         </div>
       </div>
     </div>
@@ -1435,7 +1449,21 @@ function applyMenuOverrides(overrides){
     if (!nm) return;
     var fr = (s.fr && String(s.fr).trim()) || nm;
     var ar = (s.ar && String(s.ar).trim()) || nm;
-    for (var i = 0; i < MENU.length; i++) if (MENU[i].id === id) return;
+    var editPhoto = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
+    for (var i = 0; i < MENU.length; i++) {
+      if (MENU[i].id === id) {
+        /* Section DÉJÀ dans le menu imprimé (base) :
+           l'enregistrement porte le renommage / la photo
+           (édition de catégorie) — il gagne sur le libellé
+           imprimé. Un enregistrement {order: N} seul
+           n'arrive jamais ici (pas de nom : retour
+           anticipé ci-dessus). */
+        MENU[i].fr = fr;
+        MENU[i].ar = ar;
+        MENU[i].photo = editPhoto;
+        return;
+      }
+    }
     var photo = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
     MENU.push({ id: id, fr: fr, ar: ar, photo: photo, groups: [{ name: '', items: [] }] });
   });
@@ -1658,6 +1686,11 @@ var manageQuery = "";
 var manageEditingId = null;   /* id du plat en cours de modification */
 var manageDeletingId = null;  /* id du plat en cours de suppression */
 var manageDeletingSectionId = null; /* id de la catégorie en cours de suppression */
+var MANAGE_EDIT_SECTIONS = true; /* bouton ✎ de modification de catégorie affiché (opt-in du port) */
+var manageEditingSectionId = null; /* id de la catégorie en cours de modification */
+var editCatPhoto = ""; /* data URL JPEG ≤480 px choisie dans la modale (galerie), ou "" */
+var editCatPhotoOrig = ""; /* photo actuelle de la catégorie à l'ouverture de la modale, ou "" */
+var editCatPhotoRemoved = false; /* vrai si le propriétaire a demandé « Supprimer la photo » */
 var MANAGE_SECTION_REORDER = true; /* poignée ☰ de déplacement affichée (opt-in du port) */
 var newCatPhoto = ""; /* data URL JPEG ≤480 px de la nouvelle catégorie (galerie), ou "" */
 var MANAGE_DELETE_SECTIONS = true; /* true = le 🗑 de suppression de catégorie est affiché (opt-in du port) */
@@ -1747,7 +1780,14 @@ function confirmDeleteSectionModal(){
      doit pas passer pour une section personnalisée, sinon
      sa suppression effacerait l'ordre au lieu de la
      marquer {deleted: true} — et elle reviendrait. */
-  var isCustom = !!(secRec && !secRec.deleted && (secRec.name || secRec.fr || secRec.ar));
+/* Une section de base RENOMMÉE porte un nom dans son
+     enregistrement : le test « a un nom » la prendrait
+     pour une section créée, et sa suppression effacerait
+     l'enregistrement au lieu de la marquer {deleted: true}
+     — elle reviendrait. Seul MENU_BASE tranche : un id
+     imprimé est une section de base, quoi que porte son
+     enregistrement. */
+  var isCustom = !!(secRec && !secRec.deleted && (secRec.name || secRec.fr || secRec.ar)) && !MENU_BASE.some(function(c){ return c.id === sectionId; });
   var dishes = sectionDishes(sectionId);
   MENU_OVERRIDES = MENU_OVERRIDES || {};
   dishes.forEach(function(it){
@@ -1826,9 +1866,9 @@ function renderMenuManage(){
     if (cat.ar && cat.ar !== cat.fr) catLabel += ' \u00b7 <span dir="auto">' + esc(cat.ar) + '</span>';
     if (MANAGE_DELETE_SECTIONS) {
       html += '<div class="manage-cat' + (catCollapsed ? ' collapsed' : '') + '"><div class="manage-cat-head"><div class="manage-cat-name">' + dragGripHTML(cat) + catPhoto + catLabel + (catCollapsed ? manageCollapseCountHTML(catDishCount) : '') + manageCollapseBtnHTML(cat) + '</div>' +
-        '<button type="button" class="manage-btn del manage-cat-del" data-delcat="' + esc(cat.id) + '" aria-label="Supprimer la catégorie ' + esc(cat.fr) + '">\ud83d\uddd1\ufe0f</button></div>' + rows + '</div>';
+        editSectionBtnHTML(cat) + '<button type="button" class="manage-btn del manage-cat-del" data-delcat="' + esc(cat.id) + '" aria-label="Supprimer la catégorie ' + esc(cat.fr) + '">\ud83d\uddd1\ufe0f</button></div>' + rows + '</div>';
     } else {
-      html += '<div class="manage-cat' + (catCollapsed ? ' collapsed' : '') + '"><div class="manage-cat-name">' + dragGripHTML(cat) + catPhoto + catLabel + (catCollapsed ? manageCollapseCountHTML(catDishCount) : '') + manageCollapseBtnHTML(cat) + '</div>' + rows + '</div>';
+      html += '<div class="manage-cat' + (catCollapsed ? ' collapsed' : '') + '"><div class="manage-cat-head"><div class="manage-cat-name">' + dragGripHTML(cat) + catPhoto + catLabel + (catCollapsed ? manageCollapseCountHTML(catDishCount) : '') + manageCollapseBtnHTML(cat) + '</div>' + editSectionBtnHTML(cat) + '</div>' + rows + '</div>';
     }
   });
   var list = document.getElementById("manageList");
@@ -1906,6 +1946,7 @@ function closeTopCounterModal(){
   if (top.id === "editModal") manageEditingId = null;
   else if (top.id === "deleteModal") manageDeletingId = null;
   else if (top.id === "deleteSectionModal") manageDeletingSectionId = null;
+  else if (top.id === "editSectionModal") { manageEditingSectionId = null; if (typeof clearEditCatPhoto === "function") clearEditCatPhoto(); }
   else if (top.id === "addModal") {
     var nc = document.getElementById("addNewCatName");
     if (nc) nc.value = "";
@@ -1933,7 +1974,7 @@ function showModal(id){
   setCounterStatsVisible(false);
 }
 function hideModals(){
-  ["editModal", "addModal", "deleteModal", "deleteSectionModal"].forEach(function(id){
+  ["editModal", "addModal", "deleteModal", "deleteSectionModal", "editSectionModal"].forEach(function(id){
     var m = document.getElementById(id);
     if (m) m.classList.remove("show");
   });
@@ -1955,6 +1996,8 @@ function hideModals(){
   manageEditingId = null;
   manageDeletingId = null;
   manageDeletingSectionId = null;
+  manageEditingSectionId = null;
+  if (typeof clearEditCatPhoto === "function") clearEditCatPhoto();
   setCounterStatsVisible(true); /* modale fermée : le bouton STATS revient, si déverrouillé */
 }
 function openEditModal(id){
@@ -2263,6 +2306,145 @@ function commitSectionOrder(orderedIds){
   renderAvailability();
   renderMenuManage();
 }
+function editSectionBtnHTML(cat){
+  return '<button type="button" class="manage-btn edit manage-cat-edit" data-editcat="' + esc(cat.id) + '" aria-label="Modifier la catégorie ' + esc(cat.fr) + '">\u270e</button>';
+}
+function openEditSectionModal(sectionId){
+  var cat = null;
+  for (var i = 0; i < MENU.length; i++) if (MENU[i].id === sectionId) { cat = MENU[i]; break; }
+  if (!cat) return;
+  var nameEl = document.getElementById("editSectionNameSingle");
+  var arEl = document.getElementById("editSectionNameAr");
+  var frEl = document.getElementById("editSectionNameFr");
+  if (!nameEl && !(arEl && frEl)) return; /* modale absente : le port n'a pas opté pour edit_sections */
+  manageEditingSectionId = sectionId;
+  editCatPhoto = "";
+  editCatPhotoRemoved = false;
+  editCatPhotoOrig = (cat.photo && typeof cat.photo === 'string' && cat.photo.indexOf('data:image/') === 0) ? cat.photo : '';
+  var titleEl = document.getElementById("editSectionName");
+  if (titleEl) titleEl.textContent = cat.fr;
+  if (arEl && frEl) { arEl.value = cat.ar || cat.fr; frEl.value = cat.fr; }
+  else if (nameEl) nameEl.value = cat.fr;
+  var fileEl = document.getElementById("editSectionPhotoFile");
+  if (fileEl) fileEl.value = "";
+  showEditCatPhotoPreview();
+  showModal("editSectionModal");
+}
+function saveEditSectionModal(){
+  if (!overridesRef) { manageToast("Firebase indisponible \u2014 modification impossible pour l'instant."); return; }
+  var sectionId = manageEditingSectionId;
+  var cat = null;
+  for (var i = 0; i < MENU.length; i++) if (MENU[i].id === sectionId) { cat = MENU[i]; break; }
+  if (!cat) { hideModals(); return; }
+  var arEl = document.getElementById("editSectionNameAr");
+  var frEl = document.getElementById("editSectionNameFr");
+  var singleEl = document.getElementById("editSectionNameSingle");
+  var newAr = "", newFr = "";
+  if (arEl && frEl) {
+    newAr = arEl.value.trim();
+    newFr = frEl.value.trim();
+    if (!newAr || !newFr) { manageToast("Indiquez le nom de la catégorie en arabe et en français."); return; }
+  } else {
+    newFr = singleEl ? singleEl.value.trim() : "";
+    newAr = newFr;
+    if (!newFr) { manageToast("Indiquez le nom de la catégorie."); return; }
+  }
+  var nameChanged = (newFr !== cat.fr) || (newAr !== (cat.ar || cat.fr));
+  var photoChanged = !!editCatPhoto;
+  var photoRemoved = editCatPhotoRemoved && !editCatPhoto;
+  if (!nameChanged && !photoChanged && !photoRemoved) { hideModals(); return; }
+  MENU_OVERRIDES = MENU_OVERRIDES || {};
+  var secRec = (MENU_OVERRIDES.sections && MENU_OVERRIDES.sections[sectionId]) || null;
+  if (!secRec) {
+    /* Section de base sans enregistrement : .set du dossier complet
+       {name, fr, ar} (+ photo si choisie) — la section reste
+       vivante, jamais {deleted: true}. */
+    var rec = { name: newFr, fr: newFr, ar: newAr };
+    if (editCatPhoto) rec.photo = editCatPhoto;
+    overridesRef.child("sections/" + sectionId).set(rec);
+    (MENU_OVERRIDES.sections = MENU_OVERRIDES.sections || {})[sectionId] = rec;
+  } else {
+    if (secRec.deleted) { hideModals(); return; } /* section supprimée : plus dans MENU, ne devrait pas arriver */
+    /* Enregistrement existant (section créée, ou base réordonnée
+       {order: N} seul) : .update des seuls champs changés —
+       createdAt / order survivent, jamais écrasés. */
+    var upd = {};
+    if (nameChanged) { upd.name = newFr; upd.fr = newFr; upd.ar = newAr; }
+    if (editCatPhoto) upd.photo = editCatPhoto;
+    if (Object.keys(upd).length) {
+      overridesRef.child("sections/" + sectionId).update(upd);
+      Object.keys(upd).forEach(function(k){ secRec[k] = upd[k]; });
+    }
+    if (photoRemoved) {
+      /* Retrait de la photo seule : .remove() sur la clé photo,
+         jamais une réécriture de l'enregistrement. */
+      overridesRef.child("sections/" + sectionId + "/photo").remove();
+      delete secRec.photo;
+    }
+  }
+  rebuildMenuFromOverrides();
+  renderAvailability();
+  renderMenuManage();
+  hideModals();
+  manageToast("Catégorie modifiée.");
+}
+function handleEditCatPhotoFile(file){
+  if (!file || (file.type || "").indexOf("image/") !== 0) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      var max = 480;
+      var scale = Math.min(1, max / Math.max(img.width, img.height));
+      var cw = Math.max(1, Math.round(img.width * scale));
+      var ch = Math.max(1, Math.round(img.height * scale));
+      var dataUrl = null;
+      try {
+        var canvas = document.createElement("canvas");
+        canvas.width = cw; canvas.height = ch;
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#f7efe3";
+        ctx.fillRect(0, 0, cw, ch);
+        ctx.drawImage(img, 0, 0, cw, ch);
+        dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+      } catch (e) { dataUrl = null; }
+      editCatPhoto = dataUrl || reader.result;
+      editCatPhotoRemoved = false;
+      showEditCatPhotoPreview();
+    };
+    img.onerror = function(){ editCatPhoto = reader.result; editCatPhotoRemoved = false; showEditCatPhotoPreview(); };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+function showEditCatPhotoPreview(){
+  /* Aperçu = la nouvelle photo choisie, sinon la photo actuelle —
+     sauf si « Supprimer la photo » a été demandé. Le bouton de
+     retrait ne s'affiche que quand une photo est visible. */
+  var shown = (!editCatPhotoRemoved && (editCatPhoto || editCatPhotoOrig)) || "";
+  var prev = document.getElementById("editSectionPhotoPreview");
+  if (prev) {
+    if (shown) { prev.src = shown; prev.style.display = ""; }
+    else prev.style.display = "none";
+  }
+  var rm = document.getElementById("editSectionPhotoRemove");
+  if (rm) rm.style.display = shown ? "" : "none";
+}
+function removeEditCatPhoto(){
+  editCatPhoto = "";
+  editCatPhotoRemoved = true;
+  var input = document.getElementById("editSectionPhotoFile");
+  if (input) input.value = "";
+  showEditCatPhotoPreview();
+}
+function clearEditCatPhoto(){
+  editCatPhoto = "";
+  editCatPhotoOrig = "";
+  editCatPhotoRemoved = false;
+  var input = document.getElementById("editSectionPhotoFile");
+  if (input) input.value = "";
+  showEditCatPhotoPreview();
+}
 var MANAGE_COLLAPSE_KEY = 'manage-collapsed-thon-3s-menu-overrides'; /* clé localStorage de l'état replié, par client */
 var MANAGE_SECTION_COLLAPSE = true; /* bouton de repli affiché (opt-in du port) */
 function loadManageCollapsed(){
@@ -2318,6 +2500,8 @@ function wireMenuManage(){
   document.getElementById("manageList").addEventListener("click", function (e) {
     var cc = closestAttr(e.target, "data-collapsecat");
     if (cc) { toggleManageCollapsed(cc.getAttribute("data-collapsecat")); return; }
+    var ec = closestAttr(e.target, "data-editcat");
+    if (ec) { openEditSectionModal(ec.getAttribute("data-editcat")); return; }
     if (closestAttr(e.target, "data-dragcat")) return; /* poignée de déplacement : un clic ne fait rien (ni suppression, ni édition) */
     var dc = closestAttr(e.target, "data-delcat");
     if (dc) { openDeleteSectionModal(dc.getAttribute("data-delcat")); return; }
@@ -2339,7 +2523,18 @@ function wireMenuManage(){
   if (dsc) dsc.addEventListener("click", confirmDeleteSectionModal);
   var dsx = document.getElementById("deleteSectionCancel");
   if (dsx) dsx.addEventListener("click", hideModals);
-  ["editModal", "addModal", "deleteModal", "deleteSectionModal"].forEach(function(id){
+  /* Modification de catégorie : boutons de la modale absents
+     quand le port n'a pas opté pour edit_sections — gardés,
+     pour que wireMenuManage ne casse jamais sans cette modale. */
+  var esv = document.getElementById("editSectionSave");
+  if (esv) esv.addEventListener("click", saveEditSectionModal);
+  var esx = document.getElementById("editSectionCancel");
+  if (esx) esx.addEventListener("click", hideModals);
+  var espf = document.getElementById("editSectionPhotoFile");
+  if (espf) espf.addEventListener("change", function(e){ var f = (e.target.files && e.target.files[0]) || null; handleEditCatPhotoFile(f); });
+  var espr = document.getElementById("editSectionPhotoRemove");
+  if (espr) espr.addEventListener("click", removeEditCatPhoto);
+  ["editModal", "addModal", "deleteModal", "deleteSectionModal", "editSectionModal"].forEach(function(id){
     var m = document.getElementById(id);
     if (m) m.addEventListener("click", function (e) { if (e.target === this) hideModals(); });
     /* Clavier (2026-11-15) : le champ focusé reste visible juste
