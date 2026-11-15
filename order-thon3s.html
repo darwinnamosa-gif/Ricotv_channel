@@ -17,6 +17,83 @@
   }
 })();
 </script>
+<script>
+/* ---------- Kill-switch (service on/off) — checked FIRST ----------
+   status.json lives at the repo root ({"enabled": true/false}).
+   If enabled === false the whole page is replaced by a branded
+   "suspended" screen and NOTHING else runs (no gate, no menu, no
+   Firebase init). LAST-KNOWN STATUS: the flag is cached in
+   localStorage on every successful fetch; once this phone has seen
+   "disabled", the suspended screen shows immediately even offline
+   (the background fetch still runs, and if it reports enabled the
+   page reloads to normal). FAIL-OPEN: no cached value + any fetch
+   error, timeout, malformed JSON or missing file leaves the page
+   working exactly as before. */
+(function(){
+  var LS_KEY = 'thon3s_service_status';
+  var STATUS_URL = 'https://darwinnamosa-gif.github.io/Ricotv_channel/status.json';
+  function readCache(){
+    try { return window.localStorage.getItem(LS_KEY); } catch(e){ return null; }
+  }
+  function writeCache(v){
+    try { window.localStorage.setItem(LS_KEY, v); } catch(e){}
+  }
+  var cachedDisabled = (readCache() === 'disabled');
+  window.__THON_DISABLED = cachedDisabled;
+  window.__THON_GATE_DONE = false;
+  try {
+    var _st = document.createElement('style');
+    _st.textContent = 'html.thon-checking body{visibility:hidden}';
+    document.head.appendChild(_st);
+    document.documentElement.classList.add('thon-checking');
+  } catch(e){}
+  window.__THON_SHOW_SUSPENDED = function(){
+    try {
+      document.documentElement.classList.remove('thon-checking');
+      document.documentElement.classList.remove('thon-blocked');
+      var s = document.getElementById('thonSuspended');
+      if (s) {
+        document.body.innerHTML = '';
+        s.hidden = false;
+        s.style.display = 'flex';
+        document.body.appendChild(s);
+      }
+      document.title = 'THON 3S — Service indisponible';
+    } catch(e){}
+  };
+  window.__THON_STATUS_PROMISE = new Promise(function(resolve){
+    var done = false;
+    function finish(){ if (!done) { done = true; resolve(); } }
+    /* Cached "disabled": show the suspended screen at once — do not
+       wait for the network. The fetch below still runs to refresh. */
+    if (cachedDisabled) { finish(); }
+    setTimeout(finish, 6000); /* safety: never leave the page hidden */
+    try {
+      var c = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+      var to = setTimeout(function(){ if (c) c.abort(); }, 5000);
+      var opts = { cache: 'no-store' };
+      if (c) opts.signal = c.signal;
+      fetch(STATUS_URL, opts).then(function(r){
+        clearTimeout(to);
+        if (!r || !r.ok) { finish(); return; }
+        return r.json();
+      }).then(function(j){
+        if (j && j.enabled === false) {
+          writeCache('disabled');
+          window.__THON_DISABLED = true;
+        } else if (j && j.enabled === true) {
+          writeCache('enabled');
+          /* Was suspended from cache but the service is back on:
+             reload so the normal page renders. */
+          if (cachedDisabled) { window.__THON_DISABLED = false; location.reload(); return; }
+          window.__THON_DISABLED = false;
+        }
+        finish();
+      }).catch(function(){ clearTimeout(to); finish(); });
+    } catch(e){ finish(); }
+  });
+})();
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -404,6 +481,14 @@
 </style>
 </head>
 <body>
+<div id="thonSuspended" hidden dir="ltr" style="min-height:100vh;background:#131009;color:#f7efe3;align-items:center;justify-content:center;padding:24px 16px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;">
+  <div style="max-width:420px;width:100%;text-align:center;">
+    <div style="font-size:34px;font-weight:900;letter-spacing:.5px;">THON <span style="color:#FFA94D;">&lt;3S</span></div>
+    <div style="width:56px;height:4px;background:linear-gradient(90deg,#FFA94D,#FFB26B);border-radius:999px;margin:18px auto 22px;"></div>
+    <h1 style="font-size:24px;font-weight:900;margin:0 0 10px;color:#FFFFFF;">Service momentanément indisponible</h1>
+    <p style="font-size:15.5px;line-height:1.6;color:#c9b894;margin:0;">Ce service est actuellement suspendu.<br/>Veuillez contacter le restaurant.</p>
+  </div>
+</div>
 
 <!-- QR Token Gate — shown only when the QR token is missing/invalid.
      The gate check in <head> runs FIRST, before any Firebase init or menu render. -->
@@ -510,9 +595,10 @@
 </div>
 
 <script>
-/* Token gate — checked FIRST (see <head>). When the token is missing or
-   invalid, NOTHING below runs: no Firebase init, no menu render, no cart. */
-if (window.__THON_TOKEN_OK) {
+/* Kill-switch + token gate — the status check (see <head>) runs FIRST,
+   then the token. The declarations below only define data + functions;
+   NOTHING runs (no Firebase init, no menu render, no cart) until the
+   gated init block at the end, inside window.__THON_STATUS_PROMISE.then(). */
 /* ============================================================
    FIREBASE_CONFIG — collez ici la configuration Firebase du restaurant
    (Console Firebase > Paramètres du projet > Vos applications > Web)
@@ -530,63 +616,392 @@ var FIREBASE_CONFIG = {
 /* ---------------- Menu data ---------------- */
 var MENU = [
   {
-    id: "sandwichs", fr: "Sandwichs", ar: "السندويشات",
-    items: [
-      { id: "thon-adi", name: "طون عادي", name_fr: "Thon Classique", price: 9 },
-      { id: "thon-fromage", name: "طون فرماج", name_fr: "Thon • Fromage", price: 10 },
-      { id: "thon-kiri", name: "طون كيري", name_fr: "Thon • Kiri", price: 11 },
-      { id: "thon-kachir", name: "طون كاشير", name_fr: "Thon • Kachir", price: 10 },
-      { id: "thon-kachir-lanchon", name: "طون كاشير لانشون", name_fr: "Thon • Kachir • Lanchon", price: 12 },
-      { id: "thon-kachir-fromage-ahmar", name: "طون كاشير فرماج احمر", name_fr: "Thon • Kachir • Fromage Rouge", price: 15 },
-      { id: "thon-kachir-lanchon-fromage-ahmar", name: "طون كاشير لانشون فرماج احمر", name_fr: "Thon • Kachir • Lanchon • Fromage Rouge", price: 18 },
-      { id: "thon-lanchon", name: "طون لانشون", name_fr: "Thon • Lanchon", price: 11 },
-      { id: "thon-lanchon-fromage-ahmar", name: "طون لانشون فرماج احمر", name_fr: "Thon • Lanchon • Fromage Rouge", price: 16 },
-      { id: "thon-dand-fume", name: "طون داند فيمي", name_fr: "Thon • Dinde Fumée", price: 14 },
-      { id: "thon-dand-fume-kachir", name: "طون داند فيمي كاشير", name_fr: "Thon • Dinde Fumée • Kachir", price: 15 },
-      { id: "thon-dand-fume-fromage-ahmar", name: "طون داند فيمي فرماج احمر", name_fr: "Thon • Dinde Fumée • Fromage Rouge", price: 18 },
-      { id: "thon-fromage-ahmar", name: "طون فرماج احمر", name_fr: "Thon • Fromage Rouge", price: 14 },
-      { id: "thon-double", name: "طون دوبل", name_fr: "Thon Double", price: 13 }
+    "id": "sandwichs",
+    "fr": "Sandwichs",
+    "ar": "السندويشات",
+    "groups": [
+      {
+        "name": "",
+        "items": [
+          {
+            "id": "thon-adi",
+            "name": "طون عادي",
+            "name_fr": "Thon Classique",
+            "note": "",
+            "price": 9
+          },
+          {
+            "id": "thon-fromage",
+            "name": "طون فرماج",
+            "name_fr": "Thon • Fromage",
+            "note": "",
+            "price": 10
+          },
+          {
+            "id": "thon-kiri",
+            "name": "طون كيري",
+            "name_fr": "Thon • Kiri",
+            "note": "",
+            "price": 11
+          },
+          {
+            "id": "thon-kachir",
+            "name": "طون كاشير",
+            "name_fr": "Thon • Kachir",
+            "note": "",
+            "price": 10
+          },
+          {
+            "id": "thon-kachir-lanchon",
+            "name": "طون كاشير لانشون",
+            "name_fr": "Thon • Kachir • Lanchon",
+            "note": "",
+            "price": 12
+          },
+          {
+            "id": "thon-kachir-fromage-ahmar",
+            "name": "طون كاشير فرماج احمر",
+            "name_fr": "Thon • Kachir • Fromage Rouge",
+            "note": "",
+            "price": 15
+          },
+          {
+            "id": "thon-kachir-lanchon-fromage-ahmar",
+            "name": "طون كاشير لانشون فرماج احمر",
+            "name_fr": "Thon • Kachir • Lanchon • Fromage Rouge",
+            "note": "",
+            "price": 18
+          },
+          {
+            "id": "thon-lanchon",
+            "name": "طون لانشون",
+            "name_fr": "Thon • Lanchon",
+            "note": "",
+            "price": 11
+          },
+          {
+            "id": "thon-lanchon-fromage-ahmar",
+            "name": "طون لانشون فرماج احمر",
+            "name_fr": "Thon • Lanchon • Fromage Rouge",
+            "note": "",
+            "price": 16
+          },
+          {
+            "id": "thon-dand-fume",
+            "name": "طون داند فيمي",
+            "name_fr": "Thon • Dinde Fumée",
+            "note": "",
+            "price": 14
+          },
+          {
+            "id": "thon-dand-fume-kachir",
+            "name": "طون داند فيمي كاشير",
+            "name_fr": "Thon • Dinde Fumée • Kachir",
+            "note": "",
+            "price": 15
+          },
+          {
+            "id": "thon-dand-fume-fromage-ahmar",
+            "name": "طون داند فيمي فرماج احمر",
+            "name_fr": "Thon • Dinde Fumée • Fromage Rouge",
+            "note": "",
+            "price": 18
+          },
+          {
+            "id": "thon-fromage-ahmar",
+            "name": "طون فرماج احمر",
+            "name_fr": "Thon • Fromage Rouge",
+            "note": "",
+            "price": 14
+          },
+          {
+            "id": "thon-double",
+            "name": "طون دوبل",
+            "name_fr": "Thon Double",
+            "note": "",
+            "price": 13
+          }
+        ]
+      }
     ]
   },
   {
-    id: "salades", fr: "Salades", ar: "السلطات",
-    items: [
-      { id: "salade-pates", name: "سلطة المعكرونة", name_fr: "Salade de pâtes", price: 20 },
-      { id: "salade-riz", name: "سلطة الأرز", name_fr: "Salade de riz", price: 20 },
-      { id: "salade-nicoise", name: "السلطة النيسوازية", name_fr: "Salade niçoise", price: 20 }
+    "id": "salades",
+    "fr": "Salades",
+    "ar": "السلطات",
+    "groups": [
+      {
+        "name": "",
+        "items": [
+          {
+            "id": "salade-pates",
+            "name": "سلطة المعكرونة",
+            "name_fr": "Salade de pâtes",
+            "note": "",
+            "price": 20
+          },
+          {
+            "id": "salade-riz",
+            "name": "سلطة الأرز",
+            "name_fr": "Salade de riz",
+            "note": "",
+            "price": 20
+          },
+          {
+            "id": "salade-nicoise",
+            "name": "السلطة النيسوازية",
+            "name_fr": "Salade niçoise",
+            "note": "",
+            "price": 20
+          }
+        ]
+      }
     ]
   },
   {
-    id: "boissons", fr: "Boissons", ar: "المشروبات",
-    items: [
-      { id: "verre-soda", name: "كاس مشروب غازي", name_fr: "Verre de soda", price: 2 },
-      { id: "bouteille-soda-petite", name: "قرعة مشروب غازي صغيرة", name_fr: "Petite bouteille de soda", price: 4 },
-      { id: "bouteille-eau-petite", name: "قرعة ماء صغيرة", name_fr: "Petite bouteille d'eau", price: 2 },
-      { id: "cafe", name: "قهوة", name_fr: "Café", price: 6 }
+    "id": "boissons",
+    "fr": "Boissons",
+    "ar": "المشروبات",
+    "groups": [
+      {
+        "name": "",
+        "items": [
+          {
+            "id": "verre-soda",
+            "name": "كاس مشروب غازي",
+            "name_fr": "Verre de soda",
+            "note": "",
+            "price": 2
+          },
+          {
+            "id": "bouteille-soda-petite",
+            "name": "قرعة مشروب غازي صغيرة",
+            "name_fr": "Petite bouteille de soda",
+            "note": "",
+            "price": 4
+          },
+          {
+            "id": "bouteille-eau-petite",
+            "name": "قرعة ماء صغيرة",
+            "name_fr": "Petite bouteille d'eau",
+            "note": "",
+            "price": 2
+          },
+          {
+            "id": "cafe",
+            "name": "قهوة",
+            "name_fr": "Café",
+            "note": "",
+            "price": 6
+          }
+        ]
+      }
     ]
   },
   {
-    id: "sauces", fr: "Sauces", ar: "الصلصات",
-    items: [
-      { id: "mayonnaise", name: "مايونيز", name_fr: "Mayonaise", price: 0 },
-      { id: "ketchup", name: "كيتشاب", name_fr: "Ketchup", price: 0 },
-      { id: "ranch", name: "رانش", name_fr: "Ranch", price: 1 },
-      { id: "sauce-3", name: "صلصة 3>", name_fr: "Sauce <3", price: 1 },
-      { id: "sauce-fromages", name: "صوص فروماج (بيكي، الجيريان)", name_fr: "Sauce fromages (Biggy, algérienne)", price: 0 }
+    "id": "sauces",
+    "fr": "Sauces",
+    "ar": "الصلصات",
+    "groups": [
+      {
+        "name": "",
+        "items": [
+          {
+            "id": "mayonnaise",
+            "name": "مايونيز",
+            "name_fr": "Mayonaise",
+            "note": "",
+            "price": 0
+          },
+          {
+            "id": "ketchup",
+            "name": "كيتشاب",
+            "name_fr": "Ketchup",
+            "note": "",
+            "price": 0
+          },
+          {
+            "id": "ranch",
+            "name": "رانش",
+            "name_fr": "Ranch",
+            "note": "",
+            "price": 1
+          },
+          {
+            "id": "sauce-3",
+            "name": "صلصة 3>",
+            "name_fr": "Sauce <3",
+            "note": "",
+            "price": 1
+          },
+          {
+            "id": "sauce-fromages",
+            "name": "صوص فروماج (بيكي، الجيريان)",
+            "name_fr": "Sauce fromages (Biggy, algérienne)",
+            "note": "",
+            "price": 0
+          }
+        ]
+      }
     ]
   },
   {
-    id: "special", fr: "Spécial <3S", ar: "وجبات 3> سبيسيال",
-    items: [
-      { id: "sandwich-royale", name: "سندويش رويال", name_fr: "Sandwich Royale", price: 25 },
-      { id: "salade-royale", name: "سلطة رويال", name_fr: "Salade royale", price: 30 },
-      { id: "salade-avocat", name: "سلطة الافوكادو", name_fr: "Salade acocado", price: 35 }
+    "id": "special",
+    "fr": "Spécial <3S",
+    "ar": "وجبات 3> سبيسيال",
+    "groups": [
+      {
+        "name": "",
+        "items": [
+          {
+            "id": "sandwich-royale",
+            "name": "سندويش رويال",
+            "name_fr": "Sandwich Royale",
+            "note": "",
+            "price": 25
+          },
+          {
+            "id": "salade-royale",
+            "name": "سلطة رويال",
+            "name_fr": "Salade royale",
+            "note": "",
+            "price": 30
+          },
+          {
+            "id": "salade-avocat",
+            "name": "سلطة الافوكادو",
+            "name_fr": "Salade acocado",
+            "note": "",
+            "price": 35
+          }
+        ]
+      }
     ]
   }
 ];
 
+/* MENU_BASE = menu imprimé, jamais modifié : les overrides du propriétaire
+   (thon-3s-menu-overrides) sont appliqués par-dessus au chargement. */
+var MENU_BASE = JSON.parse(JSON.stringify(MENU));
+
+/* ---------- Gestion du menu par le propriétaire (thon-3s-menu-overrides) ----------
+   Le propriétaire modifie le menu depuis le comptoir (ajouter / modifier /
+   supprimer un plat) sans toucher au code : les modifications vivent dans
+   Firebase, nœud thon-3s-menu-overrides :
+     deleted/<dishId> : true
+     edited/<dishId>  : plat complet {name, note, price} ou {name, note,
+                        options:[{label, price}]} (+ flavours si applicable,
+                        + sectionId seulement si le plat change de section)
+     added/<dishId>   : plat complet + sectionId (id Firebase-safe,
+                        ex. added-<timestamp>-<aléatoire>)
+   Le menu embarqué (menu.json) reste la base imprimée : les overrides ne
+   font que le modifier en mémoire, au chargement. FAIL-OPEN : si la
+   lecture échoue (pas de réseau, Firebase indisponible), le menu
+   embarqué s'affiche tel quel. */
+var MENU_OVERRIDES = null; /* dernier objet overrides chargé (ou null) */
+function applyMenuOverrides(overrides){
+  if (!overrides || typeof overrides !== 'object') return;
+  var del = overrides.deleted || {};
+  var edt = overrides.edited || {};
+  var add = overrides.added || {};
+  var moves = [];
+  MENU.forEach(function(cat){
+    cat.groups.forEach(function(grp){
+      var kept = [];
+      grp.items.forEach(function(it){
+        if (del[it.id]) return; /* supprimé par le propriétaire */
+        var e = edt[it.id];
+        if (e && typeof e === 'object' && e.name) {
+          var rep = { id: it.id, name: e.name, name_fr: (e.name_fr !== undefined && e.name_fr !== null && e.name_fr !== '') ? e.name_fr : (it.name_fr || ''), note: e.note || '' };
+          if (e.options && e.options.length) {
+            rep.options = e.options.map(function(o){ return { label: String(o.label), price: Math.max(0, +o.price || 0) }; });
+          } else if (e.price !== undefined && e.price !== null && e.price !== '') {
+            rep.price = Math.max(0, +e.price || 0);
+          }
+          if (e.flavours && e.flavours.length) rep.flavours = e.flavours.slice();
+          if (e.assumed) rep.assumed = true;
+          if (e.sectionId && e.sectionId !== cat.id) { moves.push({ dish: rep, sectionId: e.sectionId }); return; }
+          kept.push(rep);
+        } else {
+          kept.push(it);
+        }
+      });
+      grp.items = kept;
+    });
+  });
+  moves.forEach(function(m){
+    for (var i = 0; i < MENU.length; i++) {
+      if (MENU[i].id === m.sectionId && MENU[i].groups.length) {
+        MENU[i].groups[MENU[i].groups.length - 1].items.push(m.dish);
+        break;
+      }
+    }
+  });
+  Object.keys(add).forEach(function(id){
+    var a = add[id];
+    if (!a || typeof a !== 'object' || !a.name || !a.sectionId) return;
+    var cat = null;
+    for (var i = 0; i < MENU.length; i++) if (MENU[i].id === a.sectionId) { cat = MENU[i]; break; }
+    if (!cat || !cat.groups.length) return;
+    var dish = { id: id, name: a.name, name_fr: a.name_fr || '', note: a.note || '', added: true };
+    if (a.options && a.options.length) {
+      dish.options = a.options.map(function(o){ return { label: String(o.label), price: Math.max(0, +o.price || 0) }; });
+    } else if (a.price !== undefined && a.price !== null && a.price !== '') {
+      dish.price = Math.max(0, +a.price || 0);
+    }
+    if (a.flavours && a.flavours.length) dish.flavours = a.flavours.slice();
+    cat.groups[cat.groups.length - 1].items.push(dish);
+  });
+}
+function rebuildMenuFromOverrides(){
+  /* Repart du menu imprimé, puis réapplique les overrides : idempotent,
+     même appelé plusieurs fois (un plat ajouté n'est jamais doublé). */
+  MENU = JSON.parse(JSON.stringify(MENU_BASE));
+  if (MENU_OVERRIDES) applyMenuOverrides(MENU_OVERRIDES);
+  if (typeof buildMenuIndexes === 'function') buildMenuIndexes();
+}
+function loadMenuOverrides(timeoutMs){
+  /* Une lecture du nœud thon-3s-menu-overrides, après authentification
+     anonyme. Applique les overrides en mémoire. Résout true si des
+     overrides ont été appliqués, false sinon (FAIL-OPEN : le menu
+     embarqué reste affiché). Ne rejette jamais. */
+  return new Promise(function(resolve){
+    var done = false;
+    function finish(v){ if (!done) { done = true; resolve(v); } }
+    var ms = timeoutMs || 8000;
+    setTimeout(function(){ finish(false); }, ms);
+    try {
+      if (typeof firebase === 'undefined' || typeof firebase.database !== 'function') { finish(false); return; }
+      var db;
+      try { db = (typeof getDb === 'function') ? getDb() : firebase.database(); }
+      catch (e) { finish(false); return; }
+      function read(){
+        db.ref('thon-3s-menu-overrides').once('value').then(function(snap){
+          var val = snap.val();
+          if (val && typeof val === 'object') {
+            MENU_OVERRIDES = val;
+            rebuildMenuFromOverrides();
+            finish(true);
+          } else finish(false);
+        }).catch(function(){ finish(false); });
+      }
+      var auth = (firebase.auth && typeof firebase.auth === 'function') ? firebase.auth() : null;
+      if (!auth) { read(); return; }
+      if (auth.currentUser) { read(); return; }
+      var off = auth.onAuthStateChanged(function(user){
+        if (user) { try { off(); } catch (e) {} read(); }
+      });
+    } catch (e) { finish(false); }
+  });
+}
+
+
 var ITEM_INDEX = {};
-MENU.forEach(function(cat){ cat.items.forEach(function(it){ ITEM_INDEX[it.id] = it; }); });
+function buildMenuIndexes(){
+  ITEM_INDEX = {};
+  MENU.forEach(function(cat){ cat.groups.forEach(function(grp){ grp.items.forEach(function(it){ ITEM_INDEX[it.id] = it; }); }); });
+}
+buildMenuIndexes();
 
 /* ---------------- State ---------------- */
 var selectedTable = null;
@@ -766,7 +1181,8 @@ function renderMenu(){
     var list = document.createElement('div');
     list.className = 'dish-list';
 
-    cat.items.forEach(function(item){
+    cat.groups.forEach(function(grp){
+    grp.items.forEach(function(item){
       var row = document.createElement('div');
       row.className = 'dish';
       row.id = 'dish-' + item.id;
@@ -823,6 +1239,7 @@ function renderMenu(){
       row.appendChild(names);
       row.appendChild(side);
       list.appendChild(row);
+    });
     });
 
     section.appendChild(list);
@@ -892,7 +1309,7 @@ function cartItems(){
   /* keep menu order */
   out.sort(function(a, b){
     var order = [];
-    MENU.forEach(function(c){ c.items.forEach(function(i){ order.push(i.id); }); });
+    MENU.forEach(function(c){ c.groups.forEach(function(g){ g.items.forEach(function(i){ order.push(i.id); }); }); });
     return order.indexOf(a.item.id) - order.indexOf(b.item.id);
   });
   return out;
@@ -1023,6 +1440,7 @@ function initAuth(){
       if (user) {
         setAuthState('ok');
         startAvailabilityListener();
+        loadMenuOverrides().then(function(applied){ if (applied) { renderMenu(); applyAvailability(); } });
       }
     });
     firebase.auth().signInAnonymously().catch(function(){
@@ -1108,8 +1526,13 @@ function confirmOrder(){
   });
 }
 
-/* ---------------- Init ---------------- */
-buildPicker();
+/* ---------------- Init (gated: kill-switch, then token) ---------------- */
+window.__THON_STATUS_PROMISE.then(function(){
+  document.documentElement.classList.remove('thon-checking');
+  window.__THON_GATE_DONE = true;
+  if (window.__THON_DISABLED) { window.__THON_SHOW_SUSPENDED(); return; }
+  if (!window.__THON_TOKEN_OK) return;
+  buildPicker();
 renderMenu();
 applyAvailability();
 initAuth();
@@ -1138,7 +1561,7 @@ if (initialTable !== null) {
   showPicker();
 }
 updateCartBar();
-} /* end if (__THON_TOKEN_OK) — blocked visitors never reach Firebase/menu code */
+}); /* end gated init — blocked visitors never reach Firebase/menu code */
 </script>
 </body>
 </html>
