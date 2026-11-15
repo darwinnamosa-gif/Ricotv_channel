@@ -894,6 +894,11 @@ var MENU_BASE = JSON.parse(JSON.stringify(MENU));
                         + sectionId seulement si le plat change de section)
      added/<dishId>   : plat complet + sectionId (id Firebase-safe,
                         ex. added-<timestamp>-<aléatoire>)
+     sections/<secId> : {name: <string>, createdAt: <ms>} — une
+                        catégorie créée depuis « Ajouter un plat »
+                        (id sec-<timestamp>-<aléatoire>) ; la section
+                        est indépendante de ses plats (supprimer un
+                        plat ne supprime jamais sa section).
    Le menu embarqué (menu.json) reste la base imprimée : les overrides ne
    font que le modifier en mémoire, au chargement. FAIL-OPEN : si la
    lecture échoue (pas de réseau, Firebase indisponible), le menu
@@ -901,6 +906,24 @@ var MENU_BASE = JSON.parse(JSON.stringify(MENU));
 var MENU_OVERRIDES = null; /* dernier objet overrides chargé (ou null) */
 function applyMenuOverrides(overrides){
   if (!overrides || typeof overrides !== 'object') return;
+  /* Sections créées par le propriétaire (« Ajouter un plat » >
+     « ＋ Nouvelle catégorie… ») : appliquées EN PREMIER, dans
+     l'ordre de création, pour que les plats ajoutés / déplacés
+     trouvent leur section par id. Idempotent : un id déjà présent
+     (base ou déjà ajouté) n'est jamais doublé. */
+  var secs = overrides.sections || {};
+  var secIds = Object.keys(secs).sort(function(a, b){
+    var ca = (secs[a] && secs[a].createdAt) || 0;
+    var cb = (secs[b] && secs[b].createdAt) || 0;
+    if (ca !== cb) return ca - cb;
+    return a < b ? -1 : (a > b ? 1 : 0);
+  });
+  secIds.forEach(function(id){
+    var s = secs[id];
+    if (!s || typeof s !== 'object' || !s.name || !String(s.name).trim()) return;
+    for (var i = 0; i < MENU.length; i++) if (MENU[i].id === id) return;
+    MENU.push({ id: id, fr: s.name, ar: s.name, groups: [{ name: '', items: [] }] });
+  });
   var del = overrides.deleted || {};
   var edt = overrides.edited || {};
   var add = overrides.added || {};
