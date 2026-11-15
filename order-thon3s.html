@@ -955,7 +955,21 @@ function applyMenuOverrides(overrides){
     if (!nm) return;
     var fr = (s.fr && String(s.fr).trim()) || nm;
     var ar = (s.ar && String(s.ar).trim()) || nm;
-    for (var i = 0; i < MENU.length; i++) if (MENU[i].id === id) return;
+    var editPhoto = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
+    for (var i = 0; i < MENU.length; i++) {
+      if (MENU[i].id === id) {
+        /* Section DÉJÀ dans le menu imprimé (base) :
+           l'enregistrement porte le renommage / la photo
+           (édition de catégorie) — il gagne sur le libellé
+           imprimé. Un enregistrement {order: N} seul
+           n'arrive jamais ici (pas de nom : retour
+           anticipé ci-dessus). */
+        MENU[i].fr = fr;
+        MENU[i].ar = ar;
+        MENU[i].photo = editPhoto;
+        return;
+      }
+    }
     var photo = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
     MENU.push({ id: id, fr: fr, ar: ar, photo: photo, groups: [{ name: '', items: [] }] });
   });
