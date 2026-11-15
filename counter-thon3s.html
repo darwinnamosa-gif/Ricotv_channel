@@ -715,7 +715,7 @@
       .cat-photo-clear { margin-top: 8px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 2px solid #3a2d1a; background: var(--bg-soft); color: #211a10; font-size: 14px; font-weight: 900; font-family: inherit; cursor: pointer; }
       .cat-photo-clear:active { filter: brightness(.96); }
       /* ---------- Ordre des catégories (glisser-déposer) ---------- */
-      .manage-drag-grip { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; font-size: 18px; line-height: 1; color: #c9b894; padding: 4px 6px; margin-inline-end: 2px; border-radius: 8px; flex-shrink: 0; }
+      .manage-drag-grip { display: inline-block; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; font-size: 18px; line-height: 1; color: #c9b894; padding: 13px 12px; margin-inline-end: 2px; border-radius: 8px; flex-shrink: 0; }
       .manage-drag-grip:active { cursor: grabbing; background: #f7efe3; color: #211a10; }
       .manage-cat.dragging { opacity: .55; }
       .manage-cat.drag-insert-before { box-shadow: 0 -3px 0 0 #FFA94D; }
@@ -2191,6 +2191,12 @@ function onDragMove(e){
   dragClearIndicator();
   var els = document.querySelectorAll("#manageList .manage-cat");
   if (!els.length) return;
+  /* dragClearIndicator retire .dragging partout : la rangée tenue
+     garde son opacité .55 pendant tout le déplacement. */
+  for (var i = 0; i < els.length; i++) {
+    var g = els[i].querySelector("[data-dragcat]");
+    if (g && g.getAttribute("data-dragcat") === dragCatId) els[i].classList.add("dragging");
+  }
   if (dragToIndex < els.length) els[dragToIndex].classList.add("drag-insert-before");
   else els[els.length - 1].classList.add("drag-insert-after");
 }
@@ -2203,6 +2209,7 @@ function onDragEnd(e){
   if (!dragCatId) return;
   var id = dragCatId;
   dragCatId = null;
+  if (dragToIndex === -1) return; /* tap sur la poignée sans déplacement : ne rien écrire, ne rien réordonner — sans cela un simple tap déplaçait la section en PREMIER (at = 0). */
   var ids = [];
   for (var k = 0; k < els.length; k++) {
     var g = els[k].querySelector("[data-dragcat]");
@@ -2333,6 +2340,20 @@ function wireMenuManage(){
     document.addEventListener("pointerup", onDragEnd);
     document.addEventListener("pointercancel", onDragEnd);
   });
+  /* Tactile, ceinture + bretelles : le navigateur peut
+     annuler la séquence Pointer Events (pointercancel)
+     pour faire défiler la page malgré touch-action: none
+     sur une poignée <span> inline. Un touchstart NON
+     passif, sur la poignée seule, bloque le défilement
+     dès le toucher — partout ailleurs la page défile
+     normalement, et le bouton 🗑 n'est jamais intercepté.
+     Même garde que pointerdown : pas de déplacement
+     pendant une recherche (liste filtrée). */
+  if (ml) ml.addEventListener("touchstart", function(e){
+    if (!closestAttr(e.target, "data-dragcat")) return;
+    if (manageQuery && manageQuery.trim()) return;
+    if (e.preventDefault) e.preventDefault();
+  }, { passive: false });
   renderMenuManage();
 }
 /* ---------- Tiroir latéral + vues (2026-11-15) ----------
