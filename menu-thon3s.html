@@ -803,6 +803,11 @@ var MENU_BASE = JSON.parse(JSON.stringify(MENU));
                         + sectionId seulement si le plat change de section)
      added/<dishId>   : plat complet + sectionId (id Firebase-safe,
                         ex. added-<timestamp>-<aléatoire>)
+     sections/<secId> : {name: <string>, createdAt: <ms>} — une
+                        catégorie créée depuis « Ajouter un plat »
+                        (id sec-<timestamp>-<aléatoire>) ; la section
+                        est indépendante de ses plats (supprimer un
+                        plat ne supprime jamais sa section).
    Le menu embarqué (menu.json) reste la base imprimée : les overrides ne
    font que le modifier en mémoire, au chargement. FAIL-OPEN : si la
    lecture échoue (pas de réseau, Firebase indisponible), le menu
@@ -810,6 +815,24 @@ var MENU_BASE = JSON.parse(JSON.stringify(MENU));
 var MENU_OVERRIDES = null; /* dernier objet overrides chargé (ou null) */
 function applyMenuOverrides(overrides){
   if (!overrides || typeof overrides !== 'object') return;
+  /* Sections créées par le propriétaire (« Ajouter un plat » >
+     « ＋ Nouvelle catégorie… ») : appliquées EN PREMIER, dans
+     l'ordre de création, pour que les plats ajoutés / déplacés
+     trouvent leur section par id. Idempotent : un id déjà présent
+     (base ou déjà ajouté) n'est jamais doublé. */
+  var secs = overrides.sections || {};
+  var secIds = Object.keys(secs).sort(function(a, b){
+    var ca = (secs[a] && secs[a].createdAt) || 0;
+    var cb = (secs[b] && secs[b].createdAt) || 0;
+    if (ca !== cb) return ca - cb;
+    return a < b ? -1 : (a > b ? 1 : 0);
+  });
+  secIds.forEach(function(id){
+    var s = secs[id];
+    if (!s || typeof s !== 'object' || !s.name || !String(s.name).trim()) return;
+    for (var i = 0; i < MENU.length; i++) if (MENU[i].id === id) return;
+    MENU.push({ id: id, fr: s.name, ar: s.name, groups: [{ name: '', items: [] }] });
+  });
   var del = overrides.deleted || {};
   var edt = overrides.edited || {};
   var add = overrides.added || {};
@@ -952,14 +975,48 @@ function menuDishDiv(id){
   }
   return null;
 }
+function menuSectionFor(cat){
+  /* Renvoie la <section> de la catégorie, ou la CRÉE si elle n'existe
+     pas : une catégorie créée par le propriétaire (« ＋ Nouvelle
+     catégorie… ») n'a aucune <section> statique. Même structure que les
+     colonnes imprimées (.col > .col-head > h2), ajoutée en fin de grille.
+     Appelée seulement pour une catégorie qui a au moins un plat, donc
+     une section vide n'est jamais créée ici — et une section créée reste
+     en place même si son dernier plat est supprimé (seules les .dish
+     sont retirées par syncMenuDOM). */
+  var sec = document.getElementById(cat.id);
+  if (sec) return sec;
+  var grid = document.querySelector('main.menu-grid');
+  if (!grid) return null;
+  sec = document.createElement('section');
+  sec.className = 'col';
+  sec.id = cat.id;
+  sec.setAttribute('dir', 'rtl');
+  sec.setAttribute('aria-label', cat.ar || cat.fr);
+  var head = document.createElement('div');
+  head.className = 'col-head';
+  var h2 = document.createElement('h2');
+  h2.textContent = cat.ar || cat.fr;
+  h2.appendChild(document.createTextNode(' '));
+  var fr = document.createElement('span');
+  fr.className = 'fr';
+  fr.setAttribute('dir', 'ltr');
+  fr.textContent = cat.fr || '';
+  h2.appendChild(fr);
+  head.appendChild(h2);
+  sec.appendChild(head);
+  grid.appendChild(sec);
+  return sec;
+}
 function syncMenuDOM(){
   var seen = {};
   MENU.forEach(function(cat){
     cat.groups.forEach(function(grp){
       grp.items.forEach(function(it){
         seen[it.id] = true;
-        var sec = document.getElementById(cat.id);
+        var sec = menuSectionFor(cat);
         var div = menuDishDiv(it.id);
+        var created = false;
         if (!div) {
           if (!sec) return;
           div = document.createElement('div');
@@ -968,6 +1025,7 @@ function syncMenuDOM(){
           div.innerHTML = '<div class="d-name"></div><p class="d-desc" dir="ltr"></p><p class="d-price" dir="ltr"></p>';
           sec.appendChild(div);
           DISH_DESC_FOLLOWS_FR[it.id] = true;
+          created = true; /* .d-name vide : le nom est toujours posé ci-dessous */
         } else if (sec && div.parentNode !== sec) {
           sec.appendChild(div); /* plat déplacé de section */
         }
@@ -979,8 +1037,10 @@ function syncMenuDOM(){
           var hadText = normMenuName(nm.textContent) !== '';
           var renamed = base && normMenuName(base.name) !== normMenuName(it.name);
           /* Les boissons n'ont qu'une icône en .d-name : on ne remplace
-             l'icône par du texte que si le propriétaire a renommé le plat. */
-          if (hadText || renamed) nm.textContent = it.name;
+             l'icône par du texte que si le propriétaire a renommé le plat.
+             Une .dish qu'on vient de créer a un .d-name vide : le nom du
+             plat y est toujours posé. */
+          if (hadText || renamed || created) nm.textContent = it.name;
         }
         if (pr) {
           var wantPrice = (it.price !== undefined && it.price !== null ? String(it.price) : '') + ' DH';
