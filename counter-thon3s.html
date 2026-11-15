@@ -728,6 +728,9 @@
       .manage-cat-count { font-size: 13px; font-weight: 800; color: #c9b894; margin-inline-start: 6px; white-space: nowrap; }
       /* ---------- Modification de catégorie (nom + photo) ---------- */
       .manage-cat-edit { flex-shrink: 0; min-height: 34px; padding: 5px 11px; }
+      /* ---------- Description (plat + catégorie) ---------- */
+      .bb-field textarea { width: 100%; min-height: 76px; padding: 10px 14px; font-size: 16px; font-family: inherit; color: #211a10; font-weight: 600; border: 2px solid #3a2d1a; border-radius: 12px; background: var(--bg-soft); resize: vertical; }
+      .bb-field textarea:focus { outline: none; border-color: #FFB26B; box-shadow: 0 0 0 3px rgba(255,178,107,.3); }
 
       /* ---------- Tiroir latéral + vues (2026-11-15) : comptoir propre, commandes uniquement ---------- */
       .drawer-btn {
@@ -998,6 +1001,7 @@
         <div class="bb-field"><label for="editNameFr">Nom en français</label><input id="editNameFr" type="text" autocomplete="off" /></div>
         <div class="bb-field"><label for="editSection">Section</label><select id="editSection"></select></div>
         <div id="editPriceFields"></div>
+        <div class="bb-field"><label for="editDesc">Description (facultatif)</label><textarea id="editDesc" rows="3" dir="auto"></textarea><div class="bb-hint">Affichée sous le nom du plat sur le menu QR. Vide = description imprimée.</div></div>
         <div class="bb-modal-actions">
           <button type="button" class="bb-btn ghost" id="editCancel">Annuler</button>
           <button type="button" class="bb-btn primary" id="editSave">Enregistrer</button>
@@ -1012,9 +1016,10 @@
         <div class="bb-field"><label for="addSection">Section</label><select id="addSection"></select></div>
         <div class="bb-field" id="addNewCatFieldAr" style="display:none"><label for="addNewCatNameAr">Nom de la nouvelle catégorie (arabe)</label><input id="addNewCatNameAr" type="text" autocomplete="off" placeholder="Nom de la catégorie en arabe" dir="rtl" /></div>
         <div class="bb-field" id="addNewCatFieldFr" style="display:none"><label for="addNewCatNameFr">Nom de la nouvelle catégorie (français)</label><input id="addNewCatNameFr" type="text" autocomplete="off" placeholder="Nom de la catégorie en français" /><div class="bb-hint">Créée avec ce plat — le plat y sera ajouté.</div></div>
+        <div class="bb-field" id="addNewCatDescField" style="display:none"><label for="addNewCatDesc">Description de la catégorie (facultatif)</label><textarea id="addNewCatDesc" rows="3" dir="auto"></textarea><div class="bb-hint">Affichée sous le titre de la catégorie sur le menu QR.</div></div>
         <div class="bb-field" id="addNewCatPhotoField" style="display:none"><label for="addNewCatPhotoFile">Photo de la catégorie (facultatif)</label><input id="addNewCatPhotoFile" type="file" accept="image/*" /><img id="addNewCatPhotoPreview" class="cat-photo-preview" alt="" style="display:none" /><button type="button" class="cat-photo-clear" id="addNewCatPhotoClear" style="display:none" aria-label="Retirer la photo">✕ Retirer</button><div class="bb-hint">Choisissez une photo depuis la galerie du téléphone.</div></div>
         <div class="bb-field"><label for="addPrice">Prix (DH)</label><input id="addPrice" type="number" min="0" step="0.5" inputmode="decimal" /></div>
-        <div class="bb-field"><label for="addNote">Note (facultatif)</label><input id="addNote" type="text" autocomplete="off" /></div>
+        <div class="bb-field"><label for="addDesc">Description (facultatif)</label><textarea id="addDesc" rows="3" dir="auto"></textarea><div class="bb-hint">Affichée sous le nom du plat sur le menu QR.</div></div>
         <div class="bb-modal-actions">
           <button type="button" class="bb-btn ghost" id="addCancel">Annuler</button>
           <button type="button" class="bb-btn primary" id="addSave">Ajouter</button>
@@ -1046,6 +1051,7 @@
         <h3 id="editSectionModalTitle">Modifier la catégorie « <span id="editSectionName"></span> » ?</h3>
                 <div class="bb-field"><label for="editSectionNameAr">Nom de la catégorie (arabe)</label><input id="editSectionNameAr" type="text" autocomplete="off" placeholder="Nom de la catégorie en arabe" dir="rtl" /></div>
         <div class="bb-field"><label for="editSectionNameFr">Nom de la catégorie (français)</label><input id="editSectionNameFr" type="text" autocomplete="off" placeholder="Nom de la catégorie en français" /></div>
+        <div class="bb-field"><label for="editSectionDesc">Description de la catégorie (facultatif)</label><textarea id="editSectionDesc" rows="3" dir="auto"></textarea><div class="bb-hint">Affichée sous le titre de la catégorie sur le menu QR. Vide = sous-titre imprimé.</div></div>
         <div class="bb-field" id="editSectionPhotoField"><label>Photo de la catégorie</label><img id="editSectionPhotoPreview" class="cat-photo-preview" alt="" style="display:none" /><label for="editSectionPhotoFile">Changer la photo</label><input id="editSectionPhotoFile" type="file" accept="image/*" /><button type="button" class="cat-photo-clear" id="editSectionPhotoRemove" style="display:none">✕ Supprimer la photo</button><div class="bb-hint">Choisissez une photo depuis la galerie du téléphone.</div></div>
         <div class="bb-modal-actions">
           <button type="button" class="bb-btn ghost" id="editSectionCancel">Annuler</button>
@@ -1113,98 +1119,112 @@
             "name": "طون عادي",
             "name_fr": "Thon Classique",
             "note": "",
-            "price": 9
+            "price": 9,
+            "desc": "Thon Classique"
           },
           {
             "id": "thon-fromage",
             "name": "طون فرماج",
             "name_fr": "Thon • Fromage",
             "note": "",
-            "price": 10
+            "price": 10,
+            "desc": "Thon • Fromage"
           },
           {
             "id": "thon-kiri",
             "name": "طون كيري",
             "name_fr": "Thon • Kiri",
             "note": "",
-            "price": 11
+            "price": 11,
+            "desc": "Thon • Kiri"
           },
           {
             "id": "thon-kachir",
             "name": "طون كاشير",
             "name_fr": "Thon • Kachir",
             "note": "",
-            "price": 10
+            "price": 10,
+            "desc": "Thon • Kachir"
           },
           {
             "id": "thon-kachir-lanchon",
             "name": "طون كاشير لانشون",
             "name_fr": "Thon • Kachir • Lanchon",
             "note": "",
-            "price": 12
+            "price": 12,
+            "desc": "Thon • Kachir • Lanchon"
           },
           {
             "id": "thon-kachir-fromage-ahmar",
             "name": "طون كاشير فرماج احمر",
             "name_fr": "Thon • Kachir • Fromage Rouge",
             "note": "",
-            "price": 15
+            "price": 15,
+            "desc": "Thon • Kachir • Fromage Rouge"
           },
           {
             "id": "thon-kachir-lanchon-fromage-ahmar",
             "name": "طون كاشير لانشون فرماج احمر",
             "name_fr": "Thon • Kachir • Lanchon • Fromage Rouge",
             "note": "",
-            "price": 18
+            "price": 18,
+            "desc": "Thon • Kachir • Lanchon • Fromage Rouge"
           },
           {
             "id": "thon-lanchon",
             "name": "طون لانشون",
             "name_fr": "Thon • Lanchon",
             "note": "",
-            "price": 11
+            "price": 11,
+            "desc": "Thon • Lanchon"
           },
           {
             "id": "thon-lanchon-fromage-ahmar",
             "name": "طون لانشون فرماج احمر",
             "name_fr": "Thon • Lanchon • Fromage Rouge",
             "note": "",
-            "price": 16
+            "price": 16,
+            "desc": "Thon • Lanchon • Fromage Rouge"
           },
           {
             "id": "thon-dand-fume",
             "name": "طون داند فيمي",
             "name_fr": "Thon • Dinde Fumée",
             "note": "",
-            "price": 14
+            "price": 14,
+            "desc": "Thon • Dinde Fumée"
           },
           {
             "id": "thon-dand-fume-kachir",
             "name": "طون داند فيمي كاشير",
             "name_fr": "Thon • Dinde Fumée • Kachir",
             "note": "",
-            "price": 15
+            "price": 15,
+            "desc": "Thon • Dinde Fumée • Kachir"
           },
           {
             "id": "thon-dand-fume-fromage-ahmar",
             "name": "طون داند فيمي فرماج احمر",
             "name_fr": "Thon • Dinde Fumée • Fromage Rouge",
             "note": "",
-            "price": 18
+            "price": 18,
+            "desc": "Thon • Dinde Fumée • Fromage Rouge"
           },
           {
             "id": "thon-fromage-ahmar",
             "name": "طون فرماج احمر",
             "name_fr": "Thon • Fromage Rouge",
             "note": "",
-            "price": 14
+            "price": 14,
+            "desc": "Thon • Fromage Rouge"
           },
           {
             "id": "thon-double",
             "name": "طون دوبل",
             "name_fr": "Thon Double",
             "note": "",
-            "price": 13
+            "price": 13,
+            "desc": "Thon Double"
           }
         ]
       }
@@ -1223,21 +1243,24 @@
             "name": "سلطة المعكرونة",
             "name_fr": "Salade de pâtes",
             "note": "",
-            "price": 20
+            "price": 20,
+            "desc": "المعكرونة · الذرة · البيض · التونة · الصلصة"
           },
           {
             "id": "salade-riz",
             "name": "سلطة الأرز",
             "name_fr": "Salade de riz",
             "note": "",
-            "price": 20
+            "price": 20,
+            "desc": "الأرز · الذرة · البيض · التونة · الصلصة"
           },
           {
             "id": "salade-nicoise",
             "name": "السلطة النيسوازية",
             "name_fr": "Salade niçoise",
             "note": "",
-            "price": 20
+            "price": 20,
+            "desc": "الخس · الطماطم · التونة · البيض · الزيتون · الصلصة"
           }
         ]
       }
@@ -1256,28 +1279,32 @@
             "name": "كاس مشروب غازي",
             "name_fr": "Verre de soda",
             "note": "",
-            "price": 2
+            "price": 2,
+            "desc": "Soda au verre"
           },
           {
             "id": "bouteille-soda-petite",
             "name": "قرعة مشروب غازي صغيرة",
             "name_fr": "Petite bouteille de soda",
             "note": "",
-            "price": 4
+            "price": 4,
+            "desc": "Soda • Petite bouteille"
           },
           {
             "id": "bouteille-eau-petite",
             "name": "قرعة ماء صغيرة",
             "name_fr": "Petite bouteille d'eau",
             "note": "",
-            "price": 2
+            "price": 2,
+            "desc": "Eau • Petite bouteille"
           },
           {
             "id": "cafe",
             "name": "قهوة",
             "name_fr": "Café",
             "note": "",
-            "price": 6
+            "price": 6,
+            "desc": "Café chaud"
           }
         ]
       }
@@ -1296,35 +1323,40 @@
             "name": "مايونيز",
             "name_fr": "Mayonaise",
             "note": "",
-            "price": 0
+            "price": 0,
+            "desc": "Mayonaise"
           },
           {
             "id": "ketchup",
             "name": "كيتشاب",
             "name_fr": "Ketchup",
             "note": "",
-            "price": 0
+            "price": 0,
+            "desc": "Ketchup"
           },
           {
             "id": "ranch",
             "name": "رانش",
             "name_fr": "Ranch",
             "note": "",
-            "price": 1
+            "price": 1,
+            "desc": "Ranch"
           },
           {
             "id": "sauce-3",
             "name": "صلصة 3>",
             "name_fr": "Sauce <3",
             "note": "",
-            "price": 1
+            "price": 1,
+            "desc": "Sauce <3"
           },
           {
             "id": "sauce-fromages",
             "name": "صوص فروماج (بيكي، الجيريان)",
             "name_fr": "Sauce fromages (Biggy, algérienne)",
             "note": "",
-            "price": 0
+            "price": 0,
+            "desc": "Sauce fromages (Biggy, algérienne)"
           }
         ]
       }
@@ -1343,21 +1375,24 @@
             "name": "سندويش رويال",
             "name_fr": "Sandwich Royale",
             "note": "",
-            "price": 25
+            "price": 25,
+            "desc": "Sandwich Royale"
           },
           {
             "id": "salade-royale",
             "name": "سلطة رويال",
             "name_fr": "Salade royale",
             "note": "",
-            "price": 30
+            "price": 30,
+            "desc": "الأرز أو المعكرونة · الخس · الزيتون · الطماطم · البصل · الخيار · الذرة · التونة · البيض · فرماج أحمر · كاشير · داند فيمي · الصوص"
           },
           {
             "id": "salade-avocat",
             "name": "سلطة الافوكادو",
             "name_fr": "Salade acocado",
             "note": "",
-            "price": 35
+            "price": 35,
+            "desc": "الأفوكادو · الخس · الزيتون · الطماطم · الخيار · البصل · الذرة · التونة · البيض · الصلصة"
           }
         ]
       }
@@ -1387,15 +1422,21 @@
      edited/<dishId>  : plat complet {name, note, price} ou {name, note,
                         options:[{label, price}]} (+ flavours si applicable,
                         + sectionId seulement si le plat change de section)
+                        desc (facultatif) : texte affiché sous le
+                        nom du plat sur le menu QR ; absent ou vide
+                        = description imprimée. `note` est conservé
+                        (ancien champ, jamais affiché).
      added/<dishId>   : plat complet + sectionId (id Firebase-safe,
                         ex. added-<timestamp>-<aléatoire>)
-     sections/<secId> : {name, fr, ar, createdAt, order?, photo?} — une
+     sections/<secId> : {name, fr, ar, createdAt, order?, photo?, desc?} — une
                         catégorie créée depuis « Ajouter un plat »
                         (id sec-<timestamp>-<aléatoire>). `name` est
                         le nom français (champ historique, conservé
                         comme repli) ; `fr` / `ar` font foi quand ils
                         sont présents. Une section ancienne {name}
                         seul s'affiche avec fr = ar = name.
+                        desc (facultatif) : sous-titre affiché sous
+                        le titre de la catégorie sur le menu QR.
                         photo (facultatif) : data URL JPEG ≤480 px
                         choisie dans la galerie du téléphone.
                         order (facultatif) : nombre — position de
@@ -1449,6 +1490,7 @@ function applyMenuOverrides(overrides){
     if (!nm) return;
     var fr = (s.fr && String(s.fr).trim()) || nm;
     var ar = (s.ar && String(s.ar).trim()) || nm;
+    var editDesc = (s.desc && typeof s.desc === 'string' && s.desc.trim()) ? s.desc.trim() : '';
     var editPhoto = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
     for (var i = 0; i < MENU.length; i++) {
       if (MENU[i].id === id) {
@@ -1461,11 +1503,12 @@ function applyMenuOverrides(overrides){
         MENU[i].fr = fr;
         MENU[i].ar = ar;
         MENU[i].photo = editPhoto;
+        MENU[i].desc = editDesc;
         return;
       }
     }
     var photo = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
-    MENU.push({ id: id, fr: fr, ar: ar, photo: photo, groups: [{ name: '', items: [] }] });
+    MENU.push({ id: id, fr: fr, ar: ar, photo: photo, desc: editDesc, groups: [{ name: '', items: [] }] });
   });
   var del = overrides.deleted || {};
   var edt = overrides.edited || {};
@@ -1479,6 +1522,8 @@ function applyMenuOverrides(overrides){
         var e = edt[it.id];
         if (e && typeof e === 'object' && e.name) {
           var rep = { id: it.id, name: e.name, name_fr: (e.name_fr !== undefined && e.name_fr !== null && e.name_fr !== '') ? e.name_fr : (it.name_fr || ''), note: e.note || '' };
+          if (e.desc && String(e.desc).trim()) rep.desc = e.desc;
+          else if (it.desc) rep.desc = it.desc;
           if (e.options && e.options.length) {
             rep.options = e.options.map(function(o){ return { label: String(o.label), price: Math.max(0, +o.price || 0) }; });
           } else if (e.price !== undefined && e.price !== null && e.price !== '') {
@@ -1524,6 +1569,7 @@ function applyMenuOverrides(overrides){
     for (var i = 0; i < MENU.length; i++) if (MENU[i].id === a.sectionId) { cat = MENU[i]; break; }
     if (!cat || !cat.groups.length) return;
     var dish = { id: id, name: a.name, name_fr: a.name_fr || '', note: a.note || '', added: true };
+    if (a.desc && String(a.desc).trim()) dish.desc = a.desc;
     if (a.options && a.options.length) {
       dish.options = a.options.map(function(o){ return { label: String(o.label), price: Math.max(0, +o.price || 0) }; });
     } else if (a.price !== undefined && a.price !== null && a.price !== '') {
@@ -1751,6 +1797,7 @@ function stripSectionMove(dishId, sectionId){
   var sameAsBase = !!base
     && e.name === base.name
     && (e.note || '') === (base.note || '')
+    && (!e.desc || e.desc === (base.desc || ''))
     && optEq(e.options, base.options)
     && (e.price === undefined || e.price === null ? (base.price === undefined || base.price === null) : e.price === base.price)
     && optEq(e.flavours, base.flavours)
@@ -1962,6 +2009,10 @@ function closeTopCounterModal(){
     if (nfFr) nfFr.style.display = "none";
     var npf = document.getElementById("addNewCatPhotoField");
     if (npf) npf.style.display = "none";
+    var ndf = document.getElementById("addNewCatDescField");
+    if (ndf) ndf.style.display = "none";
+    var nd = document.getElementById("addNewCatDesc");
+    if (nd) nd.value = "";
     if (typeof clearNewCatPhoto === "function") clearNewCatPhoto();
   }
   if (!isCounterModalOpen()) setCounterStatsVisible(true);
@@ -1993,6 +2044,10 @@ function hideModals(){
   var npf = document.getElementById("addNewCatPhotoField");
   if (npf) npf.style.display = "none";
   clearNewCatPhoto();
+  var ndf = document.getElementById("addNewCatDescField");
+  if (ndf) ndf.style.display = "none";
+  var nd = document.getElementById("addNewCatDesc");
+  if (nd) nd.value = "";
   manageEditingId = null;
   manageDeletingId = null;
   manageDeletingSectionId = null;
@@ -2007,6 +2062,8 @@ function openEditModal(id){
   var it = found.dish;
   document.getElementById("editName").value = it.name;
   document.getElementById("editNameFr").value = it.name_fr || "";
+  var editDescEl = document.getElementById("editDesc");
+  if (editDescEl) editDescEl.value = it.desc || "";
   document.getElementById("editSection").innerHTML = sectionOptionsHTML(found.sectionId);
   var box = document.getElementById("editPriceFields");
   box.innerHTML = "";
@@ -2034,6 +2091,14 @@ function saveEditModal(){
   if (!name) { manageToast("Le nom du plat est obligatoire."); return; }
   var sectionId = document.getElementById("editSection").value;
   var obj = { name: name, name_fr: document.getElementById("editNameFr").value.trim(), note: it.note || "" };
+  /* Description affichée sous le nom du plat sur le menu QR :
+     écrite seulement si elle diffère de la description de base
+     (MENU_BASE) — vider le champ restaure l'impression. */
+  var editDescEl2 = document.getElementById("editDesc");
+  var newDesc = editDescEl2 ? editDescEl2.value.trim() : "";
+  var baseDesc = "";
+  MENU_BASE.forEach(function(cat){ cat.groups.forEach(function(grp){ grp.items.forEach(function(it2){ if (it2.id === it.id) baseDesc = it2.desc || ""; }); }); });
+  if (newDesc && newDesc !== baseDesc) obj.desc = newDesc;
   var priceInputs = document.querySelectorAll("#editPriceFields input");
   if (it.options) {
     var opts = [];
@@ -2100,7 +2165,8 @@ function openAddModal(){
   document.getElementById("addNameFr").value = "";
   document.getElementById("addSection").innerHTML = sectionOptionsHTML(MENU[0] ? MENU[0].id : "", true);
   document.getElementById("addPrice").value = "";
-  document.getElementById("addNote").value = "";
+  var addDescEl = document.getElementById("addDesc");
+  if (addDescEl) addDescEl.value = "";
   var nc = document.getElementById("addNewCatName");
   if (nc) nc.value = "";
   var ncAr = document.getElementById("addNewCatNameAr");
@@ -2116,6 +2182,10 @@ function openAddModal(){
   var npf = document.getElementById("addNewCatPhotoField");
   if (npf) npf.style.display = "none";
   clearNewCatPhoto();
+  var ndf = document.getElementById("addNewCatDescField");
+  if (ndf) ndf.style.display = "none";
+  var nd = document.getElementById("addNewCatDesc");
+  if (nd) nd.value = "";
   showModal("addModal");
 }
 function saveAddModal(){
@@ -2155,12 +2225,16 @@ function saveAddModal(){
   }
   var price = parseManagePrice(document.getElementById("addPrice").value);
   if (price === null) { manageToast("Indiquez un prix valide."); return; }
-  var note = document.getElementById("addNote").value.trim();
+  var addDescEl2 = document.getElementById("addDesc");
+  var desc = addDescEl2 ? addDescEl2.value.trim() : "";
   var id = "added-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
-  var obj = { name: name, name_fr: document.getElementById("addNameFr").value.trim(), note: note, price: price, sectionId: sectionId };
+  var obj = { name: name, name_fr: document.getElementById("addNameFr").value.trim(), desc: desc, price: price, sectionId: sectionId };
   MENU_OVERRIDES = MENU_OVERRIDES || {};
   if (newSecId) {
     var secObj = { name: newCatName, fr: newCatFr, ar: newCatAr, createdAt: newSecCreatedAt };
+    var newCatDescEl = document.getElementById("addNewCatDesc");
+    var newCatDesc = newCatDescEl ? newCatDescEl.value.trim() : "";
+    if (newCatDesc) secObj.desc = newCatDesc;
     if (newCatPhoto) secObj.photo = newCatPhoto;
     overridesRef.child("sections/" + newSecId).set(secObj);
     (MENU_OVERRIDES.sections = MENU_OVERRIDES.sections || {})[newSecId] = secObj;
@@ -2326,6 +2400,8 @@ function openEditSectionModal(sectionId){
   if (arEl && frEl) { arEl.value = cat.ar || cat.fr; frEl.value = cat.fr; }
   else if (nameEl) nameEl.value = cat.fr;
   var fileEl = document.getElementById("editSectionPhotoFile");
+  var descEl = document.getElementById("editSectionDesc");
+  if (descEl) descEl.value = cat.desc || "";
   if (fileEl) fileEl.value = "";
   showEditCatPhotoPreview();
   showModal("editSectionModal");
@@ -2352,7 +2428,11 @@ function saveEditSectionModal(){
   var nameChanged = (newFr !== cat.fr) || (newAr !== (cat.ar || cat.fr));
   var photoChanged = !!editCatPhoto;
   var photoRemoved = editCatPhotoRemoved && !editCatPhoto;
-  if (!nameChanged && !photoChanged && !photoRemoved) { hideModals(); return; }
+  var descEl2 = document.getElementById("editSectionDesc");
+  var newDesc = descEl2 ? descEl2.value.trim() : (cat.desc || "");
+  var descChanged = (newDesc !== (cat.desc || ""));
+  var descRemoved = descChanged && !newDesc;
+  if (!nameChanged && !photoChanged && !photoRemoved && !descChanged) { hideModals(); return; }
   MENU_OVERRIDES = MENU_OVERRIDES || {};
   var secRec = (MENU_OVERRIDES.sections && MENU_OVERRIDES.sections[sectionId]) || null;
   if (!secRec) {
@@ -2361,6 +2441,7 @@ function saveEditSectionModal(){
        vivante, jamais {deleted: true}. */
     var rec = { name: newFr, fr: newFr, ar: newAr };
     if (editCatPhoto) rec.photo = editCatPhoto;
+    if (newDesc) rec.desc = newDesc;
     overridesRef.child("sections/" + sectionId).set(rec);
     (MENU_OVERRIDES.sections = MENU_OVERRIDES.sections || {})[sectionId] = rec;
   } else {
@@ -2371,6 +2452,7 @@ function saveEditSectionModal(){
     var upd = {};
     if (nameChanged) { upd.name = newFr; upd.fr = newFr; upd.ar = newAr; }
     if (editCatPhoto) upd.photo = editCatPhoto;
+    if (descChanged && newDesc) upd.desc = newDesc;
     if (Object.keys(upd).length) {
       overridesRef.child("sections/" + sectionId).update(upd);
       Object.keys(upd).forEach(function(k){ secRec[k] = upd[k]; });
@@ -2380,6 +2462,14 @@ function saveEditSectionModal(){
          jamais une réécriture de l'enregistrement. */
       overridesRef.child("sections/" + sectionId + "/photo").remove();
       delete secRec.photo;
+    }
+    if (descRemoved) {
+      /* Retrait de la description seule : .remove()
+         sur la clé desc, jamais une réécriture de
+         l'enregistrement (et pas de desc: '' dans
+         le .update ci-dessus). */
+      overridesRef.child("sections/" + sectionId + "/desc").remove();
+      delete secRec.desc;
     }
   }
   rebuildMenuFromOverrides();
@@ -2492,7 +2582,7 @@ function wireMenuManage(){
        nom — un seul champ, ou les deux (arabe + français) quand la
        modale est bilingue. */
     var show = (e.target.value === "__new__");
-    ["addNewCatField", "addNewCatFieldAr", "addNewCatFieldFr", "addNewCatPhotoField"].forEach(function(id){
+    ["addNewCatField", "addNewCatFieldAr", "addNewCatFieldFr", "addNewCatDescField", "addNewCatPhotoField"].forEach(function(id){
       var f = document.getElementById(id);
       if (f) f.style.display = show ? "" : "none";
     });
