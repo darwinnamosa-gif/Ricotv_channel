@@ -867,7 +867,22 @@ function applyMenuOverrides(overrides){
        historique) sert de repli — une section ancienne {name} seul
        s'affiche avec fr = ar = name. */
     var nm = (s.name && String(s.name).trim()) || (s.fr && String(s.fr).trim()) || (s.ar && String(s.ar).trim());
-    if (!nm) return;
+    if (!nm) {
+      /* Enregistrement SANS NOM (ex. {order: N} créé par le
+         glisser-déposer, puis description ou photo seule) : la
+         description / la photo s'applique quand même à la
+         section de base correspondante — le nom imprimé est
+         conservé. Un {order: N} seul (rien à afficher) est
+         ignoré comme avant, et une section inconnue sans nom
+         n'est jamais créée. */
+      var _nd = (s.desc && typeof s.desc === 'string' && s.desc.trim()) ? s.desc.trim() : '';
+      var _np = (s.photo && typeof s.photo === 'string' && s.photo.indexOf('data:image/') === 0) ? s.photo : '';
+      if (!_nd && !_np) return;
+      for (var _ni = 0; _ni < MENU.length; _ni++) {
+        if (MENU[_ni].id === id) { MENU[_ni].desc = _nd; MENU[_ni].photo = _np; return; }
+      }
+      return;
+    }
     var fr = (s.fr && String(s.fr).trim()) || nm;
     var ar = (s.ar && String(s.ar).trim()) || nm;
     var editDesc = (s.desc && typeof s.desc === 'string' && s.desc.trim()) ? s.desc.trim() : '';
