@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 94,
+  "version": 95,
   "appUpdate": {
-    "versionCode": 77,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code77.apk",
-    "apkSize": 17005191,
+    "versionCode": 104,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code104.apk",
+    "apkSize": 18106235,
     "force": true,
-    "message": "Improved ads (AdMob + Start.io)"
+    "message": "TNT SPORT + USA General + real logos"
   },
   "lines": [
     {
