@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 92,
+  "version": 93,
   "appUpdate": {
-    "versionCode": 100,
-    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code100.apk",
-    "apkSize": 18789586,
+    "versionCode": 77,
+    "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code77.apk",
+    "apkSize": 17005191,
     "force": true,
-    "message": "Highlights tab + LIVE EVENT fix"
+    "message": "Improved ads (AdMob + Start.io)"
   },
   "lines": [
     {
