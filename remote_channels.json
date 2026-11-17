@@ -2,13 +2,13 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 95,
+  "version": 96,
   "appUpdate": {
     "versionCode": 104,
     "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code104.apk",
     "apkSize": 18106235,
     "force": true,
-    "message": "TNT SPORT + USA General + real logos"
+    "message": "Fix Rvotv App"
   },
   "lines": [
     {
