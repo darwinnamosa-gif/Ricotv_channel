@@ -2,7 +2,7 @@
   "added": [],
   "overrides": {},
   "removed": [],
-  "version": 100,
+  "version": 101,
   "appUpdate": {
     "versionCode": 105,
     "apkUrl": "https://raw.githubusercontent.com/darwinnamosa-gif/Ricotv_channel/refs/heads/main/releases/RicoTV-code105.apk",
@@ -12,44 +12,44 @@
   },
   "lines": [
     {
-      "u": "eKm4AYsJ",
-      "p": "dgnNwpK"
+      "u": "f3zJwTq1",
+      "p": "b33sfxQ"
     },
     {
-      "u": "wXn24dXB",
-      "p": "fy19XsA"
+      "u": "pNtXZSYs",
+      "p": "fZafnd8"
     },
     {
-      "u": "x1TtpJx6",
-      "p": "uj8DGDb"
+      "u": "jbhrqsC0",
+      "p": "crGWrC3"
     },
     {
-      "u": "dGPPWPuP",
-      "p": "k3JqUPD"
+      "u": "jS2fPBu5",
+      "p": "aA1pSCc"
     },
     {
-      "u": "s8PfTPq0",
-      "p": "sXhH15X"
+      "u": "rMYczGx9",
+      "p": "fgtRQCj"
     },
     {
-      "u": "drPFYx4Q",
-      "p": "cHa5ND2"
+      "u": "u6HXua3m",
+      "p": "rrpWbmm"
     },
     {
-      "u": "vBfscHHb",
-      "p": "nC59xhD"
+      "u": "shFC1tNd",
+      "p": "bh2Y4Ba"
     },
     {
-      "u": "ysJK5sgS",
-      "p": "rHjkauM"
+      "u": "n8jCn2rc",
+      "p": "jSmgXbc"
     },
     {
-      "u": "djcG9bmJ",
-      "p": "ptnNFsE"
+      "u": "jSUc8sJs",
+      "p": "mkpPmWB"
     },
     {
-      "u": "vfMGmGfc",
-      "p": "adeSDRn"
+      "u": "nxcUskHh",
+      "p": "axbdKkD"
     },
     {
       "u": "hZhNYTU7",
@@ -64,5 +64,5 @@
       "p": "c9yBUpQ"
     }
   ],
-  "linesExp": 1795082520000
+  "linesExp": 1795125720000
 }
