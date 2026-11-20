@@ -1064,6 +1064,28 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+<script>
+/* App Check (2026-11-20) : jetons App Check sur toutes les requetes Firebase. */
+(function () {
+  try {
+    if (window.__bbAppCheckHook) return;
+    window.__bbAppCheckHook = true;
+    if (typeof firebase === "undefined" || !firebase.initializeApp) return;
+    var _init = firebase.initializeApp.bind(firebase);
+    firebase.initializeApp = function (cfg) {
+      var app = _init(cfg);
+      try {
+        if (firebase.appCheck) {
+          var P = firebase.appCheck.ReCaptchaEnterpriseProvider || firebase.appCheck.ReCaptchaV3Provider;
+          if (P) firebase.appCheck().activate(new P("6LfHWSouAAAAAI4GjVG0Td6cnJvKX_MdNI3dh62O"), true);
+        }
+      } catch (e) { /* App Check indisponible : la page continue */ }
+      return app;
+    };
+  } catch (e) { /* ignore */ }
+})();
+</script>
     <script>
       /* ============================================================
          FIREBASE_CONFIG — collez ici la configuration de votre
